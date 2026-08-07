@@ -21,14 +21,14 @@ public class AntMovement : MonoBehaviour
             aiPath.enabled = true;
         }
 
-        if(destinationSetter != null)
-        {
-            var target = GameObject.FindGameObjectWithTag("Dessert");
-            if(target != null)
-            {
-                destinationSetter.target = target.transform;
-            }
-        }
+        //if(destinationSetter != null)
+        //{
+        //    var target = GameObject.FindGameObjectWithTag("Dessert");
+        //    if(target != null)
+        //    {
+        //        destinationSetter.target = target.transform;
+        //    }
+        //}
     }
 
 }
