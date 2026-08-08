@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-
 public class AntStats : MonoBehaviour
 {
     [Header("Ant Type")]
@@ -12,9 +10,13 @@ public class AntStats : MonoBehaviour
     [SerializeField] private int damageToDessert = 1;
     [SerializeField] private int coinReward = 1;
 
+    [Header("TNT")]
+    [SerializeField] private float tntResistance = 1f;
+
     public AntType AntType => antType;
     public float MaxHealth => maxHealth;
     public float MoveSpeed => moveSpeed;
     public int DamageToDessert => damageToDessert;
     public int CoinReward => coinReward;
+    public float TntResistance => tntResistance;
 }
