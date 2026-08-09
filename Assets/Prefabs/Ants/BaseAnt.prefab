@@ -14,10 +14,10 @@ GameObject:
   - component: {fileID: 1633937244056591332}
   - component: {fileID: 1621639962364731864}
   - component: {fileID: 3071861395202135738}
-  - component: {fileID: 8788719975593151166}
   - component: {fileID: 7931127967720700451}
   - component: {fileID: 7487838737297836561}
   - component: {fileID: 3372591543282517179}
+  - component: {fileID: 4078531860825888798}
   m_Layer: 0
   m_Name: BaseAnt
   m_TagString: Untagged
@@ -35,7 +35,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.26973, y: -0.47452, z: 0}
-  m_LocalScale: {x: 0.32, y: 0.32, z: 0.32}
+  m_LocalScale: {x: 0.41, y: 0.41, z: 0.41}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -179,6 +179,7 @@ MonoBehaviour:
   moveSpeed: 2
   damageToDessert: 1
   coinReward: 1
+  tntResistance: 1
 --- !u!114 &3071861395202135738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192,20 +193,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AntMovement
   antLineController: {fileID: 0}
---- !u!114 &8788719975593151166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5626006345240456089}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: AstarPathfindingProject::Pathfinding.AIDestinationSetter
-  version: 1
-  target: {fileID: 0}
 --- !u!114 &7931127967720700451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,3 +278,17 @@ MonoBehaviour:
   version: 1
   unwrap: 1
   splitAtEveryPortal: 0
+--- !u!114 &4078531860825888798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626006345240456089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9679e68a0f1144e79c664d9a11ca121, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AstarPathfindingProject::Pathfinding.AIDestinationSetter
+  version: 1
+  target: {fileID: 0}
