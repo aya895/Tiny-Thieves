@@ -5,18 +5,20 @@ using UnityEngine;
 public class AntLineController : MonoBehaviour
 {
     public List<GameObject> antLine = new List<GameObject>();
+    public Transform nest;
     public float spacing = 1.5f;
-    public int maxAnts = 10;
+    public int maxAnts = 5;
 
-    void Update()
+    void Start()
     {
         UpdatePosition();
     }
 
-    private void UpdatePosition()
+    public void UpdatePosition()
     {
         if (antLine != null && antLine.Count > 0)
         {
+            // assign target of first ant in line to dessrt, others follow
             antLine[0].GetComponent<AIDestinationSetter>().target = GameObject.FindGameObjectWithTag("Dessert").transform;
             for (int i = 1; i < antLine.Count; i++)
             {
@@ -28,19 +30,9 @@ public class AntLineController : MonoBehaviour
         }
     }
 
-
-private void OnCollisionEnter2D(Collision2D collision)
+    public void OnReachedDessert(GameObject ant)
     {
-        if(collision.gameObject.CompareTag("Dessert"))
-        {
-            // Remove the ant from the line when it reaches the dessert 
-            antLine.Remove(antLine[0]);
-
-            // set the dessert to next ant in line 
-            if (antLine.Count > 0)
-            {
-                antLine[0].GetComponent<AIDestinationSetter>().target = GameObject.FindGameObjectWithTag("Dessert").transform;
-            }
-        }
+        antLine.RemoveAt(0);
+        UpdatePosition();
     }
 }
