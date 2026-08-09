@@ -6,7 +6,7 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject baseAnt;
     public GameObject antNest;
-    public AntLineController ants;
+    //public AntLineController ants;
     private float spawnDelay = 0.75f;
 
     // an area to spawn & add offset for each nest so they dont spawn on top of eachother
@@ -83,8 +83,8 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnAnt(AntLineController lineController)
     {
-        if(ants != null)
-        {
+        //if(ants != null)
+        //{
             Vector2 nestPosition = lineController.nest.position;
 
             GameObject ant = Instantiate(baseAnt, nestPosition, Quaternion.identity);
@@ -94,7 +94,7 @@ public class SpawnManager : MonoBehaviour
                 lineController.antLine.Add(ant);
                 lineController.UpdatePosition();
             }
-        }
+        //}
     }
 
 }
