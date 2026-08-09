@@ -6,8 +6,8 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject baseAnt;
     public GameObject antNest;
-    //public AntLineController ants;
     private float spawnDelay = 0.75f;
+    
 
     // an area to spawn & add offset for each nest so they dont spawn on top of eachother
     private float xMin = -6;
@@ -25,6 +25,16 @@ public class SpawnManager : MonoBehaviour
         SpawnNests();
     }
 
+    //private void OnEnable()
+    //{
+    //    GameManager.OnAntArrival += SpawnNests;
+    //}
+
+    //private void OnDisable()
+    //{
+    //    GameManager.OnAntArrival -= SpawnNests;        
+    //}
+
     private void SpawnNests()
     {
         for (int i = 0; i < numberOfNests; i++)
@@ -33,7 +43,7 @@ public class SpawnManager : MonoBehaviour
 
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
-
+           
             SpawnLinePerNest(nest.transform);
         }
     }
@@ -64,7 +74,13 @@ public class SpawnManager : MonoBehaviour
         {
             GameObject line = new GameObject(nestTransform.name + "_Line" + i);
             AntLineController lineController = line.AddComponent<AntLineController>();
-            lineController.nest = nestTransform;
+
+            // small offset between each line
+            GameObject lineOrigin = new GameObject(nestTransform.name + "_LineOrigin" + i);
+            Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
+            lineOrigin.transform.position = (Vector2)nestTransform.position + lineOffset;
+
+            lineController.nest = lineOrigin.transform;
 
             StartCoroutine(SpawnLine(lineController));
         }
@@ -83,18 +99,18 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnAnt(AntLineController lineController)
     {
-        //if(ants != null)
-        //{
-            Vector2 nestPosition = lineController.nest.position;
 
-            GameObject ant = Instantiate(baseAnt, nestPosition, Quaternion.identity);
-            if (ant != null)
-            {
-                ant.GetComponent<AntMovement>().antLineController = lineController;
-                lineController.antLine.Add(ant);
-                lineController.UpdatePosition();
-            }
-        //}
+        Vector2 nestPosition = lineController.nest.position;
+
+        GameObject ant = Instantiate(baseAnt, nestPosition, Quaternion.identity);
+        if (ant != null)
+        {
+            ant.GetComponent<AntMovement>().antLineController = lineController;
+            lineController.antLine.Add(ant);
+            lineController.UpdatePosition();
+        }
     }
 
+
+   
 }

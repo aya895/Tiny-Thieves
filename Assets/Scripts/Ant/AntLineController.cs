@@ -7,7 +7,7 @@ public class AntLineController : MonoBehaviour
     public List<GameObject> antLine = new List<GameObject>();
     public Transform nest;
     public float spacing = 1.5f;
-    public int maxAnts = 5;
+    public int maxAnts = 10;
 
     void Start()
     {
