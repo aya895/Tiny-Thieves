@@ -1,11 +1,12 @@
-using UnityEngine;
 using Pathfinding;
+using UnityEngine;
 
 public class AntMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
     private AIPath aiPath;
     private AIDestinationSetter destinationSetter;
+    public AntLineController antLineController;
 
     void Start()
     {
@@ -20,15 +21,16 @@ public class AntMovement : MonoBehaviour
             aiPath.canMove = true;
             aiPath.enabled = true;
         }
-
-        if(destinationSetter != null)
-        {
-            var target = GameObject.FindGameObjectWithTag("Dessert");
-            if(target != null)
-            {
-                destinationSetter.target = target.transform;
-            }
-        }
     }
 
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Dessert"))
+        {
+            // notify line controller to remove this ant from line
+            antLineController.OnReachedDessert(gameObject);
+        }
+    }
 }
+
