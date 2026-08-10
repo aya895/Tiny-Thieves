@@ -9,6 +9,19 @@ public class AntLineController : MonoBehaviour
     public float spacing = 1.5f;
     public int maxAnts = 10;
 
+
+    private void OnEnable()
+    {
+        Ant.OnAntDeath += RemoveAnt;
+    }
+
+    private void OnDisable()
+    {
+        Ant.OnAntDeath -= RemoveAnt;
+    }
+
+
+
     void Start()
     {
         UpdatePosition();
@@ -33,6 +46,15 @@ public class AntLineController : MonoBehaviour
     public void OnReachedDessert(GameObject ant)
     {
         antLine.RemoveAt(0);
+        UpdatePosition();
+    }
+
+    public void RemoveAnt(GameObject ant)
+    {
+        int index = antLine.IndexOf(ant);
+        if (index < 0) return;
+
+        antLine.RemoveAt(index);
         UpdatePosition();
     }
 }

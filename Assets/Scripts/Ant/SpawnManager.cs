@@ -8,55 +8,42 @@ public class SpawnManager : MonoBehaviour
     public GameObject antNest;
     private float spawnDelay = 0.75f;
     
-
     // an area to spawn & add offset for each nest so they dont spawn on top of eachother
     private float xMin = -6;
     private float xMax = -8;
     private float yMin = -4;
     private float yMax = 1;
-
-    public int numberOfNests = 2; // current number , can increase with higher waves
-    private List<Vector2> placedNestPositions = new List<Vector2>();
-    public int linesPerNest = 2;
     private float distancePerNest = 5f;
 
-    //void Start()
-    //{
-    //    SpawnNests();
-    //}
+    private List<Vector2> placedNestPositions = new List<Vector2>();
+    private List<Transform> spawnedNests = new List<Transform>();
+    public int numberOfNests = 2; // current number , can increase with higher waves
+    public int linesPerNest = 2;
     
-    public void StartWave()
+    void Start()
     {
-        placedNestPositions.Clear();
-
         SpawnNests();
     }
-    // 2e7m deft goz2 da 3al4an wave manger hwa ele ykarar emta wave tebda2 m4
-    // spawn manger 2awel lama le3ba tefta7 :>
 
-
-
-
-    //private void OnEnable()
-    //{
-    //    GameManager.OnAntArrival += SpawnNests;
-    //}
-
-    //private void OnDisable()
-    //{
-    //    GameManager.OnAntArrival -= SpawnNests;        
-    //}
+    public void StartWave()
+    {
+        foreach (Transform nest in spawnedNests)
+        {
+            SpawnLinePerNest(nest);
+        }
+    }
 
     private void SpawnNests()
     {
+        placedNestPositions.Clear();
+        spawnedNests.Clear();
+
         for (int i = 0; i < numberOfNests; i++)
         {
             Vector2 nestPosition = GetNestPosition(i);
-
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
-           
-            SpawnLinePerNest(nest.transform);
+            spawnedNests.Add(nest.transform);
         }
     }
 
@@ -100,7 +87,6 @@ public class SpawnManager : MonoBehaviour
 
     private IEnumerator SpawnLine(AntLineController lineController)
     {
-
         for (int i = 0; i < lineController.maxAnts; i++)
         {
             SpawnAnt(lineController);
@@ -124,6 +110,7 @@ public class SpawnManager : MonoBehaviour
     }
 
 
+    // thank u <333
     // 4o8l fa5r mn el 2a5r
 }
 //⠀⠀⢀⠀⣠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
