@@ -723,13 +723,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4078531860825888798, guid: 7ca752f5fa8314942a8bcfd85364df20, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1747581452}
     - target: {fileID: 5498140779669267508, guid: 7ca752f5fa8314942a8bcfd85364df20, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.12
+      value: 4.12
       objectReference: {fileID: 0}
     - target: {fileID: 5498140779669267508, guid: 7ca752f5fa8314942a8bcfd85364df20, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.76
+      value: -3.8
       objectReference: {fileID: 0}
     - target: {fileID: 5498140779669267508, guid: 7ca752f5fa8314942a8bcfd85364df20, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2424,7 +2428,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b278c451b62329349a94c86b843b91c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ant
-  health: 10
 --- !u!4 &867654929
 Transform:
   m_ObjectHideFlags: 0

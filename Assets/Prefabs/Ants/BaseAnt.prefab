@@ -18,6 +18,9 @@ GameObject:
   - component: {fileID: 7487838737297836561}
   - component: {fileID: 3372591543282517179}
   - component: {fileID: 4078531860825888798}
+  - component: {fileID: -4776840184097846334}
+  - component: {fileID: -1567501944291566714}
+  - component: {fileID: 8343417340608657179}
   m_Layer: 0
   m_Name: BaseAnt
   m_TagString: Untagged
@@ -292,3 +295,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: AstarPathfindingProject::Pathfinding.AIDestinationSetter
   version: 1
   target: {fileID: 0}
+--- !u!114 &-4776840184097846334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626006345240456089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55049c93394d8d2449f88915f5f18c5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AntEating
+--- !u!114 &-1567501944291566714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626006345240456089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 468bd3da502cd96408bb54daeb2d3942, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AntStateController
+--- !u!114 &8343417340608657179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626006345240456089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f316bff2ac10a854097c590282276a83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AntDamageReceive

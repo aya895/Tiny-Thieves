@@ -7,7 +7,7 @@ public class AntStats : MonoBehaviour
     [Header("Stats")]
     [SerializeField] private float maxHealth = 10f;
     [SerializeField] private float moveSpeed = 2f;
-    [SerializeField] private int damageToDessert = 1;
+    [SerializeField] private int damageToDessert = 10;
     [SerializeField] private int coinReward = 1;
 
     [Header("TNT")]

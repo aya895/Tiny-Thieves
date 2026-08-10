@@ -5,6 +5,7 @@ public class AntDamageReceive : MonoBehaviour
     
     private AntStats stats;
     private float currentHealth;
+    private AntStateController stateController;
     private void Start()
     {
         stats = GetComponent<AntStats>();
@@ -23,7 +24,11 @@ public class AntDamageReceive : MonoBehaviour
 
     private void Die()
     {
+        stateController.SetState(AntState.Dead);
+
         Debug.Log($"{stats.AntType} died!");
+
         Destroy(gameObject);
+  
     }
 }
