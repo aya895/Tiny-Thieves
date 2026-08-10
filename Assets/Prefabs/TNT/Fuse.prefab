@@ -155,4 +155,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26bcd80fef1ef6045b8bec4e2ac2668e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FuseConnection
-  fuseColor: {r: 0.55, g: 0.35, b: 0.15, a: 1}
+  fuseColor: {r: 0, g: 0, b: 0, a: 1}

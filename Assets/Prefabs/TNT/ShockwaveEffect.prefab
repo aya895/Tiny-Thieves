@@ -155,5 +155,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23b80703a6a23534097670c071ce4211, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShockwaveEffect
-  segments: 48
+  segments: 60
   ringColor: {r: 1, g: 0.6, b: 0.1, a: 0.85}

@@ -26,8 +26,7 @@ public class TNTPlacementController : MonoBehaviour
     [SerializeField] private WaveManager waveManager;
     private void Update()
     {
-        if (waveManager.CurrentState != WaveState.Ready &&
-       waveManager.CurrentState != WaveState.Playing)
+        if (waveManager.CurrentState != WaveState.Ready && waveManager.CurrentState != WaveState.Playing)
         {
             return;
         }

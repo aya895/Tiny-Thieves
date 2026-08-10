@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: -4776840184097846334}
   - component: {fileID: -1567501944291566714}
   - component: {fileID: 8343417340608657179}
+  - component: {fileID: 8487843989419973354}
   m_Layer: 0
   m_Name: BaseAnt
   m_TagString: Untagged
@@ -331,3 +332,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f316bff2ac10a854097c590282276a83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AntDamageReceive
+--- !u!114 &8487843989419973354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5626006345240456089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8870302e1b2a3824c980b26741943c67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ant
+  health: 10
