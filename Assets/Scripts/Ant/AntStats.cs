@@ -19,4 +19,21 @@ public class AntStats : MonoBehaviour
     public int DamageToDessert => damageToDessert;
     public int CoinReward => coinReward;
     public float TntResistance => tntResistance;
+
+    // --------------------- (new) game manager with higer waves nofities this to increase ant speed
+
+    private void OnEnable()
+    {
+        GameManager.OnMoreAntSpeed += IncreseAntSpeed;
+    }
+    private void OnDisable()
+    {
+        GameManager.OnMoreAntSpeed -= IncreseAntSpeed;
+    }
+
+
+    void IncreseAntSpeed()
+    {
+        moveSpeed++;
+    }
 }

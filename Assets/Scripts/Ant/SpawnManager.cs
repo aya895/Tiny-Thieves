@@ -16,34 +16,45 @@ public class SpawnManager : MonoBehaviour
     private float distancePerNest = 5f;
 
     private List<Vector2> placedNestPositions = new List<Vector2>();
-    private List<Transform> spawnedNests = new List<Transform>();
     public int numberOfNests = 2; // current number , can increase with higher waves
     public int linesPerNest = 2;
-    
+
+
+    private void OnEnable()
+    {
+        GameManager.OnAddAntNest += AddNest;
+        GameManager.OnMoreAntInLine += AddAntInLine;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnAddAntNest -= AddNest;    
+        GameManager.OnMoreAntInLine -= AddAntInLine;
+    }
+
     void Start()
     {
-        SpawnNests();
+        // wave 1 starting values 
+        numberOfNests = 2;
+        linesPerNest = 2;
     }
 
     public void StartWave()
     {
-        foreach (Transform nest in spawnedNests)
-        {
-            SpawnLinePerNest(nest);
-        }
+        placedNestPositions.Clear();
+        SpawnNests();
     }
 
     private void SpawnNests()
     {
-        placedNestPositions.Clear();
-        spawnedNests.Clear();
-
         for (int i = 0; i < numberOfNests; i++)
         {
             Vector2 nestPosition = GetNestPosition(i);
+
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
-            spawnedNests.Add(nest.transform);
+
+            SpawnLinePerNest(nest.transform);
         }
     }
 
@@ -107,6 +118,16 @@ public class SpawnManager : MonoBehaviour
             lineController.antLine.Add(ant);
             lineController.UpdatePosition();
         }
+    }
+
+    private void AddNest()
+    {
+        numberOfNests++;
+    }
+
+    private void AddAntInLine()
+    {
+        linesPerNest++;
     }
 
 

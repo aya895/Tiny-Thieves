@@ -43,20 +43,11 @@ public class AntMovement : MonoBehaviour
         }
     }
 
-
     public void SetPathingEnabled(bool enabled)
     {
         if (aiPath != null)
         {
             aiPath.canMove = enabled;
-        }
-    }
-
-    public void NotifyDeath()
-    {
-        if (antLineController != null)
-        {
-            antLineController.RemoveAnt(gameObject);
         }
     }
 }
