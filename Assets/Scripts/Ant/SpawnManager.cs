@@ -18,11 +18,26 @@ public class SpawnManager : MonoBehaviour
     private List<Vector2> placedNestPositions = new List<Vector2>();
     public int numberOfNests = 2; // current number , can increase with higher waves
     public int linesPerNest = 2;
-    
-    //void Start()
-    //{
-    //    SpawnNests();
-    //}
+
+
+    private void OnEnable()
+    {
+        GameManager.OnAddAntNest += AddNest;
+        GameManager.OnMoreAntInLine += AddAntInLine;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnAddAntNest -= AddNest;    
+        GameManager.OnMoreAntInLine -= AddAntInLine;
+    }
+
+    void Start()
+    {
+        // wave 1 starting values 
+        numberOfNests = 2;
+        linesPerNest = 2;
+    }
 
     public void StartWave()
     {
@@ -103,6 +118,16 @@ public class SpawnManager : MonoBehaviour
             lineController.antLine.Add(ant);
             lineController.UpdatePosition();
         }
+    }
+
+    private void AddNest()
+    {
+        numberOfNests++;
+    }
+
+    private void AddAntInLine()
+    {
+        linesPerNest++;
     }
 
 

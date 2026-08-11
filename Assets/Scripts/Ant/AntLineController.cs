@@ -30,13 +30,26 @@ public class AntLineController : MonoBehaviour
     {
         if (antLine != null && antLine.Count > 0)
         {
-            // assign target of first ant in line to dessrt, others follow
-            antLine[0].GetComponent<AIDestinationSetter>().target = GameObject.FindGameObjectWithTag("Dessert").transform;
+            // assign target of first ant in line to dessert, others follow
+            GameObject dessertObj = GameObject.FindGameObjectWithTag("Dessert");
+            if (dessertObj != null && antLine[0] != null)
+            {
+                AIDestinationSetter destSetter = antLine[0].GetComponent<AIDestinationSetter>();
+                if (destSetter != null)
+                {
+                    destSetter.target = dessertObj.transform;
+                }
+            }
+
             for (int i = 1; i < antLine.Count; i++)
             {
                 if (antLine[i] != null && antLine[i - 1] != null)
                 {
-                    antLine[i].GetComponent<AIDestinationSetter>().target = antLine[i - 1].transform;
+                    AIDestinationSetter destSetter = antLine[i].GetComponent<AIDestinationSetter>();
+                    if (destSetter != null)
+                    {
+                        destSetter.target = antLine[i - 1].transform;
+                    }
                 }
             }
         }
@@ -44,8 +57,7 @@ public class AntLineController : MonoBehaviour
 
     public void OnReachedDessert(GameObject ant)
     {
-        antLine.RemoveAt(0);
-        UpdatePosition();
+        RemoveAnt(ant);
     }
 
     public void RemoveAnt(GameObject ant)
