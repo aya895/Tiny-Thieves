@@ -19,6 +19,16 @@ public class WaveManager : MonoBehaviour
 
     private float timer;
 
+
+    private void OnEnable()
+    {
+        MenuUIHandler.OnPlayClicked += StartWave;
+    }
+    private void OnDisable()
+    {
+        MenuUIHandler.OnPlayClicked -= StartWave;
+    }
+
     private void Start()
     {
         CurrentWave = 0;

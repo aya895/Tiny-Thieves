@@ -16,34 +16,30 @@ public class SpawnManager : MonoBehaviour
     private float distancePerNest = 5f;
 
     private List<Vector2> placedNestPositions = new List<Vector2>();
-    private List<Transform> spawnedNests = new List<Transform>();
     public int numberOfNests = 2; // current number , can increase with higher waves
     public int linesPerNest = 2;
     
-    void Start()
-    {
-        SpawnNests();
-    }
+    //void Start()
+    //{
+    //    SpawnNests();
+    //}
 
     public void StartWave()
     {
-        foreach (Transform nest in spawnedNests)
-        {
-            SpawnLinePerNest(nest);
-        }
+        placedNestPositions.Clear();
+        SpawnNests();
     }
 
     private void SpawnNests()
     {
-        placedNestPositions.Clear();
-        spawnedNests.Clear();
-
         for (int i = 0; i < numberOfNests; i++)
         {
             Vector2 nestPosition = GetNestPosition(i);
+
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
-            spawnedNests.Add(nest.transform);
+
+            SpawnLinePerNest(nest.transform);
         }
     }
 

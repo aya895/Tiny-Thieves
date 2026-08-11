@@ -21,7 +21,6 @@ public class AntLineController : MonoBehaviour
     }
 
 
-
     void Start()
     {
         UpdatePosition();

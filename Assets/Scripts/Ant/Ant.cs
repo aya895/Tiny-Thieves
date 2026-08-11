@@ -26,10 +26,7 @@ public class Ant : MonoBehaviour, IDamageable
     private AntMovement antMovement; 
     [SerializeField] private GameObject stackedVisualPrefab;
     [SerializeField] private float knockBackPathPause = 0.3f;
-    //private GameObject stackVisualInstance;
     private SpriteRenderer spriteRenderer;
-    //private int baseSortingOrder;
-
     private Ant stackedWith;
     private bool isKnockedBack;
     //-------------------------------------------------------------------
@@ -80,15 +77,16 @@ public class Ant : MonoBehaviour, IDamageable
 
     private IEnumerator ApplyKnockback(Vector2 impulse)
     {
+        isKnockedBack = true;
         if (antMovement != null)
         {
             antMovement.SetPathingEnabled(false);
         }
-        isKnockedBack = true;
         rb.AddForce(impulse, ForceMode2D.Impulse);
 
         yield return new WaitForSeconds(knockBackPathPause);
-        if (antMovement != null)
+
+        if (antMovement != null && transform.parent == null)
         {
             antMovement.SetPathingEnabled(true);
         }
@@ -116,17 +114,26 @@ public class Ant : MonoBehaviour, IDamageable
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!isKnockedBack || stackedWith != null) return;
-
         Ant other = collision.gameObject.GetComponent<Ant>();
-        if (other == null || other == this || other.stackedWith != null) return;
 
-        // Prevent double-processing
-        if (other.isKnockedBack && GetInstanceID() < other.GetInstanceID()) return;
+        if (other == null || other == this || other.stackedWith != null) return;
+        if (other.isKnockedBack == true)
+        {
+            if (this.GetInstanceID() < other.GetInstanceID())
+            {
+                return;
+            }
+        }
         stackedWith = other;
         other.stackedWith = this;
 
         // Disable physics and pathing on THIS flying ant so it becomes a passenger
-        if (TryGetComponent<Collider2D>(out var col)) col.enabled = false;
+        Collider2D antCollider = GetComponent<Collider2D>();
+
+        if (antCollider != null)
+        {
+            antCollider.enabled = false;
+        }
         rb.simulated = false;
         if (antMovement != null)
         {
@@ -135,6 +142,7 @@ public class Ant : MonoBehaviour, IDamageable
 
         //Parent it to the base ant so it follows its movement exactly & make its sorting order higher
         transform.SetParent(other.transform);
+        //
         transform.localPosition = new Vector3(0f, 0.3f, 0f);
         if (spriteRenderer != null && other.spriteRenderer != null)
         {
@@ -144,17 +152,37 @@ public class Ant : MonoBehaviour, IDamageable
 
     public void LeaveStack()
     {
+
         if (stackedWith != null)
         {
             // Determine which ant is the passenger (the one that has a parent)
-            Ant passenger = transform.parent != null ? this : stackedWith;
+            Ant passenger;
+            if (this.transform.parent != null)
+            {
+                passenger = this;
+            }
+            else
+            {
+                passenger = stackedWith;
+            }
 
             // Unparent the passenger & restore its physics & sorting order
             passenger.transform.SetParent(null);
-            if (passenger.TryGetComponent<Collider2D>(out var col)) col.enabled = true;
+            Collider2D passengerCollider = passenger.GetComponent<Collider2D>();
+            if (passengerCollider != null)
+            {
+                passengerCollider.enabled = true;
+            }
             passenger.rb.simulated = true;
-            if (passenger.antMovement != null) passenger.antMovement.SetPathingEnabled(true);
-            if (passenger.spriteRenderer != null) passenger.spriteRenderer.sortingOrder = 0;
+            if (passenger.antMovement != null)
+            {
+                passenger.antMovement.SetPathingEnabled(true);
+            }
+            if (passenger.spriteRenderer != null)
+            {
+                passenger.spriteRenderer.sortingOrder = 0;
+            }
+
 
             // Clear references for both
             stackedWith.stackedWith = null;
