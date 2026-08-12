@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -8,9 +9,15 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float readyTime = 10f;
     [SerializeField] private float waveDuration = 60f;
 
-    //--------------------------------------- (new) count down before each wave start (also handles the first tnt placement when clicking any button)
+    //--------------------------------------- (new)
+    // count down before each wave start
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private int countdownSeconds = 3;
+
+    // for victory check
+    public static event Action OnVictory;
+    private int activeAnts = 0;
+    private bool isSpawningDone = false;
     //----------------------------------------
 
     [Header("References")]
@@ -30,17 +37,23 @@ public class WaveManager : MonoBehaviour
         // will tell me when it's resolved." It never references
         // ExperienceManager or UpgradeSelectionUI directly.
         UpgradeFlowSignal.OnResolved += HandleUpgradesResolved;
+
+        // counts for victory check--------------------
+        AntDeathSignal.OnAntDied += HandleAntDied;
+        spawnManager.OnAntSpawned += HandleAntSpawned;
+        spawnManager.OnSpawningComplete += HandleSpawningComplete;
     }
     private void OnDisable()
     {
         UpgradeFlowSignal.OnResolved -= HandleUpgradesResolved;
+        AntDeathSignal.OnAntDied -= HandleAntDied;
+        spawnManager.OnAntSpawned -= HandleAntSpawned;
+        spawnManager.OnSpawningComplete -= HandleSpawningComplete;
     }
 
     private void Start()
     {
         CurrentWave = 0;
-        //CurrentState = WaveState.WaitingToStart;
-
         StartCoroutine(StartCountdownSequence(countdownSeconds)); // just start without any buttons to be pressed 
     }
 
@@ -60,7 +73,7 @@ public class WaveManager : MonoBehaviour
             HandleTimerFinished();
         }
     }
-    // used in play button 
+ 
     private void HandleTimerFinished()
     {
         switch (CurrentState)
@@ -103,6 +116,11 @@ public class WaveManager : MonoBehaviour
 
         CurrentState = WaveState.Playing;
         timer = waveDuration;
+
+        //------------------------------------
+        activeAnts = 0;
+        isSpawningDone = false;
+        //------------------------------------
 
         Debug.Log($"Wave {CurrentWave} Started");
 
@@ -166,5 +184,36 @@ public class WaveManager : MonoBehaviour
         Debug.Log("GAME OVER");
 
         // Later: Show Game Over Screen
+    }
+
+    private void CheckForPerfectClear()
+    {
+        if (CurrentState == WaveState.Playing && isSpawningDone && activeAnts <= 0)
+        {
+            Victory();
+        }
+    }
+
+    private void Victory()
+    {
+        spawnManager.ClearPreviousWave();
+        OnVictory?.Invoke();
+    }
+
+    private void HandleAntSpawned()
+    {
+        activeAnts++;
+    }
+
+    private void HandleAntDied(float expValue)
+    {
+        activeAnts = Mathf.Max(0, activeAnts - 1);
+        CheckForPerfectClear();
+    }
+
+    private void HandleSpawningComplete()
+    {
+        isSpawningDone = true;
+        CheckForPerfectClear();
     }
 }

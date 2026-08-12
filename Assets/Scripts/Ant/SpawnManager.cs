@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    //public GameObject baseAnt;
+
+    public event Action OnAntSpawned;
+    public event Action OnSpawningComplete;
+
     public GameObject antNest;
     private float spawnDelay = 0.75f;
     
@@ -20,9 +24,9 @@ public class SpawnManager : MonoBehaviour
     public int linesPerNest = 2;
 
     // spawning new types with higher waves
-    //[SerializeField] private ExperienceManager experienceManager;
     public List<GameObject> antPrefabs = new List<GameObject>();
     private int maxUnlockedAnt = 0;
+    private int linesStillSpawning = 0;
 
     // keeps track of spawned objects so its cleared each wave
     private List<GameObject> spawnedNests = new List<GameObject>();
@@ -52,8 +56,8 @@ public class SpawnManager : MonoBehaviour
 
     public void StartWave()
     {
-        //placedNestPositions.Clear();
         ClearPreviousWave();
+        linesStillSpawning = 0;
         SpawnNests();
     }
 
@@ -81,7 +85,7 @@ public class SpawnManager : MonoBehaviour
     {
         for (int i = 0; i < numberOfNests; i++)
         {
-            Vector2 nestPosition = GetNestPosition(i);
+            Vector2 nestPosition = NewNestPosition(i);
 
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
@@ -91,16 +95,16 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private Vector2 GetNestPosition(int index)
+    private Vector2 NewNestPosition(int index)
     {
         // first nest gets has a noraml random position
         if (index == 0)
         {
-            return new Vector2(Random.Range(xMin, xMax), Random.Range(yMin, yMax));
+            return new Vector2(UnityEngine.Random.Range(xMin, xMax), UnityEngine.Random.Range(yMin, yMax));
         }
 
         // subsequent ones has offset from previous nest by minNestDistance in a random direction
-        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        Vector2 randomDirection = UnityEngine.Random.insideUnitCircle.normalized;
         Vector2 offsetPosition = placedNestPositions[index - 1] + randomDirection * distancePerNest;
 
         // clamp so nests stay inside the placement rectangle
@@ -123,11 +127,12 @@ public class SpawnManager : MonoBehaviour
             GameObject lineOrigin = new GameObject(nestTransform.name + "_LineOrigin" + i);
             spawnedLines.Add(lineOrigin);
 
-            Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
+            Vector2 lineOffset = UnityEngine.Random.insideUnitCircle.normalized * 0.9f * i;
             lineOrigin.transform.position = (Vector2)nestTransform.position + lineOffset;
 
             lineController.nest = lineOrigin.transform;
 
+            linesStillSpawning++;
             StartCoroutine(SpawnLine(lineController));
         }
     }
@@ -139,6 +144,12 @@ public class SpawnManager : MonoBehaviour
             SpawnAnt(lineController);
             yield return new WaitForSeconds(spawnDelay);
         }
+
+        linesStillSpawning--;
+        if (linesStillSpawning <= 0)
+        {
+            OnSpawningComplete?.Invoke();
+        }
     }
 
 
@@ -147,7 +158,7 @@ public class SpawnManager : MonoBehaviour
         int index = 0;
         if (antPrefabs != null || antPrefabs.Count > 0)
         {
-            index = Random.Range(0, maxUnlockedAnt + 1);
+            index = UnityEngine.Random.Range(0, maxUnlockedAnt + 1);
         }
         GameObject selectedAntPrefab = antPrefabs[index];
 
@@ -161,6 +172,7 @@ public class SpawnManager : MonoBehaviour
                 ant.GetComponent<AntMovement>().antLineController = lineController;
                 lineController.antLine.Add(ant);
                 lineController.UpdatePosition();
+                OnAntSpawned?.Invoke();
             }
         }
     }

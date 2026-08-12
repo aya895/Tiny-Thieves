@@ -5,5 +5,5 @@ public enum WaveState
     Ready,
     Playing,
     Upgrade,
-    GameOver
+    GameOver,
 }

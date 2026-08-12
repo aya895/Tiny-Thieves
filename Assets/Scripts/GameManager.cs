@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
     public GameManager instance { set; get; }
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private ExperienceManager experienceManager;
+    private int processedWave = 0;
 
     //// needed events
     public static event Action OnMoreAntSpeed;
@@ -13,9 +14,9 @@ public class GameManager : MonoBehaviour
     public static event Action OnAddAntNest;
     public static event Action OnMapExpand; //still in progress
     public static event Action OnMoreAntInLine;
-
     //// what more to add??
-    private int processedWave = 0;
+
+    
 
     private void Awake()
     {
