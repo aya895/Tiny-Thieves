@@ -19,16 +19,19 @@ public class WaveManager : MonoBehaviour
 
     private float timer;
 
+    
     private void OnEnable()
     {
+        MenuUIHandler.OnPlayClicked += StartWave;
+
         // The only thing WaveManager knows about the upgrade flow: "someone
         // will tell me when it's resolved." It never references
         // ExperienceManager or UpgradeSelectionUI directly.
         UpgradeFlowSignal.OnResolved += HandleUpgradesResolved;
     }
- 
     private void OnDisable()
     {
+        MenuUIHandler.OnPlayClicked -= StartWave;
         UpgradeFlowSignal.OnResolved -= HandleUpgradesResolved;
     }
 
