@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    public GameObject baseAnt;
+    //public GameObject baseAnt;
     public GameObject antNest;
     private float spawnDelay = 0.75f;
     
@@ -19,17 +19,28 @@ public class SpawnManager : MonoBehaviour
     public int numberOfNests = 2; // current number , can increase with higher waves
     public int linesPerNest = 2;
 
+    // spawning new types with higher waves
+    //[SerializeField] private ExperienceManager experienceManager;
+    public List<GameObject> antPrefabs = new List<GameObject>();
+    private int maxUnlockedAnt = 0;
+
+    // keeps track of spawned objects so its cleared each wave
+    private List<GameObject> spawnedNests = new List<GameObject>();
+    private List<GameObject> spawnedLines = new List<GameObject>();
+
 
     private void OnEnable()
     {
         GameManager.OnAddAntNest += AddNest;
         GameManager.OnMoreAntInLine += AddAntInLine;
+        GameManager.OnNewAntType += UnlockNewAnt;
     }
 
     private void OnDisable()
     {
         GameManager.OnAddAntNest -= AddNest;    
         GameManager.OnMoreAntInLine -= AddAntInLine;
+        GameManager.OnNewAntType -= UnlockNewAnt;
     }
 
     void Start()
@@ -41,8 +52,29 @@ public class SpawnManager : MonoBehaviour
 
     public void StartWave()
     {
-        placedNestPositions.Clear();
+        //placedNestPositions.Clear();
+        ClearPreviousWave();
         SpawnNests();
+    }
+
+    public void ClearPreviousWave()
+    {
+        foreach (GameObject nest in spawnedNests)
+        {
+            Destroy(nest);
+        }
+        spawnedNests.Clear();
+        foreach (GameObject line in spawnedLines)
+        {
+            Destroy(line);
+        }
+        spawnedLines.Clear();
+        GameObject[] ants = GameObject.FindGameObjectsWithTag("Ant");
+        foreach (GameObject ant in ants)
+        {
+            Destroy(ant);
+        }
+        placedNestPositions.Clear();
     }
 
     private void SpawnNests()
@@ -53,6 +85,7 @@ public class SpawnManager : MonoBehaviour
 
             placedNestPositions.Add(nestPosition);
             GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
+            spawnedNests.Add(nest);
 
             SpawnLinePerNest(nest.transform);
         }
@@ -84,9 +117,12 @@ public class SpawnManager : MonoBehaviour
         {
             GameObject line = new GameObject(nestTransform.name + "_Line" + i);
             AntLineController lineController = line.AddComponent<AntLineController>();
+            spawnedLines.Add(line);
 
             // small offset between each line
             GameObject lineOrigin = new GameObject(nestTransform.name + "_LineOrigin" + i);
+            spawnedLines.Add(lineOrigin);
+
             Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
             lineOrigin.transform.position = (Vector2)nestTransform.position + lineOffset;
 
@@ -108,18 +144,34 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnAnt(AntLineController lineController)
     {
-
-        Vector2 nestPosition = lineController.nest.position;
-
-        GameObject ant = Instantiate(baseAnt, nestPosition, Quaternion.identity);
-        if (ant != null)
+        int index = 0;
+        if (antPrefabs != null || antPrefabs.Count > 0)
         {
-            ant.GetComponent<AntMovement>().antLineController = lineController;
-            lineController.antLine.Add(ant);
-            lineController.UpdatePosition();
+            index = Random.Range(0, maxUnlockedAnt + 1);
+        }
+        GameObject selectedAntPrefab = antPrefabs[index];
+
+        if (selectedAntPrefab != null)
+        {
+
+            Vector2 nestPosition = lineController.nest.position;
+            GameObject ant = Instantiate(selectedAntPrefab, nestPosition, Quaternion.identity);
+            if (ant != null)
+            {
+                ant.GetComponent<AntMovement>().antLineController = lineController;
+                lineController.antLine.Add(ant);
+                lineController.UpdatePosition();
+            }
         }
     }
 
+    private void UnlockNewAnt()
+    {
+        if (maxUnlockedAnt < antPrefabs.Count - 1)
+        {
+            maxUnlockedAnt++;
+        }
+    }
     private void AddNest()
     {
         numberOfNests++;

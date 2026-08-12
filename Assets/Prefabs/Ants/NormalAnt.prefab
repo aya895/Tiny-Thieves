@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5626006345240456089, guid: 7ca752f5fa8314942a8bcfd85364df20, type: 3}
       propertyPath: m_Name
-      value: BaseAnt
+      value: NormalAnt
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

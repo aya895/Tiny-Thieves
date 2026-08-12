@@ -24,15 +24,17 @@ public class Ant : MonoBehaviour, IDamageable
 
     private Rigidbody2D rb;
 
-    //aya: these are to handle the (dancing ant group) thingy ._. ----------------
+    // -----------------------------------------------------------------
     public static event Action <GameObject> OnAntDeath;
 
     private AntMovement antMovement; 
     [SerializeField] private GameObject stackedVisualPrefab;
     [SerializeField] private float knockBackPathPause = 0.3f;
+    [SerializeField] private float xpValue = 1f;
     private SpriteRenderer spriteRenderer;
     private Ant stackedWith;
     private bool isKnockedBack;
+
     //-------------------------------------------------------------------
 
     private void Awake()
@@ -109,10 +111,10 @@ public class Ant : MonoBehaviour, IDamageable
     private void Die()
     {
         OnAntDeath?.Invoke(this.gameObject);
+        AntDeathSignal.Raise(expValue);
         LeaveStack();
 
         // TODO: death animation / particle / score event here
-        AntDeathSignal.Raise(expValue);
         Destroy(gameObject);
     }
 

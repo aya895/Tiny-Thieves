@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class WaveManager : MonoBehaviour
@@ -6,24 +8,24 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float readyTime = 10f;
     [SerializeField] private float waveDuration = 60f;
 
+    //--------------------------------------- (new) count down before each wave start (also handles the first tnt placement when clicking any button)
+    [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField] private int countdownSeconds = 3;
+    //----------------------------------------
+
     [Header("References")]
     [SerializeField] private SpawnManager spawnManager;
 
     public float ReadyTime => readyTime;
     public float WaveDuration => waveDuration;
     public float RemainingTime => timer;
-
     public int CurrentWave { get; private set; }
-
     public WaveState CurrentState { get; private set; }
-
     private float timer;
 
     
     private void OnEnable()
     {
-        MenuUIHandler.OnPlayClicked += StartWave;
-
         // The only thing WaveManager knows about the upgrade flow: "someone
         // will tell me when it's resolved." It never references
         // ExperienceManager or UpgradeSelectionUI directly.
@@ -31,14 +33,15 @@ public class WaveManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        MenuUIHandler.OnPlayClicked -= StartWave;
         UpgradeFlowSignal.OnResolved -= HandleUpgradesResolved;
     }
 
     private void Start()
     {
         CurrentWave = 0;
-        CurrentState = WaveState.WaitingToStart;
+        //CurrentState = WaveState.WaitingToStart;
+
+        StartCoroutine(StartCountdownSequence(countdownSeconds)); // just start without any buttons to be pressed 
     }
 
     private void Update()
@@ -57,7 +60,7 @@ public class WaveManager : MonoBehaviour
             HandleTimerFinished();
         }
     }
-
+    // used in play button 
     private void HandleTimerFinished()
     {
         switch (CurrentState)
@@ -75,11 +78,14 @@ public class WaveManager : MonoBehaviour
     // Called by Start Button
     public void StartPlanning()
     {
+        spawnManager.ClearPreviousWave();
         if (CurrentState != WaveState.WaitingToStart)
             return;
 
-        StartReadyPhase();
+        //StartReadyPhase();
+        StartCoroutine(StartCountdownSequence(countdownSeconds));
     }
+
 
     private void StartReadyPhase()
     {
@@ -100,11 +106,15 @@ public class WaveManager : MonoBehaviour
 
         Debug.Log($"Wave {CurrentWave} Started");
 
-        spawnManager.StartWave();
+        if(spawnManager != null)
+        {
+            spawnManager.StartWave();
+        }
     }
 
     private void EndWave()
     {
+        spawnManager.ClearPreviousWave();
         CurrentState = WaveState.Upgrade;
 
         Debug.Log($"Wave {CurrentWave} Completed");
@@ -121,13 +131,32 @@ public class WaveManager : MonoBehaviour
     {
         if (CurrentState != WaveState.Upgrade)
             return; // ignore stray/duplicate signals outside the Upgrade state
- 
+
+        //StartReadyPhase();
+        StartCoroutine(StartCountdownSequence(countdownSeconds));
+    }
+
+    private IEnumerator StartCountdownSequence(int num)
+    {
+        countdownText.gameObject.SetActive(true);
+        for (int i = num; i > 0; i--)
+        {
+            if (countdownText != null)
+            {
+                countdownText.text = i.ToString();
+            }
+            yield return new WaitForSeconds(1f);
+        }
+        countdownText.text = "START!";
+        yield return new WaitForSeconds(0.5f);
+        countdownText.gameObject.SetActive(false);
         StartReadyPhase();
     }
 
     public void FinishUpgrade()
     {
-        StartReadyPhase();
+        //StartReadyPhase();
+        StartCoroutine(StartCountdownSequence(countdownSeconds));
     }
 
     public void GameOver()

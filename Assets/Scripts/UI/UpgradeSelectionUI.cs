@@ -32,7 +32,7 @@ public class UpgradeSelectionUI : MonoBehaviour
     {
         // If nothing is pending, ExperienceManager already resolved things
         // itself - this UI has nothing to do and stays hidden.
-        if (experienceManager.PendingLevelUps > 0)
+        if (experienceManager.PendingLevelUps > 0 && experienceManager!= null)
         {
             ShowNextChoice();
         }
