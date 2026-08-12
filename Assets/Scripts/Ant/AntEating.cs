@@ -1,54 +1,88 @@
+using System.Collections;
 using UnityEngine;
 
-public class AntEating : MonoBehaviour
+[RequireComponent(typeof(AntStats))]
+public sealed class AntEating : MonoBehaviour
 {
     private AntStats antStats;
-    private AntStateController stateController;
     private Dessert targetDessert;
+    private Coroutine eatingRoutine;
 
     private void Awake()
     {
         antStats = GetComponent<AntStats>();
-        stateController = GetComponent<AntStateController>();
-    }
-
-    private void Update()
-    {
-        if (stateController.CurrentState != AntState.Eating)
-            return;
-
-        if (targetDessert == null)
-            return;
-
-        targetDessert.TakeDamage(
-            antStats.DamageToDessert * Time.deltaTime
-        );
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Dessert dessert = collision.gameObject.GetComponent<Dessert>();
+        if (!collision.gameObject.TryGetComponent<Dessert>(out var dessert))
+            return;
 
-        if (dessert == null)
+        if (targetDessert == dessert)
             return;
 
         targetDessert = dessert;
-
-        stateController.SetState(AntState.Eating);
+        StartEating();
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        Dessert dessert = collision.gameObject.GetComponent<Dessert>();
-
-        if (dessert == null)
+        if (targetDessert == null)
             return;
 
-        if (dessert == targetDessert)
-        {
-            targetDessert = null;
+        if (!collision.gameObject.TryGetComponent<Dessert>(out var dessert))
+            return;
 
-            stateController.SetState(AntState.Moving);
+        if (dessert != targetDessert)
+            return;
+
+        StopEating();
+        targetDessert = null;
+    }
+
+    private void StartEating()
+    {
+        if (eatingRoutine != null)
+            return;
+
+        eatingRoutine = StartCoroutine(EatingRoutine());
+    }
+
+    private void StopEating()
+    {
+        if (eatingRoutine == null)
+            return;
+
+        StopCoroutine(eatingRoutine);
+        eatingRoutine = null;
+    }
+
+    private IEnumerator EatingRoutine()
+    {
+        WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
+        float damagePerSecond = antStats.DamageToDessert;
+
+        while (targetDessert != null)
+        {
+            float damage = damagePerSecond * Time.fixedDeltaTime;
+
+            targetDessert.TakeDamage(damage);
+
+            Debug.Log(
+                $"[Ant Eating] {gameObject.name} dealt {damage:F2} damage " +
+                $"to {targetDessert.name}. " +
+                $"Dessert HP: {targetDessert.CurrentHealth:F2}/{targetDessert.MaxHealth:F2}"
+            );
+
+            yield return waitForFixedUpdate;
         }
+
+        eatingRoutine = null;
+    }
+
+    private void OnDisable()
+    {
+        StopEating();
+        targetDessert = null;
     }
 }

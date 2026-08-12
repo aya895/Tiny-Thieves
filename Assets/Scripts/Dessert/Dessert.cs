@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public class Dessert : MonoBehaviour
+public class Dessert : MonoBehaviour, IDamageable
 {
     [Header("Dessert Settings")]
     [SerializeField] private float maxHealth = 1000f;
@@ -11,7 +12,7 @@ public class Dessert : MonoBehaviour
     // this reflects any MaxDessertHealth upgrades on top of the base value.
     public float MaxHealth =>
         maxHealth + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxDessertHealth : 0f);
-
+    public event Action<float, float> HealthChanged;
     private void Awake()
     {
         CurrentHealth = MaxHealth;
@@ -34,24 +35,33 @@ public class Dessert : MonoBehaviour
     private void HandleUpgradeApplied(UpgradeStatType type, float amount)
     {
         if (type != UpgradeStatType.MaxDessertHealth) return;
- 
+        NotifyHealthChanged();
+
         CurrentHealth += amount;
         Debug.Log($"[Dessert] Max HP upgrade applied: +{amount}. CurrentHealth is now {CurrentHealth}/{MaxHealth}");
     }
 
     public void TakeDamage(float damage)
     {
-        if (damage <= 0f)
+        if (damage <= 0f || CurrentHealth <= 0f)
             return;
 
         CurrentHealth -= damage;
-        //Debug.Log(CurrentHealth);
 
         if (CurrentHealth <= 0f)
         {
             CurrentHealth = 0f;
+            NotifyHealthChanged();
             Die();
+            return;
         }
+
+        NotifyHealthChanged();
+    }
+
+    private void NotifyHealthChanged()
+    {
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
     }
 
     private void Die()
