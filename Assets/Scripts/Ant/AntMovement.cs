@@ -7,7 +7,7 @@ public class AntMovement : MonoBehaviour
     private AIPath aiPath;
     private AIDestinationSetter destinationSetter;
     public AntLineController antLineController;
-    private AntStateController stateController;
+   // private AntStateController stateController;
     private Ant ant;
 
     void Start()
@@ -15,7 +15,7 @@ public class AntMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         aiPath = GetComponent<AIPath>();
         destinationSetter = GetComponent<AIDestinationSetter>();
-        stateController = GetComponent<AntStateController>();
+       // stateController = GetComponent<AntStateController>();
         ant = GetComponent<Ant>();
 
         // set ai path speed to ant's move speed
@@ -37,7 +37,7 @@ public class AntMovement : MonoBehaviour
             {
                 ant.LeaveStack();
             }
-            stateController.SetState(AntState.Eating); // deft satr da bs al4an ye8yar el state
+           // stateController.SetState(AntState.Eating); // deft satr da bs al4an ye8yar el state
                                                        // beta3t el ant mn moving le eating 3al4an
                                                        // yeb2a fe tanzem le 7araket el ant:)
         }
