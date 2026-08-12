@@ -18,6 +18,10 @@ using UnityEngine;
 public class Ant : MonoBehaviour, IDamageable
 {
     [SerializeField] private float health = 10f;
+
+    [Tooltip("How much XP this ant type grants on death. Vary this per ant prefab variant.")]
+    [SerializeField] private float expValue = 5f;
+
     private Rigidbody2D rb;
 
     //aya: these are to handle the (dancing ant group) thingy ._. ----------------
@@ -110,6 +114,7 @@ public class Ant : MonoBehaviour, IDamageable
         LeaveStack();
 
         // TODO: death animation / particle / score event here
+        AntDeathSignal.Raise(expValue);
         Destroy(gameObject);
     }
 

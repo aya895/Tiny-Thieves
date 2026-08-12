@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9540ed441d516748ba1ec848b5570c3, type: 3}
+  m_Name: MaxTNT
+  m_EditorClassIdentifier: Assembly-CSharp::StatUpgradeDefinition
+  title: More TNT
+  description: Increase TNT amount
+  icon: {fileID: 279804269508174169, guid: e5bad4ec8b25a5045b341877247169d4, type: 3}
+  statType: 1
+  amount: 1

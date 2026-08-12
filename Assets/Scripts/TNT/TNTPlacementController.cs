@@ -21,9 +21,38 @@ public class TNTPlacementController : MonoBehaviour
     private TNTLogic firstPlaced; // remembered so Detonator knows where the chain starts
     private int placedCount = 0;
 
-    // Expose this for your HUD (section 6.2 - "Remaining TNT count")
-    public int RemainingTNT => maxTNTCount - placedCount;
+    public int RemainingTNT => EffectiveMaxTNTCount - placedCount;
+
+     private int EffectiveMaxTNTCount =>
+        maxTNTCount + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxTNTCount : 0);
+
+     private float EffectiveMaxFuseLength =>
+        maxFuseLength + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxFuseDistance : 0f);
+
     [SerializeField] private WaveManager waveManager;
+
+    private void OnEnable()
+    {
+        WaveReadySignal.OnWaveReady += ResetForNewWave;
+    }
+ 
+    private void OnDisable()
+    {
+        WaveReadySignal.OnWaveReady -= ResetForNewWave;
+    }
+
+    private void ResetForNewWave()
+    {
+        placedCount = 0;
+        lastPlaced = null;
+        firstPlaced = null;
+ 
+        if (activePreview != null)
+        {
+            Destroy(activePreview.gameObject);
+            activePreview = null;
+        }
+    }
     private void Update()
     {
         if (waveManager.CurrentState != WaveState.Ready && waveManager.CurrentState != WaveState.Playing)
@@ -44,7 +73,7 @@ public class TNTPlacementController : MonoBehaviour
 
     private void UpdatePreview(Vector3 worldPos)
     {
-        if (placedCount >= maxTNTCount)
+        if (placedCount >= EffectiveMaxTNTCount)
         {
             if (activePreview != null) activePreview.SetVisible(false);
             return;
@@ -60,9 +89,9 @@ public class TNTPlacementController : MonoBehaviour
 
     private bool IsPlacementValid(Vector3 worldPos)
     {
-        if (placedCount >= maxTNTCount) return false;
+        if (placedCount >= EffectiveMaxTNTCount) return false;
         if (lastPlaced == null) return true; // first TNT can go anywhere
-        return Vector3.Distance(lastPlaced.transform.position, worldPos) <= maxFuseLength;
+        return Vector3.Distance(lastPlaced.transform.position, worldPos) <= EffectiveMaxFuseLength;
     }
 
     private void PlaceTNT(Vector3 worldPos)

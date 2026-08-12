@@ -23,12 +23,19 @@ public class TNTLogic : MonoBehaviour
              "Distance to the next TNT divided by this = the chain delay.")]
     [SerializeField] private float fuseBurnSpeed = 5f;
 
-    public float ExplosionRadius => explosionRadius;
+    public float ExplosionRadius =>
+        explosionRadius + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusExplosionRadius : 0f);
 
     // Single source of truth for the push radius - TNTVisual reads this
     // instead of keeping its own separate multiplier, so the visual ring
     // and the actual force radius can never drift apart.
     public float ShockwaveRadius => explosionRadius * shockwaveRadiusMultiplier;
+
+    private float EffectiveKnockbackForce =>
+        knockbackForce + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusKnockbackForce : 0f);
+        
+     private float EffectiveFuseBurnSpeed =>
+        fuseBurnSpeed + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusFuseBurnSpeed : 0f);
 
     // Set by TNTPlacementController when this TNT is linked to the next one
     // placed in the chain.
@@ -68,12 +75,14 @@ public class TNTLogic : MonoBehaviour
         yield return new WaitForSeconds(0.15f);
 
         OnExplode?.Invoke();
-        ExplosionSignal.Raise(transform.position, explosionRadius, damage);
-        ShockwaveSignal.Raise(transform.position, ShockwaveRadius, knockbackForce);
+        // Debug.Log($"[TNTLogic] Exploding with radius={ExplosionRadius}, " +
+        //            $"knockback={EffectiveKnockbackForce}, fuseSpeed={EffectiveFuseBurnSpeed}");
+        ExplosionSignal.Raise(transform.position, ExplosionRadius, damage);
+        ShockwaveSignal.Raise(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
 
         if (nextInChain != null)
         {
-            float chainDelay = distanceToNext / fuseBurnSpeed;
+            float chainDelay = distanceToNext / EffectiveFuseBurnSpeed;
             yield return new WaitForSeconds(chainDelay);
             nextInChain.Ignite();
         }
@@ -88,9 +97,9 @@ public class TNTLogic : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, explosionRadius);
+        Gizmos.DrawWireSphere(transform.position, ExplosionRadius);
 
         Gizmos.color = new Color(1f, 0.6f, 0.1f);
-        Gizmos.DrawWireSphere(transform.position, ShockwaveRadius);
+        Gizmos.DrawWireSphere(transform.position, EffectiveKnockbackForce);
     }
 }

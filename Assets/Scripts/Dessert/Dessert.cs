@@ -7,9 +7,36 @@ public class Dessert : MonoBehaviour
 
     public float CurrentHealth { get; private set; }
 
+    // What UI/health bars should read instead of maxHealth directly, since
+    // this reflects any MaxDessertHealth upgrades on top of the base value.
+    public float MaxHealth =>
+        maxHealth + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxDessertHealth : 0f);
+
     private void Awake()
     {
-        CurrentHealth = maxHealth;
+        CurrentHealth = MaxHealth;
+    }
+
+    private void OnEnable()
+    {
+        UpgradeAppliedSignal.OnBonusApplied += HandleUpgradeApplied;
+    }
+ 
+    private void OnDisable()
+    {
+        UpgradeAppliedSignal.OnBonusApplied -= HandleUpgradeApplied;
+    }
+
+    // MaxHealth is a live calculation, but CurrentHealth is stored state -
+    // it needs to be told the instant a health upgrade lands so it can heal
+    // by the same amount the cap just increased by (standard roguelite
+    // behavior: a +HP upgrade shouldn't just raise an invisible ceiling).
+    private void HandleUpgradeApplied(UpgradeStatType type, float amount)
+    {
+        if (type != UpgradeStatType.MaxDessertHealth) return;
+ 
+        CurrentHealth += amount;
+        Debug.Log($"[Dessert] Max HP upgrade applied: +{amount}. CurrentHealth is now {CurrentHealth}/{MaxHealth}");
     }
 
     public void TakeDamage(float damage)

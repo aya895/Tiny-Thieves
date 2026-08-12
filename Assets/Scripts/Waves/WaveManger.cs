@@ -19,6 +19,19 @@ public class WaveManager : MonoBehaviour
 
     private float timer;
 
+    private void OnEnable()
+    {
+        // The only thing WaveManager knows about the upgrade flow: "someone
+        // will tell me when it's resolved." It never references
+        // ExperienceManager or UpgradeSelectionUI directly.
+        UpgradeFlowSignal.OnResolved += HandleUpgradesResolved;
+    }
+ 
+    private void OnDisable()
+    {
+        UpgradeFlowSignal.OnResolved -= HandleUpgradesResolved;
+    }
+
     private void Start()
     {
         CurrentWave = 0;
@@ -71,6 +84,8 @@ public class WaveManager : MonoBehaviour
         timer = readyTime;
 
         Debug.Log("Planning Phase Started");
+
+        WaveReadySignal.Raise();
     }
 
     private void StartWave()
@@ -91,7 +106,20 @@ public class WaveManager : MonoBehaviour
 
         Debug.Log($"Wave {CurrentWave} Completed");
 
-        // Later: Show Upgrade Screen
+        // Whether the player leveled up zero times or five times this wave
+        // is none of WaveManager's business - it just announces the wave
+        // is over and waits to be told it can continue.
+        WaveEndSignal.Raise();
+    }
+
+    // Fires when ExperienceManager (nothing pending) or UpgradeSelectionUI
+    // (player finished picking) says the post-wave upgrade step is done.
+    private void HandleUpgradesResolved()
+    {
+        if (CurrentState != WaveState.Upgrade)
+            return; // ignore stray/duplicate signals outside the Upgrade state
+ 
+        StartReadyPhase();
     }
 
     public void FinishUpgrade()
