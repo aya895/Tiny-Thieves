@@ -1,0 +1,319 @@
+fileFormatVersion: 2
+guid: d4bb754129df39d428196d9093ffc388
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 53782257789241814
+    second: Ant Nest_0
+  - first:
+      213: -6810493749492022213
+    second: Ant Nest_1
+  - first:
+      213: -8923832838612542588
+    second: Ant Nest_2
+  - first:
+      213: 8849103307084740253
+    second: Ant Nest_3
+  - first:
+      213: -2581424874628474929
+    second: Ant Nest_4
+  - first:
+      213: 9178660791476825456
+    second: Ant Nest_5
+  - first:
+      213: -2729894223359250682
+    second: Ant Nest_6
+  - first:
+      213: -3087613852800230336
+    second: Ant Nest_7
+  - first:
+      213: 4456575547008824054
+    second: Ant Nest_8
+  - first:
+      213: 878981284611905371
+    second: Ant Nest_9
+  - first:
+      213: 8253715705634819408
+    second: Ant Nest_10
+  - first:
+      213: -8112435803718128101
+    second: Ant Nest_11
+  - first:
+      213: 7071214288297280947
+    second: Ant Nest_12
+  - first:
+      213: 3780042653397657966
+    second: Ant Nest_13
+  - first:
+      213: -2923576973783857836
+    second: Ant Nest_14
+  - first:
+      213: -7336306208283058462
+    second: Ant Nest_15
+  - first:
+      213: 3084251466096197932
+    second: Ant Nest_16
+  - first:
+      213: 6577359750581092178
+    second: Ant Nest_17
+  - first:
+      213: 2595835641706731015
+    second: Ant Nest_18
+  - first:
+      213: 6548855934179780002
+    second: Ant Nest_19
+  - first:
+      213: -8364486463373797672
+    second: Ant Nest_20
+  - first:
+      213: -6154286181400922853
+    second: Ant Nest_21
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ant Nest_0
+      rect:
+        serializedVersion: 2
+        x: 589
+        y: 118
+        width: 495
+        height: 495
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d90fb2bda21fb000800000000000000
+      internalID: 53782257789241814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ant Nest_4
+      rect:
+        serializedVersion: 2
+        x: 1653
+        y: 136
+        width: 487
+        height: 471
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc79965e0cfec2cd0800000000000000
+      internalID: -2581424874628474929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ant Nest_7
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 74
+        width: 510
+        height: 565
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04c544c4f879625d0800000000000000
+      internalID: -3087613852800230336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ant Nest_8
+      rect:
+        serializedVersion: 2
+        x: 1100
+        y: 105
+        width: 522
+        height: 522
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f2372a19dfe8dd30800000000000000
+      internalID: 4456575547008824054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 03bc013b4af7d5246a1435607b71c642
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Ant Nest_0: 53782257789241814
+      Ant Nest_1: -6810493749492022213
+      Ant Nest_10: 8253715705634819408
+      Ant Nest_11: -8112435803718128101
+      Ant Nest_12: 7071214288297280947
+      Ant Nest_13: 3780042653397657966
+      Ant Nest_14: -2923576973783857836
+      Ant Nest_15: -7336306208283058462
+      Ant Nest_16: 3084251466096197932
+      Ant Nest_17: 6577359750581092178
+      Ant Nest_18: 2595835641706731015
+      Ant Nest_19: 6548855934179780002
+      Ant Nest_2: -8923832838612542588
+      Ant Nest_20: -8364486463373797672
+      Ant Nest_21: -6154286181400922853
+      Ant Nest_3: 8849103307084740253
+      Ant Nest_4: -2581424874628474929
+      Ant Nest_5: 9178660791476825456
+      Ant Nest_6: -2729894223359250682
+      Ant Nest_7: -3087613852800230336
+      Ant Nest_8: 4456575547008824054
+      Ant Nest_9: 878981284611905371
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

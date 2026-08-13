@@ -36,8 +36,18 @@ public class UpgradeSelectionUI : MonoBehaviour
         {
             ShowNextChoice();
         }
-    }
 
+    }
+    public void ShowUpgrade()
+    {
+        if (experienceManager == null ||
+            experienceManager.PendingLevelUps <= 0)
+        {
+            return;
+        }
+
+        ShowNextChoice();
+    }
     private void ShowNextChoice()
     {
         panelRoot.SetActive(true);
