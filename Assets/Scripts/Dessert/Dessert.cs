@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Dessert : MonoBehaviour, IDamageable
 {
+    public static Dessert Instance { get; private set; }
+
     [Header("Dessert Settings")]
     [SerializeField] private float maxHealth = 1000f;
 
@@ -15,6 +17,14 @@ public class Dessert : MonoBehaviour, IDamageable
     public event Action<float, float> HealthChanged;
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
         CurrentHealth = MaxHealth;
     }
     public void ResetHealth()
@@ -53,7 +63,7 @@ public class Dessert : MonoBehaviour, IDamageable
             return;
 
         CurrentHealth -= damage;
-        //Debug.Log($"[Dessert] HP: {CurrentHealth}/{MaxHealth}");
+        Debug.Log($"[Dessert] HP: {CurrentHealth}/{MaxHealth}");
         if (CurrentHealth <= 0f)
         {
             CurrentHealth = 0f;

@@ -45,7 +45,6 @@ public class PlayerUpgradeStats : MonoBehaviour
         }
 
         Instance = this;
-        // Debug.Log("[PlayerUpgradeStats] Instance is ready.");
     }
 
     public void AddBonus(UpgradeStatType type, float amount)
@@ -68,15 +67,11 @@ public class PlayerUpgradeStats : MonoBehaviour
                 BonusMaxFuseDistance += amount;
                 break;
             case UpgradeStatType.MaxDessertHealth:
-                BonusMaxDessertHealth += (15/100) * dessert.MaxHealth;
+                BonusMaxDessertHealth += amount;
                 break;
         }
 
-        // Debug.Log($"[PlayerUpgradeStats] {type} bonus is now: " +
-        //            $"Radius={BonusExplosionRadius}, MaxTNT={BonusMaxTNTCount}, " +
-        //            $"Knockback={BonusKnockbackForce}, FuseSpeed={BonusFuseBurnSpeed}, " +
-        //            $"FuseDistance={BonusMaxFuseDistance}, DessertHP={BonusMaxDessertHealth}");
-
+        
         UpgradeAppliedSignal.Raise(type, amount);
     }
 }

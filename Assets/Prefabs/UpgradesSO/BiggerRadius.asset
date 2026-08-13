@@ -16,4 +16,4 @@ MonoBehaviour:
   description: Icrease the Explosion Radius by 1
   icon: {fileID: 3730887761424324059, guid: 86244db31b7e83341be16273533369f4, type: 3}
   statType: 0
-  amount: 1
+  amount: 0.1

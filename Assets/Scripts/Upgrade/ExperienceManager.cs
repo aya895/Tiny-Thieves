@@ -9,15 +9,15 @@ public class ExperienceManager : MonoBehaviour
 {
     [Header("Leveling Curve")]
     [Tooltip("XP required for level 1 -> 2.")]
-    [SerializeField] private float baseXPToLevel = 10f;
+    public float baseXPToLevel = 10f;
     [Tooltip("Growth rate, Brotato-style: required XP = base * level^exponent. " +
              "Higher = the grind ramps up faster at high levels.")]
     [SerializeField] private float xpCurveExponent = 1.3f;
 
-    public int CurrentLevel { get; private set; } = 1;
+    public int CurrentLevel { get; private set; } = 0;
     public int PendingLevelUps { get; private set; } = 0;
 
-    private float currentXP;
+    public float currentXP;
 
     // UI or anything else that wants to react to a level-up (e.g. a
     // "LEVEL UP!" popup) can subscribe here without touching wave logic.

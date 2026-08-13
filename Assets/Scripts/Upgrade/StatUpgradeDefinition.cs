@@ -12,16 +12,6 @@ public class StatUpgradeDefinition : UpgradeDefinition
 
     public override void Apply()
     {
-        Debug.Log($"[Upgrade] Apply() called for '{Title}' -> {statType} +{amount}");
-
-        if (PlayerUpgradeStats.Instance == null)
-        {
-            Debug.LogWarning(
-                $"Tried to apply upgrade '{Title}' but no PlayerUpgradeStats exists in the scene. " +
-                "Add an empty GameObject with a PlayerUpgradeStats component.");
-            return;
-        }
-
         PlayerUpgradeStats.Instance.AddBonus(statType, amount);
     }
 }

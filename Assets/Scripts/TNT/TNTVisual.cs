@@ -14,6 +14,8 @@ public class TNTVisual : MonoBehaviour
     [SerializeField] private string sparkTriggerName = "Spark";
     [SerializeField] private string explodeTriggerName = "Explode";
 
+    [SerializeField] private GameObject explosion;
+
     // [Header("VFX / SFX")]
     // [SerializeField] private ParticleSystem explosionVFX;
     // [SerializeField] private AudioSource audioSource;
@@ -65,8 +67,12 @@ public class TNTVisual : MonoBehaviour
         // if (explosionVFX != null) Instantiate(explosionVFX, transform.position, Quaternion.identity);
         // if (audioSource != null && explodeSFX != null) AudioSource.PlayClipAtPoint(explodeSFX, transform.position);
 
+        explosion.SetActive(true);
+
         SpawnBlastRadiusFlash();
         SpawnShockwave();
+
+        gameObject.SetActive(false);
     }
 
     // Circle at the exact explosion radius - "this is what got hit."
