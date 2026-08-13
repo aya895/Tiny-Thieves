@@ -1549,10 +1549,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a87d7f1fea5f97547a81150233af47bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  readyTime: 2
-  waveDuration: 50
+  readyTime: 5
+  waveDuration: 15
   countdownText: {fileID: 1170532452}
-  countdownSeconds: 3
+  countdownSeconds: 0
   spawnManager: {fileID: 1957066049}
   dessert: {fileID: 1701313834}
   gameOverUI: {fileID: 1553680411}
