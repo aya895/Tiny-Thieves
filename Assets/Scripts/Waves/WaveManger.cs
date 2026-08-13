@@ -1,12 +1,17 @@
-//using System.Collections;
-//using TMPro;
-//using UnityEngine;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class WaveManager : MonoBehaviour
 {
+
+    public static event Action OnVictory;
+
+    [Header("Wave Victory Check")]
+    private int activeAnts = 0;
+    private bool isSpawningFinished = false;
+
     [Header("Time Settings")]
     [SerializeField] private float readyTime = 10f;
     [SerializeField] private float waveDuration = 60f;
@@ -36,13 +41,27 @@ public class WaveManager : MonoBehaviour
     {
         UpgradeFlowSignal.OnResolved += HandleUpgradesResolved;
         DessertDestroyedSignal.OnDessertDestroyed += HandleDessertDestroyed;
+
+        AntDeathSignal.OnAntDied += TrackAntDeath;
+        SpawnManager.OnAntSpawned += TrackAntSpawned;
+        SpawnManager.OnSpawnComplete += TrackSpawnComplete;
     }
 
     private void OnDisable()
     {
         UpgradeFlowSignal.OnResolved -= HandleUpgradesResolved;
         DessertDestroyedSignal.OnDessertDestroyed -= HandleDessertDestroyed;
+
+        AntDeathSignal.OnAntDied -= TrackAntDeath;
+        SpawnManager.OnAntSpawned -= TrackAntSpawned;
+        SpawnManager.OnSpawnComplete -= TrackSpawnComplete;
     }
+    private void Start()
+    {
+        CurrentWave = 0;
+        StartCoroutine(StartCountdownSequence(countdownSeconds));
+    }
+
     public bool IsPlanning()
     {
         return stateMachine.IsInState<PlanningState>();
@@ -52,14 +71,7 @@ public class WaveManager : MonoBehaviour
     {
         return stateMachine.IsInState<PlayingState>();
     }
-    private void Start()
-    {
-        CurrentWave = 0;
 
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
-    }
 
     private void Update()
     {
@@ -133,9 +145,7 @@ public class WaveManager : MonoBehaviour
     {
         Debug.Log("=== UPGRADE RESOLVED ===");
 
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
+        StartCoroutine(StartCountdownSequence(countdownSeconds));
     }
 
     public void StartUpgradePhase()
@@ -154,14 +164,11 @@ public class WaveManager : MonoBehaviour
     // -------------------------
     // Game Over
     // -------------------------
-
     private void HandleDessertDestroyed()
     {
         Debug.Log("Player Lost - Dessert Destroyed!");
 
-        stateMachine.ChangeState(
-            new GameOverState(this)
-        );
+        stateMachine.ChangeState(new GameOverState(this));
     }
 
     public void HandleGameOver()
@@ -211,7 +218,45 @@ public class WaveManager : MonoBehaviour
             StartCountdownSequence(countdownSeconds)
         );
     }
+
+    // -------------------------
+    // Victory 
+    // -------------------------
+    private void Victory()
+    {
+        spawnManager.ClearPreviousWave();
+        OnVictory?.Invoke();
+    }
+
+    private void CheckVictory()
+    {
+        if (stateMachine != null && IsPlaying() &&
+           isSpawningFinished && activeAnts <= 0)
+        {
+            Victory();
+        }
+    }
+
+    private void TrackAntSpawned()
+    {
+        activeAnts++;
+    }
+    private void TrackAntDeath(float expValue)
+    {
+        activeAnts = Mathf.Max(0, activeAnts -1 );
+        CheckVictory();
+    }
+    private void TrackSpawnComplete()
+    {
+        isSpawningFinished = true;
+        CheckVictory();
+    }
 }
+
+
+
+
+
 //public class WaveManager : MonoBehaviour
 //{
 //    [Header("Time Settings")]

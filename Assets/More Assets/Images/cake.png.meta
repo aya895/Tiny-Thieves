@@ -186,10 +186,10 @@ TextureImporter:
       name: cake_1
       rect:
         serializedVersion: 2
-        x: 147
-        y: 265
-        width: 87
-        height: 94
+        x: 128
+        y: 257
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -208,10 +208,10 @@ TextureImporter:
       name: cake_2
       rect:
         serializedVersion: 2
-        x: 275
-        y: 265
-        width: 87
-        height: 94
+        x: 256
+        y: 257
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -230,10 +230,10 @@ TextureImporter:
       name: cake_3
       rect:
         serializedVersion: 2
-        x: 403
-        y: 264
-        width: 87
-        height: 90
+        x: 384
+        y: 257
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -252,10 +252,10 @@ TextureImporter:
       name: cake_4
       rect:
         serializedVersion: 2
-        x: 19
-        y: 138
-        width: 87
-        height: 77
+        x: 0
+        y: 129
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -274,10 +274,10 @@ TextureImporter:
       name: cake_5
       rect:
         serializedVersion: 2
-        x: 147
-        y: 137
-        width: 88
-        height: 70
+        x: 128
+        y: 129
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -296,10 +296,10 @@ TextureImporter:
       name: cake_6
       rect:
         serializedVersion: 2
-        x: 275
-        y: 138
-        width: 87
-        height: 69
+        x: 256
+        y: 129
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -318,10 +318,10 @@ TextureImporter:
       name: cake_7
       rect:
         serializedVersion: 2
-        x: 403
-        y: 137
-        width: 88
-        height: 65
+        x: 384
+        y: 129
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -340,10 +340,10 @@ TextureImporter:
       name: cake_8
       rect:
         serializedVersion: 2
-        x: 19
-        y: 10
-        width: 57
-        height: 69
+        x: 0
+        y: 1
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -362,10 +362,10 @@ TextureImporter:
       name: cake_9
       rect:
         serializedVersion: 2
-        x: 147
-        y: 10
-        width: 76
-        height: 62
+        x: 128
+        y: 1
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -384,10 +384,10 @@ TextureImporter:
       name: cake_10
       rect:
         serializedVersion: 2
-        x: 291
-        y: 13
-        width: 53
-        height: 26
+        x: 256
+        y: 1
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -406,10 +406,10 @@ TextureImporter:
       name: cake_0
       rect:
         serializedVersion: 2
-        x: 18
-        y: 266
-        width: 88
-        height: 116
+        x: 0
+        y: 257
+        width: 128
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -420,28 +420,6 @@ TextureImporter:
       bones: []
       spriteID: 22f5af36ca7c616488ce32d01ec217be
       internalID: 8732635013323328055
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: cake_11
-      rect:
-        serializedVersion: 2
-        x: 405
-        y: 15
-        width: 86
-        height: 57
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5ffa529489996cf4c9aec9ccd0a4a59e
-      internalID: -4805569797169419757
       vertices: []
       indices: 
       edges: []
@@ -460,19 +438,11 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":12.0,"y":12.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":4.0,"y":3.0},"gridSpriteSize":{"x":128.0,"y":128.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       cake_0: 8732635013323328055
       cake_1: -3768180043280603248
       cake_10: 3876746232147779578
-      cake_11: -4805569797169419757
-      cake_12: 2808253619640970225
-      cake_13: -3441057639201637584
-      cake_14: 4306000206505895419
-      cake_15: 8628482841326592508
-      cake_16: -5198289428212691793
-      cake_17: 967106924668080638
-      cake_18: -7848582485139917948
       cake_2: -1992560280664689251
       cake_3: 6148839632226414310
       cake_4: 577889525341016405

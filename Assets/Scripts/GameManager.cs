@@ -6,19 +6,20 @@ public class GameManager : MonoBehaviour
     public GameManager instance { set; get; }
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private ExperienceManager experienceManager;
+    private int processedWave = 0;
 
     //// needed events
     public static event Action OnMoreAntSpeed;
     public static event Action OnNewAntType;
     public static event Action OnAddAntNest;
-    public static event Action OnMapExpand; //still in progress
+    public static event Action OnMapExpand;
     public static event Action OnMoreAntInLine;
-
     //// what more to add??
-    private int processedWave = 0;
+
     [Header("Difficulty Settings")]
     [SerializeField] private int enemyUpgradeInterval = 3;
     [SerializeField] private int mapExpansionInterval = 3;
+
     private void Awake()
     {
         if (instance == null)
