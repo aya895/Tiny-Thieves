@@ -9,8 +9,8 @@ public class SpawnManager : MonoBehaviour
     private float spawnDelay = 0.75f;
     
     // an area to spawn & add offset for each nest so they dont spawn on top of eachother
-    private float xMin = -6;
-    private float xMax = -8;
+    private float xMin = -8;
+    private float xMax = -6;
     private float yMin = -4;
     private float yMax = 1;
     private float distancePerNest = 5f;
@@ -182,7 +182,17 @@ public class SpawnManager : MonoBehaviour
         linesPerNest++;
     }
 
+    public void ExpandSpawnArea(float amount)
+    {
+        xMin -= amount;
+        xMax += amount;
+        yMin -= amount;
+        yMax += amount;
 
+        Debug.Log(
+            $"[SpawnManager] Spawn area expanded by {amount}."
+        );
+    }
     // thank u <333
     // 4o8l fa5r mn el 2a5r
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Dessert
   - Nest
+  - Ant
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - Kitchen
   - TNT
-  - 
+  - BG
   - 
   - 
   - 
@@ -42,6 +43,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BG
+    uniqueID: 3984985219
     locked: 0
   m_RenderingLayers:
   - Default

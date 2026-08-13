@@ -16,7 +16,9 @@ public class GameManager : MonoBehaviour
 
     //// what more to add??
     private int processedWave = 0;
-
+    [Header("Difficulty Settings")]
+    [SerializeField] private int enemyUpgradeInterval = 3;
+    [SerializeField] private int mapExpansionInterval = 3;
     private void Awake()
     {
         if (instance == null)
@@ -40,14 +42,14 @@ public class GameManager : MonoBehaviour
                 processedWave = currentWave;
 
                 // prime numers so no big conflicts :)
-                if (currentWave % 3 == 0)
+                if (currentWave % enemyUpgradeInterval == 0)
                 {
                     OnMoreAntSpeed?.Invoke();
                     OnNewAntType?.Invoke();
                     OnAddAntNest?.Invoke();
                 }
 
-                if (currentWave % 7 == 0)
+                if (currentWave % mapExpansionInterval == 0)
                 {
                     OnMapExpand?.Invoke();
                     OnMoreAntInLine?.Invoke();

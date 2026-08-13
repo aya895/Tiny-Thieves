@@ -10,6 +10,7 @@ public static class UpgradeFlowSignal
 
     public static void RaiseResolved()
     {
+        
         OnResolved?.Invoke();
     }
 }

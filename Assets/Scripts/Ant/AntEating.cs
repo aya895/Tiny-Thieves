@@ -80,11 +80,11 @@ public sealed class AntEating : MonoBehaviour
             if (targetDessert == null)
                 break;
 
-            Debug.Log(
-                $"[Ant Eating] {gameObject.name} dealt {damage:F2} damage " +
-                $"to {targetDessert.name}. " +
-                $"Dessert HP: {targetDessert.CurrentHealth:F2}/{targetDessert.MaxHealth:F2}"
-            );
+            //Debug.Log(
+            //    $"[Ant Eating] {gameObject.name} dealt {damage:F2} damage " +
+            //    $"to {targetDessert.name}. " +
+            //    $"Dessert HP: {targetDessert.CurrentHealth:F2}/{targetDessert.MaxHealth:F2}"
+            //);
 
             yield return waitForFixedUpdate;
         }

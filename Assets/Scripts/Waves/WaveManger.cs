@@ -131,6 +131,8 @@ public class WaveManager : MonoBehaviour
 
     private void HandleUpgradesResolved()
     {
+        Debug.Log("=== UPGRADE RESOLVED ===");
+
         StartCoroutine(
             StartCountdownSequence(countdownSeconds)
         );
@@ -147,6 +149,7 @@ public class WaveManager : MonoBehaviour
 
         WaveEndSignal.Raise();
     }
+
 
     // -------------------------
     // Game Over
