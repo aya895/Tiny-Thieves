@@ -28,7 +28,6 @@ public class Ant : MonoBehaviour, IDamageable
     public static event Action <GameObject> OnAntDeath;
 
     private AntMovement antMovement; 
-    [SerializeField] private GameObject stackedVisualPrefab;
     [SerializeField] private float knockBackPathPause = 0.3f;
     [SerializeField] private float xpValue = 1f;
     private SpriteRenderer spriteRenderer;
@@ -111,6 +110,10 @@ public class Ant : MonoBehaviour, IDamageable
     private void Die()
     {
         OnAntDeath?.Invoke(this.gameObject);
+        if (stackedWith != null) // stacked ant give more bonus
+        {
+            expValue *= 2;
+        }
         AntDeathSignal.Raise(expValue);
         LeaveStack();
 
