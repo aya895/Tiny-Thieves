@@ -11,14 +11,14 @@ public class WaveTimerUI : MonoBehaviour
 
     private void Update()
     {
-        if (waveManager.CurrentState == WaveState.Ready)
+        if (waveManager.IsPlanning())
         {
             showGo = false;
 
             timerText.text =
                 $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";
         }
-        else if (waveManager.CurrentState == WaveState.Playing)
+        else if (waveManager.IsPlaying())
         {
             if (!showGo)
             {

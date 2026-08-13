@@ -45,6 +45,9 @@ public sealed class AntEating : MonoBehaviour
         if (eatingRoutine != null)
             return;
 
+        if (targetDessert == null)
+            return;
+
         eatingRoutine = StartCoroutine(EatingRoutine());
     }
 
@@ -60,13 +63,22 @@ public sealed class AntEating : MonoBehaviour
     private IEnumerator EatingRoutine()
     {
         WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
+
         float damagePerSecond = antStats.DamageToDessert;
 
         while (targetDessert != null)
         {
+            // Make sure the dessert is still valid
+            if (targetDessert == null)
+                break;
+
             float damage = damagePerSecond * Time.fixedDeltaTime;
 
             targetDessert.TakeDamage(damage);
+
+            // Dessert may have been destroyed after TakeDamage()
+            if (targetDessert == null)
+                break;
 
             Debug.Log(
                 $"[Ant Eating] {gameObject.name} dealt {damage:F2} damage " +
@@ -78,6 +90,7 @@ public sealed class AntEating : MonoBehaviour
         }
 
         eatingRoutine = null;
+        targetDessert = null;
     }
 
     private void OnDisable()

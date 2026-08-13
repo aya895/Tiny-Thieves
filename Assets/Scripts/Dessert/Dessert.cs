@@ -17,7 +17,13 @@ public class Dessert : MonoBehaviour, IDamageable
     {
         CurrentHealth = MaxHealth;
     }
+    public void ResetHealth()
+    {
+        CurrentHealth = MaxHealth;
+        NotifyHealthChanged();
 
+        Debug.Log($"[Dessert] Health reset to {CurrentHealth}/{MaxHealth}");
+    }
     private void OnEnable()
     {
         UpgradeAppliedSignal.OnBonusApplied += HandleUpgradeApplied;
@@ -47,7 +53,7 @@ public class Dessert : MonoBehaviour, IDamageable
             return;
 
         CurrentHealth -= damage;
-
+        Debug.Log($"[Dessert] HP: {CurrentHealth}/{MaxHealth}");
         if (CurrentHealth <= 0f)
         {
             CurrentHealth = 0f;
@@ -67,7 +73,7 @@ public class Dessert : MonoBehaviour, IDamageable
     private void Die()
     {
         Debug.Log("Dessert has been destroyed!");
-
+        DessertDestroyedSignal.Raise();
         // Later:
         // WaveManager.Instance.GameOver();
     }

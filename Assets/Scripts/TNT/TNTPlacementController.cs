@@ -55,7 +55,12 @@ public class TNTPlacementController : MonoBehaviour
     }
     private void Update()
     {
-        if (waveManager.CurrentState != WaveState.Ready && waveManager.CurrentState != WaveState.Playing)
+        //if (waveManager.CurrentState != WaveState.Ready && waveManager.CurrentState != WaveState.Playing)
+        //{
+        //    return;
+        //}
+        if (!waveManager.IsPlanning() &&
+    !waveManager.IsPlaying())
         {
             return;
         }
