@@ -19,7 +19,6 @@ public class MenuUIHandler : MonoBehaviour
     public GameObject logo;
     public Slider musicSlider;
 
-
     void Start()
     {
         musicSlider.gameObject.SetActive(false);
