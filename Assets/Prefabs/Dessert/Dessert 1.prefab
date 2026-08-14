@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2847882406900169375}
   - component: {fileID: 6345360732178788274}
   - component: {fileID: 8347977345106549521}
+  - component: {fileID: 8628327996102834816}
   m_Layer: 0
   m_Name: Dessert 1
   m_TagString: Dessert
@@ -193,7 +194,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dca53491c4658b74280e74a2016c95d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DessertEatingSound
-  audioSource: {fileID: 0}
-  eatingClip: {fileID: 0}
+  eatingClip: {fileID: 8300000, guid: 8ed536db7f36b4e478da9deab24adc80, type: 3}
+  minPitch: 0.95
+  maxPitch: 1.05
+--- !u!114 &8628327996102834816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5144415988715307754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca53491c4658b74280e74a2016c95d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DessertEatingSound
+  eatingClip: {fileID: 8300000, guid: 8b5989f0ecde3fb469ff4ebddbc0770c, type: 3}
   minPitch: 0.95
   maxPitch: 1.05
