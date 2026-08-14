@@ -17,40 +17,7 @@ public class UpgradeSelectionUI : MonoBehaviour
     [SerializeField] private int choicesPerLevel = 3;
 
     private readonly List<UpgradeChoiceButtonUI> spawnedButtons = new List<UpgradeChoiceButtonUI>();
-    private void Awake()
-    {
-        if (experienceManager == null)
-        {
-            Debug.LogError(
-                "[UpgradeSelectionUI] ExperienceManager reference is missing.",
-                this
-            );
-        }
-
-        if (panelRoot == null)
-        {
-            Debug.LogError(
-                "[UpgradeSelectionUI] Panel Root reference is missing.",
-                this
-            );
-        }
-
-        if (choicesContainer == null)
-        {
-            Debug.LogError(
-                "[UpgradeSelectionUI] Choices Container reference is missing.",
-                this
-            );
-        }
-
-        if (choiceButtonPrefab == null)
-        {
-            Debug.LogError(
-                "[UpgradeSelectionUI] Choice Button Prefab reference is missing.",
-                this
-            );
-        }
-    }
+    
     private void OnEnable()
     {
         WaveEndSignal.OnWaveEnded += HandleWaveEnded;
@@ -98,6 +65,7 @@ public class UpgradeSelectionUI : MonoBehaviour
     private void HandleUpgradeChosen(UpgradeDefinition chosen)
     {
         chosen.Apply();
+        UpgradeChosenSignal.Raise();
         experienceManager.ConsumePendingLevelUp();
 
         if (experienceManager.PendingLevelUps > 0)
