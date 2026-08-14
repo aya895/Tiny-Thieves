@@ -63,7 +63,7 @@ public class Dessert : MonoBehaviour, IDamageable
             return;
 
         CurrentHealth -= damage;
-        Debug.Log($"[Dessert] HP: {CurrentHealth}/{MaxHealth}");
+        //Debug.Log($"[Dessert] HP: {CurrentHealth}/{MaxHealth}");
         if (CurrentHealth <= 0f)
         {
             CurrentHealth = 0f;

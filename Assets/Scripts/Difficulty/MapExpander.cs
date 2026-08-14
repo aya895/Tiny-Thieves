@@ -12,7 +12,8 @@ public class MapExpander : MonoBehaviour
     [SerializeField] private int mapExpansionInterval = 3;
     [SerializeField] private float expansionAmount = 0.5f;
     [SerializeField] private float backgroundPadding = 2f;
-
+    [SerializeField] private float spawnMargin = 1f;
+    [SerializeField] private float maxCameraSize = 7f;
     private void OnEnable()
     {
         WaveReadySignal.OnWaveReady += HandlePlanningStarted;
@@ -38,21 +39,35 @@ public class MapExpander : MonoBehaviour
 
     private void ExpandMap()
     {
-        ExpandSpawnArea();
         ExpandCamera();
-       //UpdateBackground();
+        UpdateBackground();
+        UpdateSpawnArea();
 
         Debug.Log(
             $"[MapExpander] Map expanded before Wave {waveManager.CurrentWave + 1}."
         );
     }
 
-    private void ExpandSpawnArea()
+    private void UpdateSpawnArea()
     {
-        if (spawnManager == null)
+        if (spawnManager == null || mainCamera == null)
             return;
 
-        spawnManager.ExpandSpawnArea(expansionAmount);
+        float height = mainCamera.orthographicSize * 2f;
+        float width = height * mainCamera.aspect;
+
+        float xMin = mainCamera.transform.position.x - width / 2f + spawnMargin;
+        float xMax = mainCamera.transform.position.x + width / 2f - spawnMargin;
+
+        float yMin = mainCamera.transform.position.y - height / 2f + spawnMargin;
+        float yMax = mainCamera.transform.position.y + height / 2f - spawnMargin;
+
+        spawnManager.SetSpawnArea(
+            xMin,
+            xMax,
+            yMin,
+            yMax
+        );
     }
 
     private void ExpandCamera()
@@ -60,7 +75,12 @@ public class MapExpander : MonoBehaviour
         if (mainCamera == null || !mainCamera.orthographic)
             return;
 
-        mainCamera.orthographicSize += expansionAmount;
+        float targetSize = mainCamera.orthographicSize + expansionAmount;
+
+        mainCamera.orthographicSize = Mathf.Min(
+            targetSize,
+            maxCameraSize
+        );
     }
 
     //private void LateUpdate()
@@ -81,7 +101,12 @@ public class MapExpander : MonoBehaviour
             height + backgroundPadding
         );
 
-        background.transform.position = mainCamera.transform.position;
+        // Move only on X and Y.
+        background.transform.position = new Vector3(
+            mainCamera.transform.position.x,
+            mainCamera.transform.position.y,
+            background.transform.position.z
+        );
     }
 
 }
