@@ -8,6 +8,11 @@ using UnityEngine;
 // ExplosionSignal.cs, and ShockwaveSignal.cs for those.
 public class TNTLogic : MonoBehaviour
 {
+    // needed events
+    public event Action<Vector2, float, float> OnExplode;
+    public event Action<Vector2, float, float> OnShockwave;
+
+
     [Header("Explosion")]
     [SerializeField] private float explosionRadius = 2f;
     [SerializeField] private float damage = 100f;
@@ -41,13 +46,11 @@ public class TNTLogic : MonoBehaviour
     // placed in the chain.
     private TNTLogic nextInChain;
     private float distanceToNext;
-
     private bool hasIgnited = false;
 
     // Other systems (visuals, audio, score) subscribe to these instead of
     // TNTLogic calling them directly. Dependency Inversion: TNTLogic depends
     // on nothing; everyone else depends on TNTLogic's public events.
-    public event Action OnExplode;
 
     public void SetNext(TNTLogic next, float distance)
     {
@@ -62,7 +65,6 @@ public class TNTLogic : MonoBehaviour
         if (hasIgnited) return;
         hasIgnited = true;
 
-
         StartCoroutine(ExplodeThenPropagate());
     }
 
@@ -72,9 +74,10 @@ public class TNTLogic : MonoBehaviour
         // tune or remove this depending on how your fuse animation is timed.
         yield return new WaitForSeconds(0.15f);
 
-        OnExplode?.Invoke();
-        ExplosionSignal.Raise(transform.position, ExplosionRadius, damage);
-        ShockwaveSignal.Raise(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
+        OnExplode?.Invoke(transform.position, ExplosionRadius, damage);
+        OnShockwave?.Invoke(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
+        //ExplosionSignal.Raise(transform.position, ExplosionRadius, damage);
+        //ShockwaveSignal.Raise(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
 
         if (nextInChain != null)
         {

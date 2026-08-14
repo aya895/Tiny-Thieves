@@ -1,11 +1,15 @@
+using System;
 using UnityEngine;
 
 public class AntStackController : MonoBehaviour
 {
+    public event Action<bool> OnStackStateChanged;
+
     private Ant ant;
     private AntMovement antMovement;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
+    private bool isKnockedBack;
 
     public Ant StackedWith { get; private set; }
 
@@ -17,9 +21,44 @@ public class AntStackController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void OnEnable()
+    {
+        if (ant != null)
+        {
+            ant.OnKnockbackStateChanged += HandleKnockbackStateChanged;
+        }
+        if (antMovement != null)
+        {
+            antMovement.OnDessertReached += HandleDessertReached;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (ant != null)
+        {
+            ant.OnKnockbackStateChanged -= HandleKnockbackStateChanged;
+        }
+        if (antMovement != null)
+        {
+            antMovement.OnDessertReached -= HandleDessertReached;
+        }
+    }
+    private void HandleDessertReached() => LeaveStack();
+
+    private void HandleKnockbackStateChanged(bool knockedBack)
+    {
+        isKnockedBack = knockedBack;
+    }
+
+    public float GetExpMultiplier()
+    {
+        return StackedWith != null ? 2f : 1f;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!ant.isKnockedBack || StackedWith != null) return;
+        if (!isKnockedBack || StackedWith != null) return;
         Ant other = collision.gameObject.GetComponent<Ant>();
         if (other == null || other == ant) return;
 
@@ -44,10 +83,10 @@ public class AntStackController : MonoBehaviour
         }
 
         rb.simulated = false;
-        if (antMovement != null)
-        {
-            antMovement.SetPathingEnabled(false);
-        }
+        //if (antMovement != null)
+        //{
+        //    antMovement.SetPathingEnabled(false);
+        //}
 
         //Parent it to the base ant so it follows its movement exactly & make its sorting order higher
         transform.SetParent(otherAnt.transform);
@@ -57,6 +96,7 @@ public class AntStackController : MonoBehaviour
         {
             spriteRenderer.sortingOrder = otherAnt.GetComponent<SpriteRenderer>().sortingOrder + 1;
         }
+        OnStackStateChanged?.Invoke(true);
     }
 
     public void LeaveStack()
@@ -73,9 +113,9 @@ public class AntStackController : MonoBehaviour
             {
                 passenger = StackedWith;
             }
+            AntStackController passengerStacker = passenger.GetComponent<AntStackController>();
 
             // Unparent the passenger & restore all its physics & sorting order
-            AntStackController passengerStacker = passenger.GetComponent<AntStackController>();
             passenger.transform.SetParent(null);
 
             Collider2D passengerCollider = passenger.GetComponent<Collider2D>();

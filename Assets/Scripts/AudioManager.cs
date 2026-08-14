@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance { get; private set; } // make it easy to find across scenes
-
+    private TNTPlacementController tntController;
     [Header("Clips")]
     [SerializeField] private AudioClip explosionClip;
     [SerializeField] private AudioClip upgradeChosenClip;
@@ -79,23 +78,25 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySfx(AudioClip clip)
     {
-        if (sfxSource != null || clip != null)
+        //ExplosionSignal.OnExplosion += HandleExplosion;
+        if (tntController == null)
+            tntController = FindFirstObjectByType<TNTPlacementController>();
+
+        if (tntController != null)
         {
-            sfxSource.PlayOneShot(clip);
+            tntController.OnAnyExplosion += HandleExplosion;
         }
+
+        UpgradeChosenSignal.OnUpgradeChosen += HandleUpgradeChosen;
     }
 
     public void PlayEating(AudioClip clip)
     {
-        if (eatingSource != null && clip != null)
+        if (tntController != null)
         {
-            if (!eatingSource.isPlaying)
-            {
-                eatingSource.clip = clip;
-                eatingSource.loop = true;
-                eatingSource.Play();
-            }
+            tntController.OnAnyExplosion -= HandleExplosion;
         }
+        UpgradeChosenSignal.OnUpgradeChosen -= HandleUpgradeChosen;
     }
 
     public void StopEating()
