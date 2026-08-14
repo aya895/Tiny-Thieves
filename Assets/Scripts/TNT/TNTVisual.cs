@@ -16,12 +16,6 @@ public class TNTVisual : MonoBehaviour
 
     [SerializeField] private GameObject explosion;
 
-    // [Header("VFX / SFX")]
-    // [SerializeField] private ParticleSystem explosionVFX;
-    // [SerializeField] private AudioSource audioSource;
-    // [SerializeField] private AudioClip igniteSFX;
-    // [SerializeField] private AudioClip explodeSFX;
-
     [Header("Blast Radius Flash")]
     [Tooltip("Shows a circle at the EXACT explosion radius, so players can see what was actually hit.")]
     [SerializeField] private ExplosionRadiusIndicator blastRadiusPrefab;
@@ -45,28 +39,18 @@ public class TNTVisual : MonoBehaviour
 
     private void OnEnable()
     {
-        logic.OnIgnite += HandleIgnite;
         logic.OnExplode += HandleExplode;
     }
 
     private void OnDisable()
     {
-        logic.OnIgnite -= HandleIgnite;
         logic.OnExplode -= HandleExplode;
-    }
-
-    private void HandleIgnite()
-    {
-        if (animator != null) animator.SetTrigger(sparkHash);
-        // if (audioSource != null && igniteSFX != null) audioSource.PlayOneShot(igniteSFX);
     }
 
     private void HandleExplode()
     {
         if (animator != null) animator.SetTrigger(explodeHash);
-        // if (explosionVFX != null) Instantiate(explosionVFX, transform.position, Quaternion.identity);
-        // if (audioSource != null && explodeSFX != null) AudioSource.PlayClipAtPoint(explodeSFX, transform.position);
-
+        
         explosion.SetActive(true);
 
         SpawnBlastRadiusFlash();
