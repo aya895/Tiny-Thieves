@@ -15,16 +15,36 @@ public class UIManager : MonoBehaviour
     private bool isPaused = false;
 
 
-    void Start()
+    //void Start()
+    //{
+    //    Time.timeScale = 1f;
+
+    //    builder = new StringBuilder("All ants cleared at wave: ");
+    //    waveManager = GetComponent<WaveManager>();
+    //    waveClearedAt.text = "";
+    //    waveClearedAt.gameObject.SetActive(false);
+    //}
+    private void Awake()
     {
         Time.timeScale = 1f;
+        isPaused = false;
+
+        waveManager = FindFirstObjectByType<WaveManager>();
 
         builder = new StringBuilder("All ants cleared at wave: ");
-        waveManager = GetComponent<WaveManager>();
-        waveClearedAt.text = "";
-        waveClearedAt.gameObject.SetActive(false);
-    }
 
+        if (waveClearedAt != null)
+        {
+            waveClearedAt.text = "";
+            waveClearedAt.gameObject.SetActive(false);
+        }
+
+        if (victoryPanel != null)
+            victoryPanel.SetActive(false);
+
+        if (pausePanel != null)
+            pausePanel.SetActive(false);
+    }
     private void OnEnable()
     {
         WaveManager.OnVictory += ShowVictory;

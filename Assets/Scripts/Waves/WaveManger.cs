@@ -133,12 +133,11 @@ public class WaveManager : MonoBehaviour
     public void StartPlayingPhase()
     {
         CurrentWave++;
+        timer = waveDuration;
 
         // Reset victory tracking for the new wave
         activeAnts = 0;
         isSpawningFinished = false;
-
-        timer = waveDuration;
 
         Debug.Log($"Wave {CurrentWave} Started");
 

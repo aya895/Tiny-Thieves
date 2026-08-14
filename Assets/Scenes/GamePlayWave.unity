@@ -8036,7 +8036,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   waveManager: {fileID: 584036360}
-  experienceManager: {fileID: 770089304}
   enemyUpgradeInterval: 3
   mapExpansionInterval: 3
 --- !u!114 &2019891961

@@ -3,59 +3,70 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public GameManager instance { set; get; }
     [SerializeField] private WaveManager waveManager;
-    [SerializeField] private ExperienceManager experienceManager;
-    private int processedWave = 0;
-
-    //// needed events
-    public static event Action OnMoreAntSpeed;
-    public static event Action OnNewAntType;
-    public static event Action OnAddAntNest;
-    public static event Action OnMapExpand;
-    public static event Action OnMoreAntInLine;
-    //// what more to add??
 
     [Header("Difficulty Settings")]
     [SerializeField] private int enemyUpgradeInterval = 3;
     [SerializeField] private int mapExpansionInterval = 3;
 
+    private int processedWave = 0;
+
+    // Difficulty events
+    public static event Action OnMoreAntSpeed;
+    public static event Action OnNewAntType;
+    public static event Action OnAddAntNest;
+    public static event Action OnMapExpand;
+    public static event Action OnMoreAntInLine;
+
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        // Every Game Scene gets its own GameManager.
+        // No DontDestroyOnLoad here.
+        if (FindObjectsByType<GameManager>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None).Length > 1)
         {
             Destroy(gameObject);
+            return;
         }
     }
 
-    void Update()
+    private void Start()
     {
-        if (waveManager != null)
+        if (waveManager == null)
         {
-            int currentWave = waveManager.CurrentWave;
-            if (currentWave > 0 && currentWave != processedWave)
-            {
-                processedWave = currentWave;
+            waveManager = FindFirstObjectByType<WaveManager>();
+        }
+    }
 
-                // prime numers so no big conflicts :)
-                if (currentWave % enemyUpgradeInterval == 0)
-                {
-                    OnMoreAntSpeed?.Invoke();
-                    OnNewAntType?.Invoke();
-                    OnAddAntNest?.Invoke();
-                }
+    private void Update()
+    {
+        if (waveManager == null)
+        {
+            waveManager = FindFirstObjectByType<WaveManager>();
+            return;
+        }
 
-                if (currentWave % mapExpansionInterval == 0)
-                {
-                    OnMapExpand?.Invoke();
-                    OnMoreAntInLine?.Invoke();
-                }
-            }
+        int currentWave = waveManager.CurrentWave;
+
+        if (currentWave <= 0 || currentWave == processedWave)
+            return;
+
+        processedWave = currentWave;
+
+        // Every 3 waves
+        if (currentWave % enemyUpgradeInterval == 0)
+        {
+            OnMoreAntSpeed?.Invoke();
+            OnNewAntType?.Invoke();
+            OnAddAntNest?.Invoke();
+        }
+
+        // Every 3 waves
+        if (currentWave % mapExpansionInterval == 0)
+        {
+            OnMapExpand?.Invoke();
+            OnMoreAntInLine?.Invoke();
         }
     }
 }

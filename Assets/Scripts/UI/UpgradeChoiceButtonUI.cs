@@ -18,7 +18,33 @@ public class UpgradeChoiceButtonUI : MonoBehaviour
 
     public void Setup(UpgradeDefinition upgradeDefinition, Action<UpgradeDefinition> onChosenCallback)
     {
-        upgrade = upgradeDefinition;
+        
+
+            if (upgradeDefinition == null)
+            {
+                Debug.LogError("[UpgradeChoiceButtonUI] UpgradeDefinition is NULL.", this);
+                return;
+            }
+
+            if (titleText == null)
+            {
+                Debug.LogError("[UpgradeChoiceButtonUI] Title Text is missing.", this);
+                return;
+            }
+
+            if (descriptionText == null)
+            {
+                Debug.LogError("[UpgradeChoiceButtonUI] Description Text is missing.", this);
+                return;
+            }
+
+            if (button == null)
+            {
+                Debug.LogError("[UpgradeChoiceButtonUI] Button reference is missing.", this);
+                return;
+            }
+
+            upgrade = upgradeDefinition;
         onChosen = onChosenCallback;
 
         titleText.text = upgrade.Title;
