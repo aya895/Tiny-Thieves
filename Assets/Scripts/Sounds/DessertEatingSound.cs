@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DessertEatingSound : MonoBehaviour
 {
-    [SerializeField] private AudioSource audioSource;
+    private AudioSource audioSource;
     [SerializeField] private AudioClip eatingClip;
 
     [Header("Sound Settings")]
