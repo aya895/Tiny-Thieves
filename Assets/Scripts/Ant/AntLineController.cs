@@ -12,12 +12,12 @@ public class AntLineController : MonoBehaviour
 
     private void OnEnable()
     {
-        Ant.OnAntDeath += RemoveAnt;
+        Ant.OnAntDeath += HandleAntDeath;
     }
 
     private void OnDisable()
     {
-        Ant.OnAntDeath -= RemoveAnt;
+        Ant.OnAntDeath -= HandleAntDeath;
     }
 
 
@@ -53,6 +53,11 @@ public class AntLineController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void HandleAntDeath(GameObject ant, float expValue)
+    {
+        RemoveAnt(ant);
     }
 
     public void OnReachedDessert(GameObject ant)

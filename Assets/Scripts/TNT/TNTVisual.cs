@@ -50,7 +50,6 @@ public class TNTVisual : MonoBehaviour
     private void HandleExplode()
     {
         if (animator != null) animator.SetTrigger(explodeHash);
-        
         explosion.SetActive(true);
 
         SpawnBlastRadiusFlash();
@@ -64,8 +63,7 @@ public class TNTVisual : MonoBehaviour
     {
         if (blastRadiusPrefab == null) return;
 
-        ExplosionRadiusIndicator flash = Instantiate(
-            blastRadiusPrefab, logic.transform.position, Quaternion.identity);
+        ExplosionRadiusIndicator flash = Instantiate(blastRadiusPrefab, logic.transform.position, Quaternion.identity);
         flash.SetRadius(logic.ExplosionRadius);
         flash.SetVisible(true);
         Destroy(flash.gameObject, blastFlashDuration);
@@ -76,9 +74,7 @@ public class TNTVisual : MonoBehaviour
     {
         if (shockwavePrefab == null) return;
 
-        ShockwaveEffect shockwave = Instantiate(
-            shockwavePrefab, logic.transform.position, Quaternion.identity);
-
+        ShockwaveEffect shockwave = Instantiate(shockwavePrefab, logic.transform.position, Quaternion.identity);
         shockwave.Play(logic.ExplosionRadius, logic.ShockwaveRadius, shockwaveDuration);
     }
 }

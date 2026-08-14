@@ -10,6 +10,8 @@ public class ShockwaveEffect : MonoBehaviour
     [SerializeField] private int segments = 48;
     [SerializeField] private Color ringColor = new Color(1f, 0.6f, 0.1f, 0.85f);
 
+    private Vector2[] unitCircle;
+
     private LineRenderer line;
 
     private void Awake()
@@ -22,6 +24,18 @@ public class ShockwaveEffect : MonoBehaviour
         line.material = new Material(Shader.Find("Sprites/Default"));
         line.startColor = ringColor;
         line.endColor = ringColor;
+
+        BuildUnitCircle();
+    }
+
+    private void BuildUnitCircle()
+    {
+        unitCircle = new Vector2[segments];
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = 2 * Mathf.PI * i / segments;
+            unitCircle[i] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        }
     }
 
     public void Play(float startRadius, float endRadius, float duration)
@@ -54,10 +68,13 @@ public class ShockwaveEffect : MonoBehaviour
     {
         for (int i = 0; i < segments; i++)
         {
-            float angle = 2 * Mathf.PI * i / segments;
-            float x = Mathf.Cos(angle) * radius;
-            float y = Mathf.Sin(angle) * radius;
-            line.SetPosition(i, new Vector3(x, y, 0f));
+            //float angle = 2 * Mathf.PI * i / segments;
+            //float x = Mathf.Cos(angle) * radius;
+            //float y = Mathf.Sin(angle) * radius;
+            //line.SetPosition(i, new Vector3(x, y, 0f));
+
+            Vector2 dir = unitCircle[i];
+            line.SetPosition(i, new Vector3(dir.x * radius, dir.y * radius, 0f));
         }
     }
 }

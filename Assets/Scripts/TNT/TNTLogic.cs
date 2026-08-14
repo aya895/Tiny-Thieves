@@ -73,7 +73,6 @@ public class TNTLogic : MonoBehaviour
         yield return new WaitForSeconds(0.15f);
 
         OnExplode?.Invoke();
-        
         ExplosionSignal.Raise(transform.position, ExplosionRadius, damage);
         ShockwaveSignal.Raise(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
 

@@ -7,8 +7,8 @@ public class AntMovement : MonoBehaviour
     private AIPath aiPath;
     private AIDestinationSetter destinationSetter;
     public AntLineController antLineController;
-   // private AntStateController stateController;
-    private Ant ant;
+    // private AntStateController stateController;
+    private AntStackController stacker;
 
     void Start()
     {
@@ -16,7 +16,7 @@ public class AntMovement : MonoBehaviour
         aiPath = GetComponent<AIPath>();
         destinationSetter = GetComponent<AIDestinationSetter>();
        // stateController = GetComponent<AntStateController>();
-        ant = GetComponent<Ant>();
+       stacker = GetComponent<AntStackController>();
 
         // set ai path speed to ant's move speed
         if (aiPath != null)
@@ -33,9 +33,9 @@ public class AntMovement : MonoBehaviour
         {
             // notify line controller to remove this ant from line
             antLineController.OnReachedDessert(gameObject);
-            if(ant != null)
+            if (stacker != null)
             {
-                ant.LeaveStack();
+                stacker.LeaveStack();
             }
            // stateController.SetState(AntState.Eating); // deft satr da bs al4an ye8yar el state
                                                        // beta3t el ant mn moving le eating 3al4an

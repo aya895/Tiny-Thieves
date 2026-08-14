@@ -25,17 +25,19 @@ public class ExperienceManager : MonoBehaviour
 
     private void OnEnable()
     {
-        AntDeathSignal.OnAntDied += AddXP;
-        WaveEndSignal.OnWaveEnded += HandleWaveEnded;
+        Ant.OnAntDeath += AddXP;
+        //WaveEndSignal.OnWaveEnded += HandleWaveEnded;
+        WaveManager.OnWaveEnded += HandleWaveEnded;
     }
 
     private void OnDisable()
     {
-        AntDeathSignal.OnAntDied -= AddXP;
-        WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
+        Ant.OnAntDeath -= AddXP;
+        //WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
+        WaveManager.OnWaveEnded -= HandleWaveEnded;
     }
 
-    private void AddXP(float amount)
+    private void AddXP(GameObject ant, float amount)
     {
         currentXP += amount;
 

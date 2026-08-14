@@ -11,12 +11,12 @@ public class DessertEatingSound : MonoBehaviour
 
     private void OnEnable()
     {
-        WaveEndSignal.OnWaveEnded += StopEatingSound;
+        WaveManager.OnWaveEnded += StopEatingSound;
     }
 
     private void OnDisable()
     {
-        WaveEndSignal.OnWaveEnded -= StopEatingSound;
+        WaveManager.OnWaveEnded -= StopEatingSound;
     }
 
     public void PlayEatingSound()

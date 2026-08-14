@@ -28,12 +28,14 @@ public class MapExpander : MonoBehaviour
 
     private void OnEnable()
     {
-        WaveReadySignal.OnWaveReady += HandlePlanningStarted;
+        //WaveReadySignal.OnWaveReady += HandlePlanningStarted;
+        WaveManager.OnWaveReady += HandlePlanningStarted;
     }
 
     private void OnDisable()
     {
-        WaveReadySignal.OnWaveReady -= HandlePlanningStarted;
+        //WaveReadySignal.OnWaveReady -= HandlePlanningStarted;
+        WaveManager.OnWaveReady -= HandlePlanningStarted;
     }
 
 

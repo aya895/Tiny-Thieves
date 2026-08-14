@@ -19,6 +19,7 @@ public class TNTPlacementController : MonoBehaviour
     private ExplosionRadiusIndicator activePreview;
     private TNTLogic lastPlaced;
     private TNTLogic firstPlaced; // remembered so Detonator knows where the chain starts
+    private Camera mainCam; // cache & assign in awake so it wont be called every frame in update
     private int placedCount = 0;
 
     public int RemainingTNT => EffectiveMaxTNTCount - placedCount;
@@ -38,15 +39,20 @@ public class TNTPlacementController : MonoBehaviour
         {
             waveManager = FindFirstObjectByType<WaveManager>();
         }
+
+        
+        mainCam = Camera.main;
     }
     private void OnEnable()
     {
-        WaveReadySignal.OnWaveReady += ResetForNewWave;
+        //WaveReadySignal.OnWaveReady += ResetForNewWave;
+        WaveManager.OnWaveReady += ResetForNewWave;
     }
  
     private void OnDisable()
     {
-        WaveReadySignal.OnWaveReady -= ResetForNewWave;
+        //WaveReadySignal.OnWaveReady -= ResetForNewWave;
+        WaveManager.OnWaveReady -= ResetForNewWave;
     }
 
     private void ResetForNewWave()
@@ -63,10 +69,6 @@ public class TNTPlacementController : MonoBehaviour
     }
     private void Update()
     {
-        //if (waveManager.CurrentState != WaveState.Ready && waveManager.CurrentState != WaveState.Playing)
-        //{
-        //    return;
-        //}
         if (waveManager == null)
         {
             waveManager = FindFirstObjectByType<WaveManager>();
@@ -74,23 +76,23 @@ public class TNTPlacementController : MonoBehaviour
             if (waveManager == null)
                 return;
         }
-        if (!waveManager.IsPlanning() &&
-    !waveManager.IsPlaying())
+        if (!waveManager.IsPlanning() && !waveManager.IsPlaying())
         {
             return;
         }
-        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
 
-        UpdatePreview(mouseWorld);
+        bool placementValid = IsPlacementValid(mouseWorld); // computed once 
 
-        if (Input.GetMouseButtonDown(0) && IsPlacementValid(mouseWorld))
+        UpdatePreview(mouseWorld, placementValid);
+        if (Input.GetMouseButtonDown(0) && placementValid)
         {
             PlaceTNT(mouseWorld);
         }
     }
 
-    private void UpdatePreview(Vector3 worldPos)
+    private void UpdatePreview(Vector3 worldPos, bool placementValid)
     {
         if (placedCount >= EffectiveMaxTNTCount)
         {
@@ -99,18 +101,23 @@ public class TNTPlacementController : MonoBehaviour
         }
 
         if (activePreview == null)
+        {
             activePreview = Instantiate(previewIndicatorPrefab);
+        }
 
         activePreview.transform.position = worldPos;
         activePreview.SetRadius(tntPrefab.ExplosionRadius);
-        activePreview.SetVisible(IsPlacementValid(worldPos));
+        activePreview.SetVisible(placementValid);
     }
 
     private bool IsPlacementValid(Vector3 worldPos)
     {
         if (placedCount >= EffectiveMaxTNTCount) return false;
         if (lastPlaced == null) return true; // first TNT can go anywhere
-        return Vector3.Distance(lastPlaced.transform.position, worldPos) <= EffectiveMaxFuseLength;
+
+        //return Vector3.Distance(lastPlaced.transform.position, worldPos) <= EffectiveMaxFuseLength;
+        float maxFuseLength = EffectiveMaxFuseLength;
+        return (worldPos - lastPlaced.transform.position).sqrMagnitude <= maxFuseLength * maxFuseLength;
     }
 
     private void PlaceTNT(Vector3 worldPos)
@@ -134,10 +141,6 @@ public class TNTPlacementController : MonoBehaviour
 
     // Detonator reads this - it doesn't need to know HOW the chain was built.
     public TNTLogic GetChainStart() => firstPlaced;
-
-
-
-
 }
 
 

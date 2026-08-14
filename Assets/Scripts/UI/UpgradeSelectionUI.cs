@@ -20,12 +20,14 @@ public class UpgradeSelectionUI : MonoBehaviour
     
     private void OnEnable()
     {
-        WaveEndSignal.OnWaveEnded += HandleWaveEnded;
+        //WaveEndSignal.OnWaveEnded += HandleWaveEnded;
+        WaveManager.OnWaveEnded += HandleWaveEnded;
     }
 
     private void OnDisable()
     {
-        WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
+        //WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
+        WaveManager.OnWaveEnded -= HandleWaveEnded;
     }
 
     private void HandleWaveEnded()
