@@ -2,41 +2,56 @@ using UnityEngine;
 
 public class DessertEatingSound : MonoBehaviour
 {
-    private AudioSource audioSource;
+    [SerializeField] private AudioManager audioManager;
     [SerializeField] private AudioClip eatingClip;
-
-    [Header("Sound Settings")]
-    [SerializeField] private float minPitch = 0.95f;
-    [SerializeField] private float maxPitch = 1.05f;
 
     private void OnEnable()
     {
-        WaveManager.OnWaveEnded += StopEatingSound;
+        DessertEatingSignal.OnEatingStarted += HandleEatingStarted;
+        DessertEatingSignal.OnEatingStopped += HandleEatingStopped;
+        WaveManager.OnWaveEnded += HandleWaveEnded;
     }
 
     private void OnDisable()
     {
-        WaveManager.OnWaveEnded -= StopEatingSound;
+        DessertEatingSignal.OnEatingStarted -= HandleEatingStarted;
+        DessertEatingSignal.OnEatingStopped -= HandleEatingStopped;
+        WaveManager.OnWaveEnded -= HandleWaveEnded;
     }
 
-    public void PlayEatingSound()
+    private void HandleEatingStarted()
     {
-        if (audioSource == null || eatingClip == null)
+        //if (audioManager == null || eatingClip == null)
+        //    return;
+
+        //audioManager.PlayEating(eatingClip);
+        if (AudioManager.Instance == null || eatingClip == null)
             return;
 
-        // Don't restart the sound if another ant is already eating.
-        if (audioSource.isPlaying)
-            return;
-
-        audioSource.pitch = Random.Range(minPitch, maxPitch);
-        audioSource.PlayOneShot(eatingClip);
+        AudioManager.Instance.PlayEating(eatingClip);
     }
 
-    private void StopEatingSound()
+    private void HandleEatingStopped()
     {
-        if (audioSource != null && audioSource.isPlaying)
-        {
-            audioSource.Stop();
-        }
+        //if (audioManager == null)
+        //    return;
+
+        //audioManager.StopEating();
+        if (AudioManager.Instance == null)
+            return;
+
+        AudioManager.Instance.StopEating();
+    }
+
+    private void HandleWaveEnded()
+    {
+        //if (audioManager == null)
+        //    return;
+
+        //audioManager.StopEating();
+        if (AudioManager.Instance == null)
+            return;
+
+        AudioManager.Instance.StopEating();
     }
 }

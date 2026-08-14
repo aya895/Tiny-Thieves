@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
     private TNTPlacementController tntController;
@@ -8,14 +7,76 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip explosionClip;
     [SerializeField] private AudioClip upgradeChosenClip;
 
-    private AudioSource audioSource;
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource eatingSource;
+
+    private const string MUSIC_KEY = "MusicVolume";
+    private const string SFX_KEY = "SFXVolume";
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        // load changed music & sfx
+        SetMusicVolume(PlayerPrefs.GetFloat(MUSIC_KEY, 1f));
+        SetSFXVolume(PlayerPrefs.GetFloat(SFX_KEY, 1f));
     }
 
-    private void OnEnable()
+    public void SetMusicVolume(float volume)
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = volume;
+        }
+        PlayerPrefs.SetFloat(MUSIC_KEY, volume);
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.volume = volume;
+        }
+        if (eatingSource != null)
+        {
+            eatingSource.volume = volume;
+        }
+        PlayerPrefs.SetFloat(SFX_KEY, volume);
+    }
+
+    //public void SetVolume(float volume) // called whenever volume changes :)
+    //{
+    //    if (audioSource != null)
+    //    {
+    //        audioSource.volume = volume;
+    //    }
+    //    PlayerPrefs.SetFloat("MusicVolume", volume);
+    //}
+
+    public void PlayMusic(AudioClip clip)
+    {
+        if (musicSource == null || clip == null)
+            return;
+
+        if (musicSource.clip == clip && musicSource.isPlaying)
+            return;
+
+        musicSource.clip = clip;
+        musicSource.loop = true;
+        musicSource.Play();
+    }
+
+    public void PlaySfx(AudioClip clip)
     {
         //ExplosionSignal.OnExplosion += HandleExplosion;
         if (tntController == null)
@@ -29,7 +90,7 @@ public class AudioManager : MonoBehaviour
         UpgradeChosenSignal.OnUpgradeChosen += HandleUpgradeChosen;
     }
 
-    private void OnDisable()
+    public void PlayEating(AudioClip clip)
     {
         if (tntController != null)
         {
@@ -38,15 +99,19 @@ public class AudioManager : MonoBehaviour
         UpgradeChosenSignal.OnUpgradeChosen -= HandleUpgradeChosen;
     }
 
-    // ExplosionSignal's signature is (position, radius, damage) - we only
-    // care that an explosion happened, so the params are unused here.
-    private void HandleExplosion(Vector2 position, float radius, float damage)
+    public void StopEating()
     {
-        if (explosionClip != null) audioSource.PlayOneShot(explosionClip);
+        if (eatingSource != null && eatingSource.isPlaying)
+        {
+            eatingSource.Stop();
+        }
     }
 
-    private void HandleUpgradeChosen()
+    public void StopMusic()
     {
-        if (upgradeChosenClip != null) audioSource.PlayOneShot(upgradeChosenClip);
+        if (musicSource != null)
+        {
+            musicSource.Stop();
+        }
     }
 }
