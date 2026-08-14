@@ -1547,6 +1547,152 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &440016972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 440016975}
+  - component: {fileID: 440016974}
+  - component: {fileID: 440016973}
+  m_Layer: 0
+  m_Name: DessertEatingSound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &440016973
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440016972}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &440016974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440016972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca53491c4658b74280e74a2016c95d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DessertEatingSound
+  audioSource: {fileID: 440016973}
+  eatingClip: {fileID: 8300000, guid: 8b5989f0ecde3fb469ff4ebddbc0770c, type: 3}
+  minPitch: 0.95
+  maxPitch: 1.05
+--- !u!4 &440016975
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440016972}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.2494, y: 0.04217, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &448224798
 GameObject:
   m_ObjectHideFlags: 0
@@ -3554,6 +3700,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1204193793 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5144415988715307754, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
+  m_PrefabInstance: {fileID: 1234625408}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1220762528
 GameObject:
   m_ObjectHideFlags: 0
@@ -3747,7 +3898,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5144415988715307754, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1701313842}
   m_SourcePrefab: {fileID: 100100000, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
 --- !u!1 &1268424593
 GameObject:
@@ -5721,7 +5875,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2847882406900169375, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
   m_PrefabInstance: {fileID: 1234625408}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1204193793}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 423bab2670552624384512bca77d9131, type: 3}
@@ -5732,6 +5886,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5958556874469410641, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
   m_PrefabInstance: {fileID: 1234625408}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1701313842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204193793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca53491c4658b74280e74a2016c95d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DessertEatingSound
+  audioSource: {fileID: 440016973}
+  eatingClip: {fileID: 8300000, guid: 8b5989f0ecde3fb469ff4ebddbc0770c, type: 3}
+  minPitch: 0.95
+  maxPitch: 1.05
 --- !u!1 &1709674731
 GameObject:
   m_ObjectHideFlags: 0
@@ -6177,7 +6347,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3e5088a2502d5fb42a2dff98f9d84582, type: 2}
   - {fileID: 11400000, guid: adc64392c6ec3a74aa3f02b8540aa322, type: 2}
   - {fileID: 11400000, guid: 766c9c4e9ac73c04e98c4330afba94b0, type: 2}
-  - {fileID: 11400000, guid: ccc040f4d2c295a419f77132adac6c77, type: 2}
+  - {fileID: 11400000, guid: abff84600c6e27e4f8067ca4e73b196c, type: 2}
   - {fileID: 11400000, guid: a1781b04e04093f48a95a3def02ae9ec, type: 2}
   panelRoot: {fileID: 1498385589}
   choicesContainer: {fileID: 922635097}
@@ -8254,3 +8424,4 @@ SceneRoots:
   - {fileID: 1451174104}
   - {fileID: 1891420182}
   - {fileID: 1815039112}
+  - {fileID: 440016975}
