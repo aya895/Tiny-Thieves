@@ -47,7 +47,6 @@ public class TNTLogic : MonoBehaviour
     // Other systems (visuals, audio, score) subscribe to these instead of
     // TNTLogic calling them directly. Dependency Inversion: TNTLogic depends
     // on nothing; everyone else depends on TNTLogic's public events.
-    public event Action OnIgnite;
     public event Action OnExplode;
 
     public void SetNext(TNTLogic next, float distance)
@@ -63,7 +62,6 @@ public class TNTLogic : MonoBehaviour
         if (hasIgnited) return;
         hasIgnited = true;
 
-        OnIgnite?.Invoke(); // e.g. TNTVisual plays the spark/fuse-burning animation
 
         StartCoroutine(ExplodeThenPropagate());
     }
@@ -75,8 +73,7 @@ public class TNTLogic : MonoBehaviour
         yield return new WaitForSeconds(0.15f);
 
         OnExplode?.Invoke();
-        // Debug.Log($"[TNTLogic] Exploding with radius={ExplosionRadius}, " +
-        //            $"knockback={EffectiveKnockbackForce}, fuseSpeed={EffectiveFuseBurnSpeed}");
+        
         ExplosionSignal.Raise(transform.position, ExplosionRadius, damage);
         ShockwaveSignal.Raise(transform.position, ShockwaveRadius, EffectiveKnockbackForce);
 
