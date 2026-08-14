@@ -18,13 +18,14 @@ public class GameManager : MonoBehaviour
     public static event Action OnMapExpand;
     public static event Action OnMoreAntInLine;
 
+    [Header("Gameplay music")]
+    [SerializeField] private AudioClip gameplayMusicClip;
+
     private void Awake()
     {
         // Every Game Scene gets its own GameManager.
         // No DontDestroyOnLoad here.
-        if (FindObjectsByType<GameManager>(
-            FindObjectsInactive.Exclude,
-            FindObjectsSortMode.None).Length > 1)
+        if (FindObjectsByType<GameManager>(FindObjectsInactive.Exclude,FindObjectsSortMode.None).Length > 1)
         {
             Destroy(gameObject);
             return;
@@ -36,6 +37,11 @@ public class GameManager : MonoBehaviour
         if (waveManager == null)
         {
             waveManager = FindFirstObjectByType<WaveManager>();
+        }
+
+        if (AudioManager.Instance != null && gameplayMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(gameplayMusicClip);
         }
     }
 

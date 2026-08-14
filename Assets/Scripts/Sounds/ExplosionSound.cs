@@ -17,9 +17,13 @@ public class ExplosionSound : MonoBehaviour
 
     private void HandleExplosion(Vector2 position, float radius, float damage)
     {
-        if (audioManager == null || explosionClip == null)
+        //if (audioManager == null || explosionClip == null)
+        //    return;
+
+        //audioManager.PlaySfx(explosionClip);
+        if (AudioManager.Instance == null || explosionClip == null)
             return;
 
-        audioManager.PlaySfx(explosionClip);
+        AudioManager.Instance.PlaySfx(explosionClip);
     }
 }

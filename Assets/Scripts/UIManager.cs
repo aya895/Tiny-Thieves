@@ -14,6 +14,12 @@ public class UIManager : MonoBehaviour
     private StringBuilder builder;
     private bool isPaused = false;
 
+    [Header("Audio Settings")]
+    [SerializeField] private Slider musicSlider;
+    [SerializeField] private Slider sfxSlider;
+
+    private const string MUSIC_PREF_KEY = "MusicVolume";
+    private const string SFX_PREF_KEY = "SFXVolume";
 
     //void Start()
     //{
@@ -24,6 +30,7 @@ public class UIManager : MonoBehaviour
     //    waveClearedAt.text = "";
     //    waveClearedAt.gameObject.SetActive(false);
     //}
+
     private void Awake()
     {
         Time.timeScale = 1f;
@@ -40,19 +47,88 @@ public class UIManager : MonoBehaviour
         }
 
         if (victoryPanel != null)
+        {
             victoryPanel.SetActive(false);
+        }
 
         if (pausePanel != null)
+        {
             pausePanel.SetActive(false);
+        }
+
+        InitVolumeSliders();
     }
+
     private void OnEnable()
     {
         WaveManager.OnVictory += ShowVictory;
+        //InitVolumeSliders();
+
+        if (musicSlider != null)
+        {
+            musicSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+            musicSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
+            sfxSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
+        }
     }
 
     private void OnDisable()
     {
         WaveManager.OnVictory -= ShowVictory;
+
+        if (musicSlider != null)
+        {
+            musicSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
+        }
+    }
+
+    private void InitVolumeSliders()
+    {
+        float savedMusic = PlayerPrefs.GetFloat(MUSIC_PREF_KEY, 1f);
+        float savedSFX = PlayerPrefs.GetFloat(SFX_PREF_KEY, 1f);
+
+        if (musicSlider != null)
+        {
+            musicSlider.SetValueWithoutNotify(savedMusic); // no event triggers
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.SetValueWithoutNotify(savedSFX);
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(savedMusic);
+            AudioManager.Instance.SetSFXVolume(savedSFX);
+        }
+    }
+
+    // Called whenever player moves the pause menu sliders
+    private void OnMusicVolumeChanged(float value)
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(value);
+        }
+    }
+
+    private void OnSFXVolumeChanged(float value)
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXVolume(value);
+        }
     }
 
     private void ShowVictory()
@@ -91,6 +167,12 @@ public class UIManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         isPaused = false;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopEating();
+            AudioManager.Instance.StopMusic();
+        }
 
         SceneManager.LoadScene(0);
     }

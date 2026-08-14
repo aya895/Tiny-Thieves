@@ -10,7 +10,7 @@ using UnityEditor;
 
 public class MenuUIHandler : MonoBehaviour
 {
-    public MenuUIHandler instance { set; get; }
+    public static MenuUIHandler instance { set; get; }
 
     public static event Action OnPlayClicked;
 
@@ -19,35 +19,61 @@ public class MenuUIHandler : MonoBehaviour
     public GameObject logo;
     public Slider musicSlider;
 
-    void Start()
-    {
-        musicSlider.gameObject.SetActive(false);
-        creditsScreen.gameObject.SetActive(false);
-        howToPlayScreen.gameObject.SetActive(false);
-        logo.gameObject.SetActive(true);
-    }
+    private bool isInitializing = false;
+
+    [Header("Menu Music")]
+    [SerializeField] private AudioClip menuMusicClip;
 
     void Awake()
     {
-        if (instance == null)
+        //if (instance == null)
+        //{
+        //    instance = this;
+        //    DontDestroyOnLoad(gameObject);
+        //}
+        //else
+        //{
+        //    Destroy(gameObject);
+        //}
+    }
+
+    void Start()
+    {
+        isInitializing = true;
+        creditsScreen.gameObject.SetActive(false);
+        howToPlayScreen.gameObject.SetActive(false);
+        logo.gameObject.SetActive(true);
+
+        if (musicSlider != null)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
+            musicSlider.gameObject.SetActive(false);       
+            // Load saved music volume into the slider
+            float savedVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            musicSlider.SetValueWithoutNotify(savedVolume);
+            musicSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
+            //musicSlider.value = savedVolume;
+            if (AudioManager.Instance != null && menuMusicClip != null)
+            {
+                AudioManager.Instance.PlayMusic(menuMusicClip);
+            }
+            isInitializing = false;
         }
     }
+
 
     // functions needed for the buttons
     public void PlayClicked() 
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopMusic();
+        }
+
         SceneManager.LoadScene(1);
         OnPlayClicked?.Invoke();
     }
 
-    public void SettingsClicked()
+    public void VolumeClicked()
     {
         bool shown = musicSlider.isActiveAndEnabled;
         if (!shown)
@@ -64,18 +90,31 @@ public class MenuUIHandler : MonoBehaviour
     {
         howToPlayScreen.SetActive(true);
         logo.gameObject.SetActive(false);
+        musicSlider.gameObject.SetActive(false);
     }
 
     public void CreditsClicked()
     {
         creditsScreen.SetActive(true);
         logo.gameObject.SetActive(false);
+        musicSlider.gameObject.SetActive(false);
     }
 
     // for back button in how-to-play/credits screens
     public void BackClicked() 
     {
-        SceneManager.LoadScene(0);
+        howToPlayScreen.SetActive(false);
+        creditsScreen.SetActive(false);
+        logo.gameObject.SetActive(true);
+    }
+
+    private void OnVolumeSliderChanged(float value)
+    {
+        if (isInitializing) return;
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(value);
+        }
     }
 
     public void QuitClicked()
