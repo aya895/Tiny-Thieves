@@ -9,14 +9,14 @@ public class DessertEatingSound : MonoBehaviour
     {
         DessertEatingSignal.OnEatingStarted += HandleEatingStarted;
         DessertEatingSignal.OnEatingStopped += HandleEatingStopped;
-        WaveEndSignal.OnWaveEnded += HandleWaveEnded;
+        WaveManager.OnWaveEnded += HandleWaveEnded;
     }
 
     private void OnDisable()
     {
         DessertEatingSignal.OnEatingStarted -= HandleEatingStarted;
         DessertEatingSignal.OnEatingStopped -= HandleEatingStopped;
-        WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
+        WaveManager.OnWaveEnded -= HandleWaveEnded;
     }
 
     private void HandleEatingStarted()
