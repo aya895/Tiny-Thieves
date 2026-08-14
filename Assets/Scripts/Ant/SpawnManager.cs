@@ -17,7 +17,7 @@ public class SpawnManager : MonoBehaviour
 
     private List<Vector2> placedNestPositions = new List<Vector2>();
     public int numberOfNests = 2; // current number , can increase with higher waves
-    public int linesPerNest = 2;
+    public int linesPerNest = 1;
 
     // spawning new types with higher waves
     //[SerializeField] private ExperienceManager experienceManager;
@@ -28,7 +28,9 @@ public class SpawnManager : MonoBehaviour
     private List<GameObject> spawnedNests = new List<GameObject>();
     private List<GameObject> spawnedLines = new List<GameObject>();
 
-
+    [SerializeField] private Transform dessertTransform;
+    [SerializeField] private float minDistanceFromDessert = 4f;
+    [SerializeField] private float minDistanceBetweenNests = 3f;
     private void OnEnable()
     {
         GameManager.OnAddAntNest += AddNest;
@@ -47,7 +49,7 @@ public class SpawnManager : MonoBehaviour
     {
         // wave 1 starting values 
         numberOfNests = 2;
-        linesPerNest = 2;
+        linesPerNest = 1;
     }
 
     public void StartWave()
@@ -57,26 +59,37 @@ public class SpawnManager : MonoBehaviour
         SpawnNests();
     }
 
+    
     public void ClearPreviousWave()
     {
+        StopAllCoroutines();
+
         foreach (GameObject nest in spawnedNests)
         {
-            Destroy(nest);
+            if (nest != null)
+                Destroy(nest);
         }
+
         spawnedNests.Clear();
+
         foreach (GameObject line in spawnedLines)
         {
-            Destroy(line);
+            if (line != null)
+                Destroy(line);
         }
+
         spawnedLines.Clear();
+
         GameObject[] ants = GameObject.FindGameObjectsWithTag("Ant");
+
         foreach (GameObject ant in ants)
         {
-            Destroy(ant);
+            if (ant != null)
+                Destroy(ant);
         }
+
         placedNestPositions.Clear();
     }
-
     private void SpawnNests()
     {
         for (int i = 0; i < numberOfNests; i++)
@@ -91,26 +104,87 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    //private Vector2 GetNestPosition(int index)
+    //{
+    //    // first nest gets has a noraml random position
+    //    if (index == 0)
+    //    {
+    //        return new Vector2(Random.Range(xMin, xMax), Random.Range(yMin, yMax));
+    //    }
+
+    //    // subsequent ones has offset from previous nest by minNestDistance in a random direction
+    //    Vector2 randomDirection = Random.insideUnitCircle.normalized;
+    //    Vector2 offsetPosition = placedNestPositions[index - 1] + randomDirection * distancePerNest;
+
+    //    // clamp so nests stay inside the placement rectangle
+    //    offsetPosition.x = Mathf.Clamp(offsetPosition.x, xMin, xMax);
+    //    offsetPosition.y = Mathf.Clamp(offsetPosition.y, yMin, yMax);
+
+    //    return offsetPosition;
+    //}
+
     private Vector2 GetNestPosition(int index)
     {
-        // first nest gets has a noraml random position
-        if (index == 0)
+        const int maxAttempts = 30;
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
-            return new Vector2(Random.Range(xMin, xMax), Random.Range(yMin, yMax));
+            Vector2 candidate;
+
+            if (index == 0)
+            {
+                candidate = new Vector2(
+                    Random.Range(xMin, xMax),
+                    Random.Range(yMin, yMax)
+                );
+            }
+            else
+            {
+                Vector2 randomDirection = Random.insideUnitCircle.normalized;
+
+                candidate = placedNestPositions[index - 1]
+                            + randomDirection * distancePerNest;
+
+                candidate.x = Mathf.Clamp(candidate.x, xMin, xMax);
+                candidate.y = Mathf.Clamp(candidate.y, yMin, yMax);
+            }
+
+            if (IsValidNestPosition(candidate))
+                return candidate;
         }
 
-        // subsequent ones has offset from previous nest by minNestDistance in a random direction
-        Vector2 randomDirection = Random.insideUnitCircle.normalized;
-        Vector2 offsetPosition = placedNestPositions[index - 1] + randomDirection * distancePerNest;
-
-        // clamp so nests stay inside the placement rectangle
-        offsetPosition.x = Mathf.Clamp(offsetPosition.x, xMin, xMax);
-        offsetPosition.y = Mathf.Clamp(offsetPosition.y, yMin, yMax);
-
-        return offsetPosition;
+        // Fallback if no valid position was found.
+        return GetFallbackNestPosition();
     }
+    private Vector2 GetFallbackNestPosition()
+    {
+        return new Vector2(
+            Random.Range(xMin, xMax),
+            Random.Range(yMin, yMax)
+        );
+    }
+    private bool IsValidNestPosition(Vector2 position)
+    {
+        if (dessertTransform != null)
+        {
+            if (Vector2.Distance(position, dessertTransform.position)
+                < minDistanceFromDessert)
+            {
+                return false;
+            }
+        }
 
+        foreach (Vector2 existingNest in placedNestPositions)
+        {
+            if (Vector2.Distance(position, existingNest)
+                < minDistanceBetweenNests)
+            {
+                return false;
+            }
+        }
 
+        return true;
+    }
     private void SpawnLinePerNest(Transform nestTransform)
     {
         for (int i = 0; i < linesPerNest; i++)
@@ -181,7 +255,17 @@ public class SpawnManager : MonoBehaviour
     {
         linesPerNest++;
     }
-
+    public void SetSpawnArea(
+    float minX,
+    float maxX,
+    float minY,
+    float maxY)
+    {
+        xMin = minX;
+        xMax = maxX;
+        yMin = minY;
+        yMax = maxY;
+    }
     public void ExpandSpawnArea(float amount)
     {
         xMin -= amount;
