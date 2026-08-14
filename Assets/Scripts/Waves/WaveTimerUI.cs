@@ -6,40 +6,93 @@ public class WaveTimerUI : MonoBehaviour
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private TMP_Text timerText;
 
+    private IWaveState currentState; //just to keep track of state 
+    private bool isCountingDown;
     private bool showGo;
     private float goTimer;
 
+
+    private void OnEnable()
+    {
+        WaveManager.OnStateChanged += HandleStateChanged;
+        WaveManager.OnCountdownTick += HandleCountdownTick;
+    }
+
+    private void OnDisable()
+    {
+        WaveManager.OnStateChanged -= HandleStateChanged;
+        WaveManager.OnCountdownTick -= HandleCountdownTick;
+    }
+
+    private void HandleStateChanged(IWaveState state)
+    {
+        currentState = state;
+        isCountingDown = false;
+
+        if (state is PlayingState)
+        {
+            showGo = true;
+            goTimer = 1f;
+        }
+        else if (state is GameOverState)
+        {
+            timerText.text = "";
+        }
+    }
+
+    private void HandleCountdownTick(int secondsRemaining)
+    {
+        isCountingDown = true;
+        timerText.text = secondsRemaining > 0 ? secondsRemaining.ToString() : "START!";
+    }
+
     private void Update()
     {
-        if (waveManager.IsPlanning())
-        {
-            showGo = false;
+        if (isCountingDown) return;
 
-            timerText.text =
-                $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";
+        //if (waveManager.IsPlanning())
+        //{
+        //    showGo = false;
+
+        //    timerText.text =
+        //        $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";
+        //}
+        //else if (waveManager.IsPlaying())
+        //{
+        //    if (!showGo)
+        //    {
+        //        showGo = true;
+        //        goTimer = 1f;
+        //    }
+
+        //    if (goTimer > 0f)
+        //    {
+        //        goTimer -= Time.deltaTime;
+        //        timerText.text = "GO!";
+        //        return;
+        //    }
+
+        //    timerText.text =
+        //        $"WAVE {waveManager.CurrentWave}\n" +
+        //        $"{Mathf.Ceil(waveManager.RemainingTime)}";
+        //}
+        //else
+        //{
+        //    timerText.text = "";
+        //}
+        if (currentState is PlanningState)
+        {
+            timerText.text = $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";
         }
-        else if (waveManager.IsPlaying())
+        else if (currentState is PlayingState)
         {
-            if (!showGo)
-            {
-                showGo = true;
-                goTimer = 1f;
-            }
-
             if (goTimer > 0f)
             {
                 goTimer -= Time.deltaTime;
                 timerText.text = "GO!";
                 return;
             }
-
-            timerText.text =
-                $"WAVE {waveManager.CurrentWave}\n" +
-                $"{Mathf.Ceil(waveManager.RemainingTime)}";
-        }
-        else
-        {
-            timerText.text = "";
+            timerText.text = $"WAVE {waveManager.CurrentWave}\n{Mathf.Ceil(waveManager.RemainingTime)}";
         }
     }
 }

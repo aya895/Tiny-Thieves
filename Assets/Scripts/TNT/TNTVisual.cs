@@ -47,7 +47,7 @@ public class TNTVisual : MonoBehaviour
         logic.OnExplode -= HandleExplode;
     }
 
-    private void HandleExplode()
+    private void HandleExplode(Vector2 position, float radius, float damage)
     {
         if (animator != null) animator.SetTrigger(explodeHash);
         explosion.SetActive(true);

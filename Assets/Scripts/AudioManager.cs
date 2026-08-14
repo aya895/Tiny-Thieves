@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
+    private TNTPlacementController tntController;
     [Header("Clips")]
     [SerializeField] private AudioClip explosionClip;
     [SerializeField] private AudioClip upgradeChosenClip;
@@ -16,13 +17,24 @@ public class AudioManager : MonoBehaviour
 
     private void OnEnable()
     {
-        ExplosionSignal.OnExplosion += HandleExplosion;
+        //ExplosionSignal.OnExplosion += HandleExplosion;
+        if (tntController == null)
+            tntController = FindFirstObjectByType<TNTPlacementController>();
+
+        if (tntController != null)
+        {
+            tntController.OnAnyExplosion += HandleExplosion;
+        }
+
         UpgradeChosenSignal.OnUpgradeChosen += HandleUpgradeChosen;
     }
 
     private void OnDisable()
     {
-        ExplosionSignal.OnExplosion -= HandleExplosion;
+        if (tntController != null)
+        {
+            tntController.OnAnyExplosion -= HandleExplosion;
+        }
         UpgradeChosenSignal.OnUpgradeChosen -= HandleUpgradeChosen;
     }
 

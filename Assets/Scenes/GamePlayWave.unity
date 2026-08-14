@@ -2726,7 +2726,7 @@ MonoBehaviour:
   readyTime: 5
   waveDuration: 15
   countdownText: {fileID: 124315678}
-  countdownSeconds: 0
+  countdownSeconds: 3
   spawnManager: {fileID: 1957066049}
   dessert: {fileID: 1701313834}
   gameOverUI: {fileID: 1891420181}
@@ -6514,7 +6514,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3e5088a2502d5fb42a2dff98f9d84582, type: 2}
   - {fileID: 11400000, guid: adc64392c6ec3a74aa3f02b8540aa322, type: 2}
   - {fileID: 11400000, guid: 766c9c4e9ac73c04e98c4330afba94b0, type: 2}
-  - {fileID: 11400000, guid: ccc040f4d2c295a419f77132adac6c77, type: 2}
+  - {fileID: 11400000, guid: abff84600c6e27e4f8067ca4e73b196c, type: 2}
   - {fileID: 11400000, guid: a1781b04e04093f48a95a3def02ae9ec, type: 2}
   panelRoot: {fileID: 1498385589}
   choicesContainer: {fileID: 922635097}

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // SINGLE RESPONSIBILITY: input + placement + linking TNTs into a fuse chain.
@@ -5,6 +6,10 @@ using UnityEngine;
 // TNTLogic instances and tells them who's next in line via SetNext().
 public class TNTPlacementController : MonoBehaviour
 {
+
+    public event Action<Vector2, float, float> OnAnyExplosion;
+    public event Action<Vector2, float, float> OnAnyShockwave;
+
     [Header("Prefabs")]
     [SerializeField] private TNTLogic tntPrefab;
     [SerializeField] private ExplosionRadiusIndicator previewIndicatorPrefab;
@@ -124,6 +129,9 @@ public class TNTPlacementController : MonoBehaviour
     {
         TNTLogic newTNT = Instantiate(tntPrefab, worldPos, Quaternion.identity);
         placedCount++;
+
+        newTNT.OnExplode += (pos, r, dmg) => OnAnyExplosion?.Invoke(pos, r, dmg);
+        newTNT.OnShockwave += (pos, r, force) => OnAnyShockwave?.Invoke(pos, r, force);
 
         if (lastPlaced != null)
         {

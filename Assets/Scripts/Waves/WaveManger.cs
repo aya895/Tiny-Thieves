@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 public class WaveManager : MonoBehaviour
 {
 
     public static event Action OnVictory;
     public static event Action OnWaveReady;
     public static event Action OnWaveEnded;
+    public static event Action<IWaveState> OnStateChanged;
+    public static event Action<int> OnCountdownTick;
 
     //[Header("Wave Victory Check")]
     //private int activeAnts = 0;
@@ -41,6 +44,7 @@ public class WaveManager : MonoBehaviour
         Time.timeScale = 1f;
 
         stateMachine = new WaveStateMachine();
+        stateMachine.OnStateChanged += state => OnStateChanged?.Invoke(state);  // new
         victoryTracker = new VictoryTracker();
     }
 
@@ -198,10 +202,12 @@ public class WaveManager : MonoBehaviour
             {
                 countdownText.text = i.ToString();
             }
+            OnCountdownTick?.Invoke(i);
             yield return new WaitForSeconds(1f);
         }
 
         countdownText.text = "START!";
+        OnCountdownTick?.Invoke(0);
         yield return new WaitForSeconds(0.5f);
         countdownText.gameObject.SetActive(false);
         stateMachine?.ChangeState(new PlanningState(this));
@@ -223,8 +229,6 @@ public class WaveManager : MonoBehaviour
             OnVictory?.Invoke();
         }
     }
-
-
 
 
     //private void Victory()
