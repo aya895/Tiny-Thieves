@@ -8,8 +8,6 @@ public sealed class AntEating : MonoBehaviour
     private Dessert targetDessert;
     private Coroutine eatingRoutine;
 
-    private DessertEatingSound dessertEatingSound;
-
     private void Awake()
     {
         antStats = GetComponent<AntStats>();
@@ -24,9 +22,6 @@ public sealed class AntEating : MonoBehaviour
             return;
 
         targetDessert = dessert;
-
-        // Get the ONE shared eating sound from the cake
-        dessertEatingSound = dessert.GetComponent<DessertEatingSound>();
 
         StartEating();
     }
@@ -43,24 +38,15 @@ public sealed class AntEating : MonoBehaviour
             return;
 
         StopEating();
-
         targetDessert = null;
-        dessertEatingSound = null;
     }
 
     private void StartEating()
     {
-        if (eatingRoutine != null)
+        if (eatingRoutine != null || targetDessert == null)
             return;
 
-        if (targetDessert == null)
-            return;
-
-        // Play the shared eating sound
-        if (dessertEatingSound != null)
-        {
-            dessertEatingSound.PlayEatingSound();
-        }
+        DessertEatingSignal.RaiseEatingStarted();
 
         eatingRoutine = StartCoroutine(EatingRoutine());
     }
@@ -72,38 +58,33 @@ public sealed class AntEating : MonoBehaviour
 
         StopCoroutine(eatingRoutine);
         eatingRoutine = null;
+
+        DessertEatingSignal.RaiseEatingStopped();
     }
 
     private IEnumerator EatingRoutine()
     {
         WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
-
         float damagePerSecond = antStats.DamageToDessert;
 
         while (targetDessert != null)
         {
-            if (targetDessert == null)
-                break;
-
             float damage = damagePerSecond * Time.fixedDeltaTime;
 
             targetDessert.TakeDamage(damage);
-
-            if (targetDessert == null)
-                break;
 
             yield return waitForFixedUpdate;
         }
 
         eatingRoutine = null;
         targetDessert = null;
-        dessertEatingSound = null;
+
+        DessertEatingSignal.RaiseEatingStopped();
     }
 
     private void OnDisable()
     {
         StopEating();
         targetDessert = null;
-        dessertEatingSound = null;
     }
 }

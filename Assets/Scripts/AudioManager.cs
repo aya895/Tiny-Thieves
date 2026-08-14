@@ -1,40 +1,51 @@
 using UnityEngine;
 
-[RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
-    [Header("Clips")]
-    [SerializeField] private AudioClip explosionClip;
-    [SerializeField] private AudioClip upgradeChosenClip;
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource eatingSource;
 
-    private AudioSource audioSource;
-
-    private void Awake()
+    public void PlayMusic(AudioClip clip)
     {
-        audioSource = GetComponent<AudioSource>();
+        if (musicSource == null || clip == null)
+            return;
+
+        if (musicSource.clip == clip && musicSource.isPlaying)
+            return;
+
+        musicSource.clip = clip;
+        musicSource.loop = true;
+        musicSource.Play();
     }
 
-    private void OnEnable()
+    public void PlaySfx(AudioClip clip)
     {
-        ExplosionSignal.OnExplosion += HandleExplosion;
-        UpgradeChosenSignal.OnUpgradeChosen += HandleUpgradeChosen;
+        if (sfxSource == null || clip == null)
+            return;
+
+        sfxSource.PlayOneShot(clip);
     }
 
-    private void OnDisable()
+    public void PlayEating(AudioClip clip)
     {
-        ExplosionSignal.OnExplosion -= HandleExplosion;
-        UpgradeChosenSignal.OnUpgradeChosen -= HandleUpgradeChosen;
+        if (eatingSource == null || clip == null)
+            return;
+
+        if (eatingSource.isPlaying)
+            return;
+
+        eatingSource.clip = clip;
+        eatingSource.loop = true;
+        eatingSource.Play();
     }
 
-    // ExplosionSignal's signature is (position, radius, damage) - we only
-    // care that an explosion happened, so the params are unused here.
-    private void HandleExplosion(Vector2 position, float radius, float damage)
+    public void StopEating()
     {
-        if (explosionClip != null) audioSource.PlayOneShot(explosionClip);
-    }
+        if (eatingSource == null || !eatingSource.isPlaying)
+            return;
 
-    private void HandleUpgradeChosen()
-    {
-        if (upgradeChosenClip != null) audioSource.PlayOneShot(upgradeChosenClip);
+        eatingSource.Stop();
     }
 }
