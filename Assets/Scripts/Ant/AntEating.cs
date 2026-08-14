@@ -8,6 +8,8 @@ public sealed class AntEating : MonoBehaviour
     private Dessert targetDessert;
     private Coroutine eatingRoutine;
 
+    private DessertEatingSound dessertEatingSound;
+
     private void Awake()
     {
         antStats = GetComponent<AntStats>();
@@ -22,6 +24,10 @@ public sealed class AntEating : MonoBehaviour
             return;
 
         targetDessert = dessert;
+
+        // Get the ONE shared eating sound from the cake
+        dessertEatingSound = dessert.GetComponent<DessertEatingSound>();
+
         StartEating();
     }
 
@@ -37,7 +43,9 @@ public sealed class AntEating : MonoBehaviour
             return;
 
         StopEating();
+
         targetDessert = null;
+        dessertEatingSound = null;
     }
 
     private void StartEating()
@@ -47,6 +55,12 @@ public sealed class AntEating : MonoBehaviour
 
         if (targetDessert == null)
             return;
+
+        // Play the shared eating sound
+        if (dessertEatingSound != null)
+        {
+            dessertEatingSound.PlayEatingSound();
+        }
 
         eatingRoutine = StartCoroutine(EatingRoutine());
     }
@@ -68,7 +82,6 @@ public sealed class AntEating : MonoBehaviour
 
         while (targetDessert != null)
         {
-            // Make sure the dessert is still valid
             if (targetDessert == null)
                 break;
 
@@ -76,26 +89,21 @@ public sealed class AntEating : MonoBehaviour
 
             targetDessert.TakeDamage(damage);
 
-            // Dessert may have been destroyed after TakeDamage()
             if (targetDessert == null)
                 break;
-
-            //Debug.Log(
-            //    $"[Ant Eating] {gameObject.name} dealt {damage:F2} damage " +
-            //    $"to {targetDessert.name}. " +
-            //    $"Dessert HP: {targetDessert.CurrentHealth:F2}/{targetDessert.MaxHealth:F2}"
-            //);
 
             yield return waitForFixedUpdate;
         }
 
         eatingRoutine = null;
         targetDessert = null;
+        dessertEatingSound = null;
     }
 
     private void OnDisable()
     {
         StopEating();
         targetDessert = null;
+        dessertEatingSound = null;
     }
 }
