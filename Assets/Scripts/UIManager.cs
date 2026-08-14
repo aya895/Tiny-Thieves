@@ -17,6 +17,8 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f;
+
         builder = new StringBuilder("All ants cleared at wave: ");
         waveManager = GetComponent<WaveManager>();
         waveClearedAt.text = "";
@@ -67,6 +69,9 @@ public class UIManager : MonoBehaviour
 
     public void ShowMenu()
     {
+        Time.timeScale = 1f;
+        isPaused = false;
+
         SceneManager.LoadScene(0);
     }
 }

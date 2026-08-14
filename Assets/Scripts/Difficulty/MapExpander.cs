@@ -11,9 +11,21 @@ public class MapExpander : MonoBehaviour
     [Header("Expansion Settings")]
     [SerializeField] private int mapExpansionInterval = 3;
     [SerializeField] private float expansionAmount = 0.5f;
+
+    [Header("Background")]
     [SerializeField] private float backgroundPadding = 2f;
+
+    [Header("Spawn Area")]
     [SerializeField] private float spawnMargin = 1f;
+
+    [Header("Camera Limit")]
     [SerializeField] private float maxCameraSize = 7f;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void OnEnable()
     {
         WaveReadySignal.OnWaveReady += HandlePlanningStarted;
@@ -24,6 +36,11 @@ public class MapExpander : MonoBehaviour
         WaveReadySignal.OnWaveReady -= HandlePlanningStarted;
     }
 
+
+    // =========================================================
+    // WAVE / EXPANSION
+    // =========================================================
+
     private void HandlePlanningStarted()
     {
         if (waveManager == null)
@@ -31,36 +48,140 @@ public class MapExpander : MonoBehaviour
 
         int nextWave = waveManager.CurrentWave + 1;
 
-        if (nextWave <= 0 || nextWave % mapExpansionInterval != 0)
+        // Expand every X waves.
+        if (nextWave <= 0 ||
+            nextWave % mapExpansionInterval != 0)
+        {
             return;
+        }
 
         ExpandMap();
     }
 
+
     private void ExpandMap()
     {
         ExpandCamera();
+
         UpdateBackground();
+
         UpdateSpawnArea();
 
         Debug.Log(
-            $"[MapExpander] Map expanded before Wave {waveManager.CurrentWave + 1}."
+            $"[MapExpander] Map expanded before Wave " +
+            $"{waveManager.CurrentWave + 1}."
         );
     }
 
-    private void UpdateSpawnArea()
+
+    // =========================================================
+    // CAMERA
+    // =========================================================
+
+    private void ExpandCamera()
     {
-        if (spawnManager == null || mainCamera == null)
+        if (mainCamera == null)
             return;
 
-        float height = mainCamera.orthographicSize * 2f;
-        float width = height * mainCamera.aspect;
+        if (!mainCamera.orthographic)
+            return;
 
-        float xMin = mainCamera.transform.position.x - width / 2f + spawnMargin;
-        float xMax = mainCamera.transform.position.x + width / 2f - spawnMargin;
+        float targetSize =
+            mainCamera.orthographicSize + expansionAmount;
 
-        float yMin = mainCamera.transform.position.y - height / 2f + spawnMargin;
-        float yMax = mainCamera.transform.position.y + height / 2f - spawnMargin;
+        mainCamera.orthographicSize =
+            Mathf.Min(targetSize, maxCameraSize);
+
+        Debug.Log(
+            $"[MapExpander] Camera size: " +
+            $"{mainCamera.orthographicSize}"
+        );
+    }
+
+
+    // =========================================================
+    // BACKGROUND
+    // =========================================================
+
+    private void UpdateBackground()
+    {
+        if (mainCamera == null || background == null)
+            return;
+
+        if (!mainCamera.orthographic)
+            return;
+
+        float height =
+            mainCamera.orthographicSize * 2f;
+
+        float width =
+            height * mainCamera.aspect;
+
+        // Resize background to cover the camera.
+        background.size = new Vector2(
+            width + backgroundPadding,
+            height + backgroundPadding
+        );
+
+        // Keep background centered with camera.
+        Vector3 backgroundPosition =
+            background.transform.position;
+
+        backgroundPosition.x =
+            mainCamera.transform.position.x;
+
+        backgroundPosition.y =
+            mainCamera.transform.position.y;
+
+        // Keep original Z.
+        background.transform.position =
+            backgroundPosition;
+    }
+
+
+    // =========================================================
+    // SPAWN AREA
+    // =========================================================
+
+    private void UpdateSpawnArea()
+    {
+        if (spawnManager == null ||
+            mainCamera == null)
+        {
+            return;
+        }
+
+        if (!mainCamera.orthographic)
+            return;
+
+        float height =
+            mainCamera.orthographicSize * 2f;
+
+        float width =
+            height * mainCamera.aspect;
+
+
+        float xMin =
+            mainCamera.transform.position.x
+            - width / 2f
+            + spawnMargin;
+
+        float xMax =
+            mainCamera.transform.position.x
+            + width / 2f
+            - spawnMargin;
+
+
+        float yMin =
+            mainCamera.transform.position.y
+            - height / 2f
+            + spawnMargin;
+
+        float yMax =
+            mainCamera.transform.position.y
+            + height / 2f
+            - spawnMargin;
+
 
         spawnManager.SetSpawnArea(
             xMin,
@@ -68,45 +189,12 @@ public class MapExpander : MonoBehaviour
             yMin,
             yMax
         );
-    }
 
-    private void ExpandCamera()
-    {
-        if (mainCamera == null || !mainCamera.orthographic)
-            return;
 
-        float targetSize = mainCamera.orthographicSize + expansionAmount;
-
-        mainCamera.orthographicSize = Mathf.Min(
-            targetSize,
-            maxCameraSize
+        Debug.Log(
+            $"[MapExpander] Spawn Area Updated: " +
+            $"X({xMin} → {xMax}), " +
+            $"Y({yMin} → {yMax})"
         );
     }
-
-    //private void LateUpdate()
-    //{
-    //    UpdateBackground();
-    //}
-
-    private void UpdateBackground()
-    {
-        if (mainCamera == null || background == null)
-            return;
-
-        float height = mainCamera.orthographicSize * 2f;
-        float width = height * mainCamera.aspect;
-
-        background.size = new Vector2(
-            width + backgroundPadding,
-            height + backgroundPadding
-        );
-
-        // Move only on X and Y.
-        background.transform.position = new Vector3(
-            mainCamera.transform.position.x,
-            mainCamera.transform.position.y,
-            background.transform.position.z
-        );
-    }
-
 }

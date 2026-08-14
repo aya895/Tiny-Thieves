@@ -30,7 +30,15 @@ public class TNTPlacementController : MonoBehaviour
         maxFuseLength + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxFuseDistance : 0f);
 
     [SerializeField] private WaveManager waveManager;
+   
 
+    private void Awake()
+    {
+        if (waveManager == null)
+        {
+            waveManager = FindFirstObjectByType<WaveManager>();
+        }
+    }
     private void OnEnable()
     {
         WaveReadySignal.OnWaveReady += ResetForNewWave;
@@ -59,12 +67,18 @@ public class TNTPlacementController : MonoBehaviour
         //{
         //    return;
         //}
+        if (waveManager == null)
+        {
+            waveManager = FindFirstObjectByType<WaveManager>();
+
+            if (waveManager == null)
+                return;
+        }
         if (!waveManager.IsPlanning() &&
     !waveManager.IsPlaying())
         {
             return;
         }
-        // 2ehm deft bs da goz2 da 3al4an placement beta3 tnt yeb2a fe wa2t el planning time w wave bs :>
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
 

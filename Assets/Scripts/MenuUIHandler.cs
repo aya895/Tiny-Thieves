@@ -43,7 +43,7 @@ public class MenuUIHandler : MonoBehaviour
     // functions needed for the buttons
     public void PlayClicked() 
     {
-        SceneManager.LoadScene(3);
+        SceneManager.LoadScene(1);
         OnPlayClicked?.Invoke();
     }
 

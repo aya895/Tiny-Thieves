@@ -11,17 +11,17 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MainMenu.unity
     guid: 42b54db3545d688439de9e9bd6e4be19
-  - enabled: 1
-    path: Assets/Scenes/GamePlay.unity
+  - enabled: 0
+    path: Assets/Scenes/Aya's Scene.unity
     guid: 293574be959d171489ccd66dd32e3f2a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/HowToPlayScreen.unity
     guid: 4d1ca72b43d3bc24db2289703488d6e5
   - enabled: 0
     path: Assets/Scenes/GameOverScene.unity
     guid: b8f0064065f687b4bb19c3d051c05657
   - enabled: 1
-    path: Assets/Scenes/GamePlay.unity
+    path: Assets/Scenes/GamePlayWave.unity
     guid: d15fd93197149c54a9f352da7d4c05dd
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

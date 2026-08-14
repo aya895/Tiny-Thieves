@@ -38,6 +38,8 @@ public class WaveManager : MonoBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1f;
+
         stateMachine = new WaveStateMachine();
     }
 
@@ -116,9 +118,26 @@ public class WaveManager : MonoBehaviour
     // Playing
     // -------------------------
 
+    //public void StartPlayingPhase()
+    //{
+    //    CurrentWave++;
+    //    timer = waveDuration;
+
+    //    Debug.Log($"Wave {CurrentWave} Started");
+
+    //    if (spawnManager != null)
+    //    {
+    //        spawnManager.StartWave();
+    //    }
+    //}
     public void StartPlayingPhase()
     {
         CurrentWave++;
+
+        // Reset victory tracking for the new wave
+        activeAnts = 0;
+        isSpawningFinished = false;
+
         timer = waveDuration;
 
         Debug.Log($"Wave {CurrentWave} Started");
@@ -128,7 +147,6 @@ public class WaveManager : MonoBehaviour
             spawnManager.StartWave();
         }
     }
-
     public void UpdatePlayingTimer()
     {
         timer -= Time.deltaTime;
