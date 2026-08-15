@@ -23,6 +23,7 @@ public class ExperienceManager : MonoBehaviour
 
     public event Action UpgradesResolved;
 
+
     private void OnEnable()
     {
         Ant.OnAntDeath += HandleAntDeath;
@@ -32,6 +33,11 @@ public class ExperienceManager : MonoBehaviour
     {
         Ant.OnAntDeath -= HandleAntDeath;
     }
+
+
+    // =========================================================
+    // XP
+    // =========================================================
 
     private void HandleAntDeath(
         GameObject ant,
@@ -73,6 +79,11 @@ public class ExperienceManager : MonoBehaviour
                );
     }
 
+
+    // =========================================================
+    // UPGRADE FLOW
+    // =========================================================
+
     public void ResolveWaveEnd()
     {
         if (PendingLevelUps > 0)
@@ -100,6 +111,7 @@ public class ExperienceManager : MonoBehaviour
 
         PendingLevelUps--;
 
+        // More upgrades still need to be selected.
         if (PendingLevelUps > 0)
             return;
 
@@ -107,6 +119,11 @@ public class ExperienceManager : MonoBehaviour
 
         UpgradesResolved?.Invoke();
     }
+
+
+    // =========================================================
+    // RESET
+    // =========================================================
 
     public void ResetProgress()
     {

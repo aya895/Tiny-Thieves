@@ -12,9 +12,7 @@ public class WaveManager : MonoBehaviour
     public static event Action OnVictory;
     public static event Action OnWaveReady;
     public static event Action OnWaveEnded;
-
     public static event Action<IWaveState> OnStateChanged;
-    public static event Action<int> OnCountdownTick;
 
 
     // =========================================================
@@ -25,9 +23,10 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float readyTime = 10f;
     [SerializeField] private float waveDuration = 60f;
 
-    [Header("Countdown")]
+    [Header("Start Message")]
     [SerializeField] private TextMeshProUGUI countdownText;
-    [SerializeField] private int countdownSeconds = 3;
+    [SerializeField] private string startMessage = "GO!";
+    [SerializeField] private float startMessageDuration = 0.75f;
 
 
     // =========================================================
@@ -49,6 +48,8 @@ public class WaveManager : MonoBehaviour
     private WaveStateMachine stateMachine;
     private float timer;
 
+    private bool retryCurrentWave;
+
     public int CurrentWave { get; private set; }
 
     public float ReadyTime => readyTime;
@@ -68,11 +69,14 @@ public class WaveManager : MonoBehaviour
 
         stateMachine.OnStateChanged += HandleStateChanged;
 
-        // VictoryTracker is a MonoBehaviour.
-        // Never create it using "new VictoryTracker()".
         if (victoryTracker == null)
         {
             victoryTracker = GetComponent<VictoryTracker>();
+        }
+
+        if (countdownText != null)
+        {
+            countdownText.gameObject.SetActive(false);
         }
     }
 
@@ -115,10 +119,9 @@ public class WaveManager : MonoBehaviour
     private void Start()
     {
         CurrentWave = 0;
+        retryCurrentWave = false;
 
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
+        StartCoroutine(ShowStartMessage());
     }
 
     private void Update()
@@ -201,7 +204,14 @@ public class WaveManager : MonoBehaviour
 
     public void StartPlayingPhase()
     {
-        CurrentWave++;
+        if (retryCurrentWave)
+        {
+            retryCurrentWave = false;
+        }
+        else
+        {
+            CurrentWave++;
+        }
 
         timer = waveDuration;
 
@@ -246,6 +256,8 @@ public class WaveManager : MonoBehaviour
         if (!IsPlaying())
             return;
 
+        retryCurrentWave = false;
+
         OnVictory?.Invoke();
 
         FinishWave();
@@ -263,8 +275,6 @@ public class WaveManager : MonoBehaviour
             spawnManager.ClearPreviousWave();
         }
 
-        // TNTPlacementController also listens to this
-        // and removes remaining TNT/fuses.
         OnWaveEnded?.Invoke();
 
         if (experienceManager != null)
@@ -278,18 +288,7 @@ public class WaveManager : MonoBehaviour
 
     private void HandleUpgradesResolved()
     {
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
-    }
-
-    // Keep this public method in case an existing UI/button
-    // still calls it.
-    public void FinishUpgrade()
-    {
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
+        StartCoroutine(ShowStartMessage());
     }
 
 
@@ -299,7 +298,7 @@ public class WaveManager : MonoBehaviour
 
     private void HandleDessertDestroyed()
     {
-        if (IsGameOver())
+        if (!IsPlaying())
             return;
 
         stateMachine.ChangeState(
@@ -309,15 +308,14 @@ public class WaveManager : MonoBehaviour
 
     public void HandleGameOver()
     {
+        retryCurrentWave = true;
+
         if (spawnManager != null)
         {
             spawnManager.ClearPreviousWave();
         }
 
-        if (experienceManager != null)
-        {
-            experienceManager.ResetProgress();
-        }
+        OnWaveEnded?.Invoke();
 
         if (gameOverUI != null)
         {
@@ -327,43 +325,31 @@ public class WaveManager : MonoBehaviour
 
     public void ContinueAfterGameOver()
     {
-        StartCoroutine(
-            StartCountdownSequence(countdownSeconds)
-        );
+        if (experienceManager != null)
+        {
+            experienceManager.ResolveWaveEnd();
+            return;
+        }
+
+        StartCoroutine(ShowStartMessage());
     }
 
 
     // =========================================================
-    // COUNTDOWN
+    // START MESSAGE
     // =========================================================
 
-    private IEnumerator StartCountdownSequence(int seconds)
+    private IEnumerator ShowStartMessage()
     {
         if (countdownText != null)
         {
+            countdownText.text = startMessage;
             countdownText.gameObject.SetActive(true);
         }
 
-        for (int i = seconds; i > 0; i--)
-        {
-            if (countdownText != null)
-            {
-                countdownText.text = i.ToString();
-            }
-
-            OnCountdownTick?.Invoke(i);
-
-            yield return new WaitForSeconds(1f);
-        }
-
-        if (countdownText != null)
-        {
-            countdownText.text = "START!";
-        }
-
-        OnCountdownTick?.Invoke(0);
-
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(
+            startMessageDuration
+        );
 
         if (countdownText != null)
         {
