@@ -10,8 +10,8 @@ public class UIManager : MonoBehaviour
     public GameObject victoryPanel;
     public GameObject pausePanel;
     public Button pauseButton;
+    public Button nextWaveButton;
     public TextMeshProUGUI waveClearedAt;
-    private StringBuilder builder;
     private bool isPaused = false;
 
     [Header("Audio Settings")]
@@ -27,8 +27,6 @@ public class UIManager : MonoBehaviour
         isPaused = false;
 
         waveManager = FindFirstObjectByType<WaveManager>();
-
-        builder = new StringBuilder("All ants cleared at wave: ");
 
         if (waveClearedAt != null)
         {
@@ -66,6 +64,12 @@ public class UIManager : MonoBehaviour
             sfxSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
             sfxSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         }
+
+        if (nextWaveButton != null)
+        {
+            nextWaveButton.onClick.RemoveListener(HandleNextWaveClicked);
+            nextWaveButton.onClick.AddListener(HandleNextWaveClicked);
+        }
     }
 
     private void OnDisable()
@@ -82,6 +86,11 @@ public class UIManager : MonoBehaviour
         if (sfxSlider != null)
         {
             sfxSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
+        }
+
+        if (nextWaveButton != null)
+        {
+            nextWaveButton.onClick.RemoveListener(HandleNextWaveClicked);
         }
     }
 
@@ -132,8 +141,16 @@ public class UIManager : MonoBehaviour
         waveClearedAt.gameObject.SetActive(true);
 
 
-        builder.Append(waveManager.CurrentWave);
-        waveClearedAt.text = builder.ToString();
+        waveClearedAt.text = $"All ants cleared at wave: {waveManager.CurrentWave}";
+    }
+
+    private void HandleNextWaveClicked()
+    {
+        victoryPanel.SetActive(false);
+        waveClearedAt.gameObject.SetActive(false);
+        pauseButton.gameObject.SetActive(true);
+
+        Time.timeScale = 1f;
     }
 
     public void ShowPause()

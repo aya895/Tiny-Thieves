@@ -16,10 +16,7 @@ public class DessertVisualController : MonoBehaviour
     private int currentSpriteIndex = -1;
     private float previousHealth = -1f;
 
-    private void Awake()
-    {
-        ValidateReferences();
-    }
+ 
 
     private void OnEnable()
     {
@@ -54,7 +51,7 @@ public class DessertVisualController : MonoBehaviour
 
         int spriteIndex = Mathf.FloorToInt((1f - healthPercentage) * healthSprites.Length);
 
-        spriteIndex = Mathf.Clamp(spriteIndex,0,healthSprites.Length - 1);
+        spriteIndex = Mathf.Clamp(spriteIndex, 0, healthSprites.Length - 1);
 
         if (spriteIndex == currentSpriteIndex)
             return;
@@ -78,24 +75,6 @@ public class DessertVisualController : MonoBehaviour
             StartCoroutine(invurnerability());
         }
 
-    }
-
-    private void ValidateReferences()
-    {
-        if (dessert == null)
-        {
-            Debug.LogError("[DessertVisualController] Dessert reference is missing.", this);
-        }
-
-        if (spriteRenderer == null)
-        {
-            Debug.LogError("[DessertVisualController] SpriteRenderer reference is missing.", this);
-        }
-
-        if (healthSprites == null || healthSprites.Length == 0)
-        {
-            Debug.LogError("[DessertVisualController] No health sprites assigned.", this);
-        }
     }
 
     private void UpdateColliderToSprite(Sprite sprite)

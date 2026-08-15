@@ -17,10 +17,6 @@ public class UpgradeSound : MonoBehaviour
 
     private void HandleUpgradeChosen()
     {
-        //if (audioManager == null || upgradeClip == null)
-        //    return;
-
-        //audioManager.PlaySfx(upgradeClip);
 
         if (AudioManager.Instance == null || upgradeClip == null)
             return;

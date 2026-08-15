@@ -8,7 +8,6 @@ public class AntStats : MonoBehaviour
     [SerializeField] private float maxHealth = 10f;
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private int damageToDessert = 10;
-    [SerializeField] private int coinReward = 1;
 
     [Header("TNT")]
     [SerializeField] private float tntResistance = 1f;
@@ -17,7 +16,6 @@ public class AntStats : MonoBehaviour
     public float MaxHealth => maxHealth;
     public float MoveSpeed => moveSpeed;
     public int DamageToDessert => damageToDessert;
-    public int CoinReward => coinReward;
     public float TntResistance => tntResistance;
 
     private void OnEnable()

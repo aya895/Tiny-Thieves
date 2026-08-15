@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &19384111
 RectTransform:
   m_ObjectHideFlags: 0
@@ -301,15 +301,15 @@ RectTransform:
   m_GameObject: {fileID: 57326747}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.48}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.38, y: 0.38, z: 0.38}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 791175639}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -64.6, y: 14.4}
-  m_SizeDelta: {x: 374.42, y: 50}
+  m_AnchoredPosition: {x: -49.72, y: 20.5}
+  m_SizeDelta: {x: 452.76, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &57326749
 MonoBehaviour:
@@ -331,18 +331,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Protect your desserts by explding ants and clear all the wave to win.
-
-
-    Useing
-    the mouse click at the ground to place Tnt in a Chain sequence.
-
-    Press the
-    detonator at the  perfect moment to start Exploding ants.
-
-
-    Collect XP by
-    killing more ant to upgrade your kit and be ready for more challanging waves.'
+  m_text: "Protect your desserts by exploding ants and clear all the wave to win.\n\nYou
+    have a timer of 5 seconds to think of a strategy to place fused TNT before abts
+    arrive. \n \nUseing the mouse click at the ground to place Tnt in a Chain sequence.\n\nPress
+    the detonator at the  perfect moment to start Exploding ants.\n\nCollect XP by
+    killing more ant to upgrade  and be ready for more challanging waves."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1929,7 +1922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &549050583
 SpriteRenderer:
   serializedVersion: 2
@@ -2726,7 +2719,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &791175639
 RectTransform:
   m_ObjectHideFlags: 0

@@ -96,8 +96,6 @@ public class Ant : MonoBehaviour, IDamageable, IKnockbackable
             expValue *= 2;
         }
         OnAntDeath?.Invoke(this.gameObject, expValue);
-
-        // TODO: death animation / particle / score event here
         Destroy(gameObject);
     }
 }

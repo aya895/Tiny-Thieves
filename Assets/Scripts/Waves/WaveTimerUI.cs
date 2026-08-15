@@ -35,46 +35,8 @@ public class WaveTimerUI : MonoBehaviour
         }
     }
 
-    //private void HandleCountdownTick(int secondsRemaining)
-    //{
-    //    isCountingDown = true;
-    //    timerText.text = secondsRemaining > 0 ? secondsRemaining.ToString() : "START!";
-    //}
-
     private void Update()
     {
-        //if (isCountingDown) return;
-
-        //if (waveManager.IsPlanning())
-        //{
-        //    showGo = false;
-
-        //    timerText.text =
-        //        $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";
-        //}
-        //else if (waveManager.IsPlaying())
-        //{
-        //    if (!showGo)
-        //    {
-        //        showGo = true;
-        //        goTimer = 1f;
-        //    }
-
-        //    if (goTimer > 0f)
-        //    {
-        //        goTimer -= Time.deltaTime;
-        //        timerText.text = "GO!";
-        //        return;
-        //    }
-
-        //    timerText.text =
-        //        $"WAVE {waveManager.CurrentWave}\n" +
-        //        $"{Mathf.Ceil(waveManager.RemainingTime)}";
-        //}
-        //else
-        //{
-        //    timerText.text = "";
-        //}
         if (currentState is PlanningState)
         {
             timerText.text = $"Planning Phase!\n{Mathf.Ceil(waveManager.RemainingTime)}";

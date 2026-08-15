@@ -7,7 +7,10 @@ public class GameManager : MonoBehaviour
 
     [Header("Difficulty Settings")]
     [SerializeField] private int enemyUpgradeInterval = 3;
-    [SerializeField] private int mapExpansionInterval = 4;
+    [SerializeField] private int mapExpansionInterval = 5;
+
+    [SerializeField] private float startingWaveDuration = 20f;
+    [SerializeField] private float waveDurationIncrement = 5f;
 
     private int processedWave = 0;
 
@@ -34,6 +37,11 @@ public class GameManager : MonoBehaviour
         {
             waveManager = FindFirstObjectByType<WaveManager>();
         }
+
+        if (waveManager != null)
+        {
+            waveManager.SetWaveDuration(startingWaveDuration);
+        }
     }
 
     private void Update()
@@ -57,9 +65,13 @@ public class GameManager : MonoBehaviour
             OnMoreAntSpeed?.Invoke();
             OnNewAntType?.Invoke();
             OnAddAntNest?.Invoke();
+
+            int increments = currentWave / enemyUpgradeInterval;
+            float newWaveDuration = startingWaveDuration + waveDurationIncrement * increments;
+            waveManager.SetWaveDuration(newWaveDuration);
         }
 
-        // Every 4 waves
+        // Every 5 waves
         if (currentWave % mapExpansionInterval == 0)
         {
             OnMapExpand?.Invoke();

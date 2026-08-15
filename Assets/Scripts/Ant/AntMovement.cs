@@ -19,7 +19,7 @@ public class AntMovement : MonoBehaviour
         aiPath = GetComponent<AIPath>();
         destinationSetter = GetComponent<AIDestinationSetter>();
         ant = GetComponent<Ant>();
-       stacker = GetComponent<AntStackController>();
+        stacker = GetComponent<AntStackController>();
     }
     void Start()
     {
@@ -62,7 +62,8 @@ public class AntMovement : MonoBehaviour
         {
             SetPathingEnabled(false);
         }
-        else if (transform.parent == null) // don't resume pathing if it became a stacked passenger mid-knockback
+        // don't resume pathing if it became a stacked passenger mid-knockback
+        else if (transform.parent == null)
         {
             SetPathingEnabled(true);
         }

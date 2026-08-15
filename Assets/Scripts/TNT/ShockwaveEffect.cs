@@ -1,9 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-// SINGLE RESPONSIBILITY: purely a visual ring that expands and fades.
-// Knows nothing about TNT, explosions, or damage - TNTVisual tells it
-// what radius range and duration to animate.
 [RequireComponent(typeof(LineRenderer))]
 public class ShockwaveEffect : MonoBehaviour
 {
@@ -68,11 +65,6 @@ public class ShockwaveEffect : MonoBehaviour
     {
         for (int i = 0; i < segments; i++)
         {
-            //float angle = 2 * Mathf.PI * i / segments;
-            //float x = Mathf.Cos(angle) * radius;
-            //float y = Mathf.Sin(angle) * radius;
-            //line.SetPosition(i, new Vector3(x, y, 0f));
-
             Vector2 dir = unitCircle[i];
             line.SetPosition(i, new Vector3(dir.x * radius, dir.y * radius, 0f));
         }

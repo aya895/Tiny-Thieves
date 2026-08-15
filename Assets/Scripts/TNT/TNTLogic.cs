@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class TNTLogic : MonoBehaviour
 {
+
+    // TNTVisual and FuseConnection listen to this.
+    public event Action OnExplode;
+
     [Header("Explosion")]
     [SerializeField] private float explosionRadius = 2f;
     [SerializeField] private float damage = 100f;
@@ -20,11 +24,7 @@ public class TNTLogic : MonoBehaviour
 
     private TNTLogic nextInChain;
     private float distanceToNext;
-
     private bool hasIgnited;
-
-    // TNTVisual and FuseConnection listen to this.
-    public event Action OnExplode;
 
     public float BaseExplosionRadius =>
         explosionRadius;

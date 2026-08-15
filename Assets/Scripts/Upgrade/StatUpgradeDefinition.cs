@@ -15,19 +15,11 @@ public sealed class StatUpgradeDefinition : UpgradeDefinition
     {
         if (context == null)
         {
-            Debug.LogError(
-                $"Cannot apply '{Title}': UpgradeContext is missing."
-            );
-
             return;
         }
 
         if (context.PlayerStats == null)
         {
-            Debug.LogError(
-                $"Cannot apply '{Title}': PlayerUpgradeStats is missing."
-            );
-
             return;
         }
 

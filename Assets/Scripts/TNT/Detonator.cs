@@ -1,7 +1,5 @@
 using UnityEngine;
 
-// SINGLE RESPONSIBILITY: fires the first TNT in the chain. Hook
-// DetonateChain() to a UI Button's OnClick.
 public class Detonator : MonoBehaviour
 {
     [SerializeField] private TNTPlacementController placementController;

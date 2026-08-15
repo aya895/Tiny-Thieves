@@ -21,7 +21,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("Time Settings")]
     [SerializeField] private float readyTime = 10f;
-    [SerializeField] private float waveDuration = 60f;
+    [SerializeField] private float waveDuration = 20f;
 
     [Header("Start Message")]
     [SerializeField] private TextMeshProUGUI countdownText;
@@ -55,6 +55,11 @@ public class WaveManager : MonoBehaviour
     public float ReadyTime => readyTime;
     public float WaveDuration => waveDuration;
     public float RemainingTime => timer;
+
+    public void SetWaveDuration(float duration)
+    {
+        waveDuration = duration;
+    }
 
 
     // =========================================================
@@ -139,26 +144,22 @@ public class WaveManager : MonoBehaviour
 
     public bool IsPlanning()
     {
-        return stateMachine != null &&
-               stateMachine.IsInState<PlanningState>();
+        return stateMachine != null && stateMachine.IsInState<PlanningState>();
     }
 
     public bool IsPlaying()
     {
-        return stateMachine != null &&
-               stateMachine.IsInState<PlayingState>();
+        return stateMachine != null && stateMachine.IsInState<PlayingState>();
     }
 
     public bool IsUpgrading()
     {
-        return stateMachine != null &&
-               stateMachine.IsInState<UpgradeState>();
+        return stateMachine != null && stateMachine.IsInState<UpgradeState>();
     }
 
     public bool IsGameOver()
     {
-        return stateMachine != null &&
-               stateMachine.IsInState<GameOverState>();
+        return stateMachine != null && stateMachine.IsInState<GameOverState>();
     }
 
 
@@ -294,28 +295,19 @@ public class WaveManager : MonoBehaviour
         if (!IsPlaying())
             return;
 
-        // Player earned at least one upgrade during this wave.
-        // Even though the dessert was destroyed,
-        // allow progression to the next wave.
         if (experienceManager != null &&
             experienceManager.PendingLevelUps > 0)
         {
             retryCurrentWave = false;
 
-            stateMachine.ChangeState(
-                new UpgradeState(this)
-            );
+            stateMachine.ChangeState(new UpgradeState(this));
 
             return;
         }
 
-        // No upgrade was earned.
-        // The player must retry the same wave.
         retryCurrentWave = true;
 
-        stateMachine.ChangeState(
-            new GameOverState(this)
-        );
+        stateMachine.ChangeState(new GameOverState(this));
     }
 
     public void HandleGameOver()

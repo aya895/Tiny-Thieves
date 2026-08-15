@@ -13,28 +13,16 @@ public sealed class PercentMaxHealthUpgrade : UpgradeDefinition
     {
         if (context == null)
         {
-            Debug.LogError(
-                $"Cannot apply '{Title}': UpgradeContext is missing."
-            );
-
             return;
         }
 
         if (context.PlayerStats == null)
         {
-            Debug.LogError(
-                $"Cannot apply '{Title}': PlayerUpgradeStats is missing."
-            );
-
             return;
         }
 
         if (context.Dessert == null)
         {
-            Debug.LogError(
-                $"Cannot apply '{Title}': Dessert is missing."
-            );
-
             return;
         }
 

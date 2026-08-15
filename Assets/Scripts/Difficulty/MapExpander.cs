@@ -28,13 +28,11 @@ public class MapExpander : MonoBehaviour
 
     private void OnEnable()
     {
-        //WaveReadySignal.OnWaveReady += HandlePlanningStarted;
         WaveManager.OnWaveReady += HandlePlanningStarted;
     }
 
     private void OnDisable()
     {
-        //WaveReadySignal.OnWaveReady -= HandlePlanningStarted;
         WaveManager.OnWaveReady -= HandlePlanningStarted;
     }
 
@@ -68,11 +66,6 @@ public class MapExpander : MonoBehaviour
         UpdateBackground();
 
         UpdateSpawnArea();
-
-        Debug.Log(
-            $"[MapExpander] Map expanded before Wave " +
-            $"{waveManager.CurrentWave + 1}."
-        );
     }
 
 
@@ -93,11 +86,6 @@ public class MapExpander : MonoBehaviour
 
         mainCamera.orthographicSize =
             Mathf.Min(targetSize, maxCameraSize);
-
-        Debug.Log(
-            $"[MapExpander] Camera size: " +
-            $"{mainCamera.orthographicSize}"
-        );
     }
 
 
@@ -190,13 +178,6 @@ public class MapExpander : MonoBehaviour
             xMax,
             yMin,
             yMax
-        );
-
-
-        Debug.Log(
-            $"[MapExpander] Spawn Area Updated: " +
-            $"X({xMin} → {xMax}), " +
-            $"Y({yMin} → {yMax})"
         );
     }
 }

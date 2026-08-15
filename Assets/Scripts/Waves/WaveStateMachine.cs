@@ -3,7 +3,7 @@ using System;
 public class WaveStateMachine
 {
     public IWaveState CurrentState { get; private set; }
-    public event Action<IWaveState> OnStateChanged; // (aya) added this event :)
+    public event Action<IWaveState> OnStateChanged;
 
     public void ChangeState(IWaveState newState)
     {

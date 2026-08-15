@@ -124,10 +124,6 @@ public class SpawnManager : MonoBehaviour
                     placedNestPositions,
                     out Vector2 nestPosition))
             {
-                Debug.LogWarning(
-                    "[SpawnManager] No valid nest position available."
-                );
-
                 break;
             }
 
@@ -202,7 +198,7 @@ public class SpawnManager : MonoBehaviour
             return;
         }
 
-        int maxIndex = Mathf.Min(maxUnlockedAnt,antPrefabs.Count - 1);
+        int maxIndex = Mathf.Min(maxUnlockedAnt, antPrefabs.Count - 1);
         int index = Random.Range(0, maxIndex + 1);
 
         GameObject selectedAntPrefab = antPrefabs[index];
@@ -213,7 +209,7 @@ public class SpawnManager : MonoBehaviour
 
         Vector2 spawnPosition = lineController.nest.position;
 
-        GameObject ant = Instantiate(selectedAntPrefab,spawnPosition,Quaternion.identity);
+        GameObject ant = Instantiate(selectedAntPrefab, spawnPosition, Quaternion.identity);
         if (ant == null)
             return;
 
@@ -259,7 +255,7 @@ public class SpawnManager : MonoBehaviour
         positionCalculator.UpdateArea(xMin, xMax, yMin, yMax);
     }
 
-    public void SetSpawnArea(float newXMin,float newXMax,float newYMin,float newYMax)
+    public void SetSpawnArea(float newXMin, float newXMax, float newYMin, float newYMax)
     {
         xMin = newXMin;
         xMax = newXMax;

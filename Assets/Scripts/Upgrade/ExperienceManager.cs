@@ -101,11 +101,6 @@ public class ExperienceManager : MonoBehaviour
     {
         if (PendingLevelUps <= 0)
         {
-            Debug.LogWarning(
-                "[ExperienceManager] No pending level-up to consume.",
-                this
-            );
-
             return;
         }
 

@@ -20,11 +20,6 @@ public class UpgradeChoiceButtonUI : MonoBehaviour
     {
         if (upgradeDefinition == null)
         {
-            Debug.LogError(
-                "[UpgradeChoiceButtonUI] Upgrade is missing.",
-                this
-            );
-
             return;
         }
 

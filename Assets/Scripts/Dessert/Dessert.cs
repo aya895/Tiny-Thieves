@@ -13,8 +13,7 @@ public class Dessert : MonoBehaviour, IDamageable
     public float CurrentHealth { get; private set; }
 
     public float MaxHealth =>
-        maxHealth +
-        (playerUpgradeStats != null? playerUpgradeStats.BonusMaxDessertHealth: 0f);
+        maxHealth + (playerUpgradeStats != null ? playerUpgradeStats.BonusMaxDessertHealth : 0f);
 
     public event Action<float, float> HealthChanged;
 
@@ -55,10 +54,7 @@ public class Dessert : MonoBehaviour, IDamageable
             return;
 
         CurrentHealth =
-            Mathf.Max(
-                0f,
-                CurrentHealth - damage
-            );
+            Mathf.Max(0f, CurrentHealth - damage);
 
         NotifyHealthChanged();
 
@@ -76,10 +72,7 @@ public class Dessert : MonoBehaviour, IDamageable
             return;
 
         CurrentHealth =
-            Mathf.Min(
-                CurrentHealth + amount,
-                MaxHealth
-            );
+            Mathf.Min(CurrentHealth + amount, MaxHealth);
 
         NotifyHealthChanged();
     }
@@ -94,10 +87,6 @@ public class Dessert : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        Debug.Log(
-            "[Dessert] Dessert destroyed."
-        );
-
         DessertDestroyedSignal.Raise();
     }
 }

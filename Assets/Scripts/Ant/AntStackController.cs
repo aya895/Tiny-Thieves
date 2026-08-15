@@ -101,7 +101,7 @@ public class AntStackController : MonoBehaviour
         {
             // Determine which ant is the passenger (the one that has a parent)
             Ant passenger;
-            if(transform.parent != null)
+            if (transform.parent != null)
             {
                 passenger = ant;
             }

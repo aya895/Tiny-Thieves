@@ -21,10 +21,6 @@ public class DessertEatingSound : MonoBehaviour
 
     private void HandleEatingStarted()
     {
-        //if (audioManager == null || eatingClip == null)
-        //    return;
-
-        //audioManager.PlayEating(eatingClip);
         if (AudioManager.Instance == null || eatingClip == null)
             return;
 
@@ -33,10 +29,6 @@ public class DessertEatingSound : MonoBehaviour
 
     private void HandleEatingStopped()
     {
-        //if (audioManager == null)
-        //    return;
-
-        //audioManager.StopEating();
         if (AudioManager.Instance == null)
             return;
 
@@ -45,10 +37,6 @@ public class DessertEatingSound : MonoBehaviour
 
     private void HandleWaveEnded()
     {
-        //if (audioManager == null)
-        //    return;
-
-        //audioManager.StopEating();
         if (AudioManager.Instance == null)
             return;
 

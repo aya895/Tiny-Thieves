@@ -12,8 +12,7 @@ public class ExplosionSound : MonoBehaviour
     {
         if (tntController == null)
         {
-            tntController =
-                FindFirstObjectByType<TNTPlacementController>();
+            tntController = FindFirstObjectByType<TNTPlacementController>();
         }
     }
 
@@ -21,8 +20,7 @@ public class ExplosionSound : MonoBehaviour
     {
         if (tntController != null)
         {
-            tntController.OnAnyExplosion +=
-                HandleExplosion;
+            tntController.OnAnyExplosion += HandleExplosion;
         }
     }
 
@@ -30,8 +28,7 @@ public class ExplosionSound : MonoBehaviour
     {
         if (tntController != null)
         {
-            tntController.OnAnyExplosion -=
-                HandleExplosion;
+            tntController.OnAnyExplosion -= HandleExplosion;
         }
     }
 
