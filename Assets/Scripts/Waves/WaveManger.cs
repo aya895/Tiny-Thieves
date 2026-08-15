@@ -2,15 +2,24 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
 
 public class WaveManager : MonoBehaviour
 {
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
     public static event Action OnVictory;
     public static event Action OnWaveReady;
     public static event Action OnWaveEnded;
+
     public static event Action<IWaveState> OnStateChanged;
     public static event Action<int> OnCountdownTick;
+
+
+    // =========================================================
+    // SETTINGS
+    // =========================================================
 
     [Header("Time Settings")]
     [SerializeField] private float readyTime = 10f;
@@ -20,6 +29,11 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private int countdownSeconds = 3;
 
+
+    // =========================================================
+    // REFERENCES
+    // =========================================================
+
     [Header("References")]
     [SerializeField] private SpawnManager spawnManager;
     [SerializeField] private Dessert dessert;
@@ -27,7 +41,13 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private ExperienceManager experienceManager;
     [SerializeField] private VictoryTracker victoryTracker;
 
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
     private WaveStateMachine stateMachine;
+    private float timer;
 
     public int CurrentWave { get; private set; }
 
@@ -35,16 +55,21 @@ public class WaveManager : MonoBehaviour
     public float WaveDuration => waveDuration;
     public float RemainingTime => timer;
 
-    private float timer;
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
         Time.timeScale = 1f;
 
         stateMachine = new WaveStateMachine();
-        stateMachine.OnStateChanged += state => OnStateChanged?.Invoke(state);  // new
-        victoryTracker = new VictoryTracker();
 
+        stateMachine.OnStateChanged += HandleStateChanged;
+
+        // VictoryTracker is a MonoBehaviour.
+        // Never create it using "new VictoryTracker()".
         if (victoryTracker == null)
         {
             victoryTracker = GetComponent<VictoryTracker>();
@@ -53,23 +78,37 @@ public class WaveManager : MonoBehaviour
 
     private void OnEnable()
     {
-        DessertDestroyedSignal.OnDessertDestroyed += HandleDessertDestroyed;
-        VictoryTracker.OnVictoryAchieved += HandleVictory;
+        DessertDestroyedSignal.OnDessertDestroyed +=
+            HandleDessertDestroyed;
+
+        VictoryTracker.OnVictoryAchieved +=
+            HandleVictory;
 
         if (experienceManager != null)
         {
-            experienceManager.UpgradesResolved += HandleUpgradesResolved;
+            experienceManager.UpgradesResolved +=
+                HandleUpgradesResolved;
         }
     }
 
     private void OnDisable()
     {
-        DessertDestroyedSignal.OnDessertDestroyed -= HandleDessertDestroyed;
-        VictoryTracker.OnVictoryAchieved -= HandleVictory;
+        DessertDestroyedSignal.OnDessertDestroyed -=
+            HandleDessertDestroyed;
+
+        VictoryTracker.OnVictoryAchieved -=
+            HandleVictory;
 
         if (experienceManager != null)
         {
-            experienceManager.UpgradesResolved -= HandleUpgradesResolved;
+            experienceManager.UpgradesResolved -=
+                HandleUpgradesResolved;
+        }
+
+        if (stateMachine != null)
+        {
+            stateMachine.OnStateChanged -=
+                HandleStateChanged;
         }
     }
 
@@ -84,8 +123,19 @@ public class WaveManager : MonoBehaviour
 
     private void Update()
     {
-        stateMachine.Update();
+        stateMachine?.Update();
     }
+
+
+    // =========================================================
+    // STATE EVENTS
+    // =========================================================
+
+    private void HandleStateChanged(IWaveState state)
+    {
+        OnStateChanged?.Invoke(state);
+    }
+
 
     // =========================================================
     // STATE QUERIES
@@ -93,23 +143,28 @@ public class WaveManager : MonoBehaviour
 
     public bool IsPlanning()
     {
-        return stateMachine.IsInState<PlanningState>();
+        return stateMachine != null &&
+               stateMachine.IsInState<PlanningState>();
     }
 
     public bool IsPlaying()
     {
-        return stateMachine.IsInState<PlayingState>();
+        return stateMachine != null &&
+               stateMachine.IsInState<PlayingState>();
     }
 
     public bool IsUpgrading()
     {
-        return stateMachine.IsInState<UpgradeState>();
+        return stateMachine != null &&
+               stateMachine.IsInState<UpgradeState>();
     }
 
     public bool IsGameOver()
     {
-        return stateMachine.IsInState<GameOverState>();
+        return stateMachine != null &&
+               stateMachine.IsInState<GameOverState>();
     }
+
 
     // =========================================================
     // PLANNING STATE
@@ -138,6 +193,7 @@ public class WaveManager : MonoBehaviour
             );
         }
     }
+
 
     // =========================================================
     // PLAYING STATE
@@ -180,6 +236,7 @@ public class WaveManager : MonoBehaviour
         );
     }
 
+
     // =========================================================
     // VICTORY
     // =========================================================
@@ -194,6 +251,7 @@ public class WaveManager : MonoBehaviour
         FinishWave();
     }
 
+
     // =========================================================
     // UPGRADE STATE
     // =========================================================
@@ -205,6 +263,8 @@ public class WaveManager : MonoBehaviour
             spawnManager.ClearPreviousWave();
         }
 
+        // TNTPlacementController also listens to this
+        // and removes remaining TNT/fuses.
         OnWaveEnded?.Invoke();
 
         if (experienceManager != null)
@@ -223,8 +283,18 @@ public class WaveManager : MonoBehaviour
         );
     }
 
+    // Keep this public method in case an existing UI/button
+    // still calls it.
+    public void FinishUpgrade()
+    {
+        StartCoroutine(
+            StartCountdownSequence(countdownSeconds)
+        );
+    }
+
+
     // =========================================================
-    // GAME OVER STATE
+    // GAME OVER
     // =========================================================
 
     private void HandleDessertDestroyed()
@@ -262,6 +332,7 @@ public class WaveManager : MonoBehaviour
         );
     }
 
+
     // =========================================================
     // COUNTDOWN
     // =========================================================
@@ -279,28 +350,8 @@ public class WaveManager : MonoBehaviour
             {
                 countdownText.text = i.ToString();
             }
+
             OnCountdownTick?.Invoke(i);
-            yield return new WaitForSeconds(1f);
-        }
-
-        countdownText.text = "START!";
-        OnCountdownTick?.Invoke(0);
-        yield return new WaitForSeconds(0.5f);
-        countdownText.gameObject.SetActive(false);
-        stateMachine?.ChangeState(new PlanningState(this));
-    }
-
-    public void FinishUpgrade()
-    {
-        StartCoroutine(StartCountdownSequence(countdownSeconds));
-    }
-
-    // -------------------------
-    // Victory 
-    // -------------------------
-    private void HandleVictory()
-    {
-        if (IsPlaying())
 
             yield return new WaitForSeconds(1f);
         }
@@ -309,6 +360,8 @@ public class WaveManager : MonoBehaviour
         {
             countdownText.text = "START!";
         }
+
+        OnCountdownTick?.Invoke(0);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -321,35 +374,4 @@ public class WaveManager : MonoBehaviour
             new PlanningState(this)
         );
     }
-
-
-    //private void Victory()
-    //{
-    //    spawnManager.ClearPreviousWave();
-    //    OnVictory?.Invoke();
-    //}
-
-    //private void CheckVictory()
-    //{
-    //    if (stateMachine != null && IsPlaying() &&
-    //       isSpawningFinished && activeAnts <= 0)
-    //    {
-    //        Victory();
-    //    }
-    //}
-
-    //private void TrackAntSpawned()
-    //{
-    //    activeAnts++;
-    //}
-    //private void TrackAntDeath(GameObject ant, float expValue)
-    //{
-    //    activeAnts = Mathf.Max(0, activeAnts -1 );
-    //    CheckVictory();
-    //}
-    //private void TrackSpawnComplete()
-    //{
-    //    isSpawningFinished = true;
-    //    CheckVictory();
-    //}
 }
