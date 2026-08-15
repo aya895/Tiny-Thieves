@@ -301,6 +301,25 @@ public class WaveManager : MonoBehaviour
         if (!IsPlaying())
             return;
 
+        // Player earned at least one upgrade during this wave.
+        // Even though the dessert was destroyed,
+        // allow progression to the next wave.
+        if (experienceManager != null &&
+            experienceManager.PendingLevelUps > 0)
+        {
+            retryCurrentWave = false;
+
+            stateMachine.ChangeState(
+                new UpgradeState(this)
+            );
+
+            return;
+        }
+
+        // No upgrade was earned.
+        // The player must retry the same wave.
+        retryCurrentWave = true;
+
         stateMachine.ChangeState(
             new GameOverState(this)
         );
@@ -308,8 +327,6 @@ public class WaveManager : MonoBehaviour
 
     public void HandleGameOver()
     {
-        retryCurrentWave = true;
-
         if (spawnManager != null)
         {
             spawnManager.ClearPreviousWave();

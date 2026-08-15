@@ -3151,7 +3151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   readyTime: 5
-  waveDuration: 15
+  waveDuration: 10
   countdownText: {fileID: 124315678}
   startMessage: GO!
   startMessageDuration: 0.75
