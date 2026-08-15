@@ -43,6 +43,13 @@ public class XPUI : MonoBehaviour
         );
     }
 
+    private void Update()
+    {
+        HandleXPChanged(experienceManager.CurrentXP,
+            experienceManager.XPRequiredForNextLevel,
+            experienceManager.CurrentLevel);
+    }
+
     private void HandleXPChanged(
         float currentXP,
         float requiredXP,

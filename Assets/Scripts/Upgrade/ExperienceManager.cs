@@ -92,7 +92,7 @@ public class ExperienceManager : MonoBehaviour
             return;
         }
 
-        ResetProgress();
+        // ResetProgress();
 
         UpgradesResolved?.Invoke();
     }
@@ -115,7 +115,7 @@ public class ExperienceManager : MonoBehaviour
         if (PendingLevelUps > 0)
             return;
 
-        ResetProgress();
+        // ResetProgress();
 
         UpgradesResolved?.Invoke();
     }
