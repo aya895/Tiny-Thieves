@@ -60,7 +60,7 @@ public class TNTLogic : MonoBehaviour
     }
 
     public void SetNext(
-        TNTLogic next,
+TNTLogic next,
         float distance)
     {
         nextInChain = next;

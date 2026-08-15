@@ -7,31 +7,26 @@ public class WaveTimerUI : MonoBehaviour
     [SerializeField] private TMP_Text timerText;
 
     private IWaveState currentState; //just to keep track of state 
-    private bool isCountingDown;
-    private bool showGo;
+    //private bool isCountingDown;
     private float goTimer;
 
 
     private void OnEnable()
     {
         WaveManager.OnStateChanged += HandleStateChanged;
-       // WaveManager.OnCountdownTick += HandleCountdownTick;
     }
 
     private void OnDisable()
     {
         WaveManager.OnStateChanged -= HandleStateChanged;
-       // WaveManager.OnCountdownTick -= HandleCountdownTick;
     }
 
     private void HandleStateChanged(IWaveState state)
     {
         currentState = state;
-        isCountingDown = false;
 
         if (state is PlayingState)
         {
-            showGo = true;
             goTimer = 1f;
         }
         else if (state is GameOverState)
@@ -40,15 +35,15 @@ public class WaveTimerUI : MonoBehaviour
         }
     }
 
-    private void HandleCountdownTick(int secondsRemaining)
-    {
-        isCountingDown = true;
-        timerText.text = secondsRemaining > 0 ? secondsRemaining.ToString() : "START!";
-    }
+    //private void HandleCountdownTick(int secondsRemaining)
+    //{
+    //    isCountingDown = true;
+    //    timerText.text = secondsRemaining > 0 ? secondsRemaining.ToString() : "START!";
+    //}
 
     private void Update()
     {
-        if (isCountingDown) return;
+        //if (isCountingDown) return;
 
         //if (waveManager.IsPlanning())
         //{

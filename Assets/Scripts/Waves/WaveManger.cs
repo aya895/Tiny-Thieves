@@ -82,37 +82,30 @@ public class WaveManager : MonoBehaviour
 
     private void OnEnable()
     {
-        DessertDestroyedSignal.OnDessertDestroyed +=
-            HandleDessertDestroyed;
+        DessertDestroyedSignal.OnDessertDestroyed += HandleDessertDestroyed;
 
-        VictoryTracker.OnVictoryAchieved +=
-            HandleVictory;
+        VictoryTracker.OnVictoryAchieved += HandleVictory;
 
         if (experienceManager != null)
         {
-            experienceManager.UpgradesResolved +=
-                HandleUpgradesResolved;
+            experienceManager.UpgradesResolved += HandleUpgradesResolved;
         }
     }
 
     private void OnDisable()
     {
-        DessertDestroyedSignal.OnDessertDestroyed -=
-            HandleDessertDestroyed;
+        DessertDestroyedSignal.OnDessertDestroyed -= HandleDessertDestroyed;
 
-        VictoryTracker.OnVictoryAchieved -=
-            HandleVictory;
+        VictoryTracker.OnVictoryAchieved -= HandleVictory;
 
         if (experienceManager != null)
         {
-            experienceManager.UpgradesResolved -=
-                HandleUpgradesResolved;
+            experienceManager.UpgradesResolved -= HandleUpgradesResolved;
         }
 
         if (stateMachine != null)
         {
-            stateMachine.OnStateChanged -=
-                HandleStateChanged;
+            stateMachine.OnStateChanged -= HandleStateChanged;
         }
     }
 

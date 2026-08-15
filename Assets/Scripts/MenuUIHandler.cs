@@ -24,19 +24,6 @@ public class MenuUIHandler : MonoBehaviour
     [Header("Menu Music")]
     [SerializeField] private AudioClip menuMusicClip;
 
-    void Awake()
-    {
-        //if (instance == null)
-        //{
-        //    instance = this;
-        //    DontDestroyOnLoad(gameObject);
-        //}
-        //else
-        //{
-        //    Destroy(gameObject);
-        //}
-    }
-
     void Start()
     {
         isInitializing = true;
@@ -46,24 +33,19 @@ public class MenuUIHandler : MonoBehaviour
 
         if (musicSlider != null)
         {
-            musicSlider.gameObject.SetActive(false);       
+            musicSlider.gameObject.SetActive(false);  
+            
             // Load saved music volume into the slider
             float savedVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
             musicSlider.SetValueWithoutNotify(savedVolume);
             musicSlider.onValueChanged.AddListener(OnVolumeSliderChanged);
-            //musicSlider.value = savedVolume;
-            if (AudioManager.Instance != null && menuMusicClip != null)
-            {
-                AudioManager.Instance.PlayMusic(menuMusicClip);
-            }
-            isInitializing = false;
         }
-        if (AudioManager.Instance != null &&
-        menuMusicClip != null)
+        
+        isInitializing = false;
+
+        if (AudioManager.Instance != null &&menuMusicClip != null)
         {
-            AudioManager.Instance.PlayMusic(
-                menuMusicClip
-            );
+            AudioManager.Instance.PlayMusic(menuMusicClip);
         }
     }
 

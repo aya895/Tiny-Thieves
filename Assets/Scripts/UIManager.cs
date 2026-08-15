@@ -21,16 +21,6 @@ public class UIManager : MonoBehaviour
     private const string MUSIC_PREF_KEY = "MusicVolume";
     private const string SFX_PREF_KEY = "SFXVolume";
 
-    //void Start()
-    //{
-    //    Time.timeScale = 1f;
-
-    //    builder = new StringBuilder("All ants cleared at wave: ");
-    //    waveManager = GetComponent<WaveManager>();
-    //    waveClearedAt.text = "";
-    //    waveClearedAt.gameObject.SetActive(false);
-    //}
-
     private void Awake()
     {
         Time.timeScale = 1f;
@@ -62,7 +52,6 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         WaveManager.OnVictory += ShowVictory;
-        //InitVolumeSliders();
 
         if (musicSlider != null)
         {
@@ -149,6 +138,10 @@ public class UIManager : MonoBehaviour
         {
             pausePanel.SetActive(true);
             Time.timeScale = 0f; // stops the game entirely
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PauseAll();
+            }
             isPaused = true;
         }
     }
@@ -159,6 +152,10 @@ public class UIManager : MonoBehaviour
         {
             pausePanel.SetActive(false);
             Time.timeScale = 1f;
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.ResumeAll();
+            }
             isPaused = false;
         }
     }

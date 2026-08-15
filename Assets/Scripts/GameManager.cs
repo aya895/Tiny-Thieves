@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Difficulty Settings")]
     [SerializeField] private int enemyUpgradeInterval = 3;
-    [SerializeField] private int mapExpansionInterval = 3;
+    [SerializeField] private int mapExpansionInterval = 4;
 
     private int processedWave = 0;
 
@@ -18,13 +18,9 @@ public class GameManager : MonoBehaviour
     public static event Action OnMapExpand;
     public static event Action OnMoreAntInLine;
 
-    [Header("Gameplay music")]
-    [SerializeField] private AudioClip gameplayMusicClip;
-
     private void Awake()
     {
         // Every Game Scene gets its own GameManager.
-        // No DontDestroyOnLoad here.
         if (FindObjectsByType<GameManager>(FindObjectsInactive.Exclude,FindObjectsSortMode.None).Length > 1)
         {
             Destroy(gameObject);
@@ -37,11 +33,6 @@ public class GameManager : MonoBehaviour
         if (waveManager == null)
         {
             waveManager = FindFirstObjectByType<WaveManager>();
-        }
-
-        if (AudioManager.Instance != null && gameplayMusicClip != null)
-        {
-            AudioManager.Instance.PlayMusic(gameplayMusicClip);
         }
     }
 
@@ -68,7 +59,7 @@ public class GameManager : MonoBehaviour
             OnAddAntNest?.Invoke();
         }
 
-        // Every 3 waves
+        // Every 4 waves
         if (currentWave % mapExpansionInterval == 0)
         {
             OnMapExpand?.Invoke();
