@@ -35,7 +35,7 @@ public class FuseConnection : MonoBehaviour
         return Vector3.Distance(fromTNT.transform.position, to);
     }
 
-    private void HandleFromExploded()
+    private void HandleFromExploded(Vector2 position, float radius, float damage)
     {
         from.OnExplode -= HandleFromExploded;
         Destroy(gameObject, 0.2f); // small delay so the burn-away visual can finish
