@@ -52,6 +52,8 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         WaveManager.OnVictory += ShowVictory;
+        GameOverUI.OnGameOverShown += HidePauseButton;
+        GameOverUI.OnGameOverHidden += ShowPauseButton;
 
         if (musicSlider != null)
         {
@@ -69,6 +71,8 @@ public class UIManager : MonoBehaviour
     private void OnDisable()
     {
         WaveManager.OnVictory -= ShowVictory;
+        GameOverUI.OnGameOverShown -= HidePauseButton;
+        GameOverUI.OnGameOverHidden -= ShowPauseButton;
 
         if (musicSlider != null)
         {
@@ -171,5 +175,20 @@ public class UIManager : MonoBehaviour
         }
 
         SceneManager.LoadScene(0);
+    }
+
+    private void HidePauseButton()
+    {
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(false);
+        }
+    }
+    private void ShowPauseButton()
+    {
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(true);
+        }
     }
 }

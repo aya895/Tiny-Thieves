@@ -150,57 +150,6 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    //private Vector2 GetNestPosition(int index)
-    //{
-    //    const int maxAttempts = 50;
-
-    //    for (int attempt = 0; attempt < maxAttempts; attempt++)
-    //    {
-    //        Vector2 candidate = new Vector2(
-    //            Random.Range(xMin, xMax),
-    //            Random.Range(yMin, yMax)
-    //        );
-
-    //        // Don't spawn nest too close to dessert.
-    //        if (dessertTransform != null)
-    //        {
-    //            float distanceFromDessert =
-    //                Vector2.Distance(candidate, dessertTransform.position);
-
-    //            if (distanceFromDessert < minDistanceFromDessert)
-    //                continue;
-    //        }
-
-    //        // Don't overlap another nest.
-    //        bool tooCloseToAnotherNest = false;
-
-    //        foreach (Vector2 existingPosition in placedNestPositions)
-    //        {
-    //            if (Vector2.Distance(candidate, existingPosition)
-    //                < minDistanceBetweenNests)
-    //            {
-    //                tooCloseToAnotherNest = true;
-    //                break;
-    //            }
-    //        }
-
-    //        if (tooCloseToAnotherNest)
-    //            continue;
-
-    //        return candidate;
-    //    }
-
-    //    // Fallback if no valid position was found.
-    //    Debug.LogWarning(
-    //        "[SpawnManager] Couldn't find a perfect nest position. Using random position."
-    //    );
-
-    //    return new Vector2(
-    //        Random.Range(xMin, xMax),
-    //        Random.Range(yMin, yMax)
-    //    );
-    //}
-
     // =========================================================
     // LINES
     // =========================================================

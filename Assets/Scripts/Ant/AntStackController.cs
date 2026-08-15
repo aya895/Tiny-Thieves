@@ -83,10 +83,6 @@ public class AntStackController : MonoBehaviour
         }
 
         rb.simulated = false;
-        //if (antMovement != null)
-        //{
-        //    antMovement.SetPathingEnabled(false);
-        //}
 
         //Parent it to the base ant so it follows its movement exactly & make its sorting order higher
         transform.SetParent(otherAnt.transform);

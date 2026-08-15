@@ -6,8 +6,7 @@ public class DessertVisualController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Dessert dessert;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private BoxCollider2D boxCollider; // aya: i added this so box collider udates when sprite changes
-    // dont worry it wont conflict with the logic :)
+    [SerializeField] private BoxCollider2D boxCollider;
 
     [Header("Health Sprites")]
     [SerializeField] private Sprite[] healthSprites;
@@ -15,6 +14,7 @@ public class DessertVisualController : MonoBehaviour
     private float iframesDuration = 0.75f;
     private int numOfFlashes = 5;
     private int currentSpriteIndex = -1;
+    private float previousHealth = -1f;
 
     private void Awake()
     {
@@ -61,16 +61,23 @@ public class DessertVisualController : MonoBehaviour
 
         // i-frames only when taking damage
         bool isFirstSetup = (currentSpriteIndex == -1);
+        bool tookDamage = !isFirstSetup && currentHealth < previousHealth;
 
-        currentSpriteIndex = spriteIndex;
-        spriteRenderer.sprite = healthSprites[spriteIndex];
-        UpdateColliderToSprite(healthSprites[spriteIndex]);
+        previousHealth = currentHealth;
 
-        if (!isFirstSetup)
+        if (spriteIndex != currentSpriteIndex)
+        {
+            currentSpriteIndex = spriteIndex;
+            spriteRenderer.sprite = healthSprites[spriteIndex];
+            UpdateColliderToSprite(healthSprites[spriteIndex]);
+
+        }
+        if (tookDamage)
         {
             StopAllCoroutines();
             StartCoroutine(invurnerability());
         }
+
     }
 
     private void ValidateReferences()

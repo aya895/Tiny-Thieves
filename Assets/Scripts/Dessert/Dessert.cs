@@ -14,9 +14,7 @@ public class Dessert : MonoBehaviour, IDamageable
 
     public float MaxHealth =>
         maxHealth +
-        (playerUpgradeStats != null
-            ? playerUpgradeStats.BonusMaxDessertHealth
-            : 0f);
+        (playerUpgradeStats != null? playerUpgradeStats.BonusMaxDessertHealth: 0f);
 
     public event Action<float, float> HealthChanged;
 
@@ -29,8 +27,7 @@ public class Dessert : MonoBehaviour, IDamageable
     {
         if (playerUpgradeStats != null)
         {
-            playerUpgradeStats.BonusApplied +=
-                HandleBonusApplied;
+            playerUpgradeStats.BonusApplied += HandleBonusApplied;
         }
     }
 
@@ -38,8 +35,7 @@ public class Dessert : MonoBehaviour, IDamageable
     {
         if (playerUpgradeStats != null)
         {
-            playerUpgradeStats.BonusApplied -=
-                HandleBonusApplied;
+            playerUpgradeStats.BonusApplied -= HandleBonusApplied;
         }
     }
 

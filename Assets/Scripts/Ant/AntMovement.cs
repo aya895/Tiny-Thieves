@@ -80,10 +80,6 @@ public class AntMovement : MonoBehaviour
             // notify line controller to remove this ant from line
             antLineController.OnReachedDessert(gameObject);
             OnDessertReached?.Invoke();
-            //if (stacker != null)
-            //{
-            //    stacker.LeaveStack();
-            //}
         }
     }
 

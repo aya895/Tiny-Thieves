@@ -26,21 +26,14 @@ public class NestPositionCalculate
         this.yMin = yMin;
         this.yMax = yMax;
 
-        this.minDistanceBetweenNests =
-            minDistanceBetweenNests;
+        this.minDistanceBetweenNests = minDistanceBetweenNests;
 
-        this.minDistanceFromDessert =
-            minDistanceFromDessert;
+        this.minDistanceFromDessert = minDistanceFromDessert;
 
-        this.dessertTransform =
-            dessertTransform;
+        this.dessertTransform = dessertTransform;
     }
 
-    public void UpdateArea(
-        float xMin,
-        float xMax,
-        float yMin,
-        float yMax)
+    public void UpdateArea(float xMin, float xMax, float yMin, float yMax)
     {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -48,12 +41,9 @@ public class NestPositionCalculate
         this.yMax = yMax;
     }
 
-    public bool TryGetNestPosition(
-        List<Vector2> existingPositions,
-        out Vector2 position)
+    public bool TryGetNestPosition(List<Vector2> existingPositions, out Vector2 position)
     {
-        List<Vector2> validPositions =
-            GenerateValidPositions(existingPositions);
+        List<Vector2> validPositions = GenerateValidPositions(existingPositions);
 
         if (validPositions.Count == 0)
         {
@@ -61,8 +51,7 @@ public class NestPositionCalculate
             return false;
         }
 
-        int randomIndex =
-            Random.Range(0, validPositions.Count);
+        int randomIndex = Random.Range(0, validPositions.Count);
 
         position = validPositions[randomIndex];
 
