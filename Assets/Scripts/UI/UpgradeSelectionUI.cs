@@ -1,112 +1,174 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// SINGLE RESPONSIBILITY: presentation and selection flow only. Applying an
-// upgrade's effect is the upgrade's own job (Apply()); tracking XP/levels
-// is ExperienceManager's job; this class just shows choices and reacts to clicks.
 public class UpgradeSelectionUI : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Dependencies")]
     [SerializeField] private ExperienceManager experienceManager;
-    [SerializeField] private List<UpgradeDefinition> upgradePool;
+
+    [SerializeField] private PlayerUpgradeStats playerUpgradeStats;
+
+    [SerializeField] private Dessert dessert;
+
+    [Header("Upgrade Pool")]
+    [SerializeField]
+    private List<UpgradeDefinition> upgradePool;
 
     [Header("UI")]
     [SerializeField] private GameObject panelRoot;
+
     [SerializeField] private Transform choicesContainer;
-    [SerializeField] private UpgradeChoiceButtonUI choiceButtonPrefab;
+
+    [SerializeField]
+    private UpgradeChoiceButtonUI choiceButtonPrefab;
+
     [SerializeField] private int choicesPerLevel = 3;
 
-    private readonly List<UpgradeChoiceButtonUI> spawnedButtons = new List<UpgradeChoiceButtonUI>();
-    
+    private readonly List<UpgradeChoiceButtonUI> spawnedButtons =
+        new List<UpgradeChoiceButtonUI>();
+
+    private UpgradeContext context;
+
+    private void Awake()
+    {
+        context = new UpgradeContext(
+            playerUpgradeStats,
+            dessert
+        );
+
+        if (panelRoot != null)
+        {
+            panelRoot.SetActive(false);
+        }
+    }
+
     private void OnEnable()
     {
-        //WaveEndSignal.OnWaveEnded += HandleWaveEnded;
-        WaveManager.OnWaveEnded += HandleWaveEnded;
+        if (experienceManager != null)
+        {
+            experienceManager.UpgradeSelectionRequested +=
+                ShowNextChoice;
+        }
     }
 
     private void OnDisable()
     {
-        //WaveEndSignal.OnWaveEnded -= HandleWaveEnded;
-        WaveManager.OnWaveEnded -= HandleWaveEnded;
-    }
-
-    private void HandleWaveEnded()
-    {
-        // If nothing is pending, ExperienceManager already resolved things
-        // itself - this UI has nothing to do and stays hidden.
-        if (experienceManager != null &&
-        experienceManager.PendingLevelUps > 0)
+        if (experienceManager != null)
         {
-            ShowNextChoice();
+            experienceManager.UpgradeSelectionRequested -=
+                ShowNextChoice;
         }
-
     }
-    public void ShowUpgrade()
-    {
-        if (experienceManager == null ||
-            experienceManager.PendingLevelUps <= 0)
-        {
-            return;
-        }
 
-        ShowNextChoice();
-    }
     private void ShowNextChoice()
     {
+        if (experienceManager == null)
+            return;
+
+        if (experienceManager.PendingLevelUps <= 0)
+            return;
+
+        if (panelRoot == null)
+            return;
+
         panelRoot.SetActive(true);
+
         ClearButtons();
 
-        foreach (UpgradeDefinition upgrade in PickRandomUpgrades(choicesPerLevel))
+        List<UpgradeDefinition> choices =
+            PickRandomUpgrades(choicesPerLevel);
+
+        foreach (UpgradeDefinition upgrade in choices)
         {
-            UpgradeChoiceButtonUI buttonUI = Instantiate(choiceButtonPrefab, choicesContainer);
-            buttonUI.Setup(upgrade, HandleUpgradeChosen);
-            spawnedButtons.Add(buttonUI);
+            UpgradeChoiceButtonUI button =
+                Instantiate(
+                    choiceButtonPrefab,
+                    choicesContainer
+                );
+
+            button.Setup(
+                upgrade,
+                HandleUpgradeChosen
+            );
+
+            spawnedButtons.Add(button);
         }
     }
 
-    private void HandleUpgradeChosen(UpgradeDefinition chosen)
+    private void HandleUpgradeChosen(
+        UpgradeDefinition chosen)
     {
-        chosen.Apply();
+        if (chosen == null)
+            return;
+
+        chosen.Apply(context);
+
         UpgradeChosenSignal.Raise();
+
         experienceManager.ConsumePendingLevelUp();
 
         if (experienceManager.PendingLevelUps > 0)
         {
-            // Another level was banked from the same wave - immediately
-            // show the next choice instead of closing the panel.
             ShowNextChoice();
+            return;
         }
-        else
+
+        panelRoot.SetActive(false);
+
+        ClearButtons();
+    }
+
+    private List<UpgradeDefinition> PickRandomUpgrades(
+        int count)
+    {
+        List<UpgradeDefinition> available =
+            new List<UpgradeDefinition>();
+
+        foreach (UpgradeDefinition upgrade in upgradePool)
         {
-            panelRoot.SetActive(false);
-            ClearButtons();
-            // No need to raise UpgradeFlowSignal here - ConsumePendingLevelUp()
-            // already did, since ExperienceManager owns that responsibility.
+            if (upgrade != null)
+            {
+                available.Add(upgrade);
+            }
         }
+
+        List<UpgradeDefinition> selected =
+            new List<UpgradeDefinition>();
+
+        int amount =
+            Mathf.Min(
+                count,
+                available.Count
+            );
+
+        for (int i = 0; i < amount; i++)
+        {
+            int index =
+                Random.Range(
+                    0,
+                    available.Count
+                );
+
+            selected.Add(
+                available[index]
+            );
+
+            available.RemoveAt(index);
+        }
+
+        return selected;
     }
 
     private void ClearButtons()
     {
-        foreach (UpgradeChoiceButtonUI b in spawnedButtons)
+        foreach (UpgradeChoiceButtonUI button in spawnedButtons)
         {
-            Destroy(b.gameObject);
+            if (button != null)
+            {
+                Destroy(button.gameObject);
+            }
         }
+
         spawnedButtons.Clear();
-    }
-
-    private List<UpgradeDefinition> PickRandomUpgrades(int count)
-    {
-        List<UpgradeDefinition> pool = new List<UpgradeDefinition>(upgradePool);
-        List<UpgradeDefinition> result = new List<UpgradeDefinition>();
-
-        int pickCount = Mathf.Min(count, pool.Count);
-        for (int i = 0; i < pickCount; i++)
-        {
-            int index = Random.Range(0, pool.Count);
-            result.Add(pool[index]);
-            pool.RemoveAt(index); // no duplicate choices within the same prompt
-        }
-
-        return result;
     }
 }
