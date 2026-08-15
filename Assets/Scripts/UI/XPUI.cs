@@ -1,30 +1,63 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-
 
 public class XPUI : MonoBehaviour
 {
-    [SerializeField] ExperienceManager experienceManager;
+    [SerializeField]
+    private ExperienceManager experienceManager;
 
-    [SerializeField] Slider xpSlider;
+    [SerializeField]
+    private Slider xpSlider;
 
-    [SerializeField] TMP_Text levelText;
+    [SerializeField]
+    private TMP_Text levelText;
+
+    private void OnEnable()
+    {
+        if (experienceManager != null)
+        {
+            experienceManager.XPChanged +=
+                HandleXPChanged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (experienceManager != null)
+        {
+            experienceManager.XPChanged -=
+                HandleXPChanged;
+        }
+    }
 
     private void Start()
     {
-        UpdateXP();
+        if (experienceManager == null)
+            return;
+
+        HandleXPChanged(
+            experienceManager.CurrentXP,
+            experienceManager.XPRequiredForNextLevel,
+            experienceManager.CurrentLevel
+        );
     }
 
-    private void Update()
+    private void HandleXPChanged(
+        float currentXP,
+        float requiredXP,
+        int level)
     {
-        UpdateXP();
-    }
+        if (xpSlider != null)
+        {
+            xpSlider.maxValue = requiredXP;
+            xpSlider.value = currentXP;
+        }
 
-    public void UpdateXP()
-    {
-        xpSlider.maxValue = experienceManager.baseXPToLevel;
-        xpSlider.value = experienceManager.currentXP;
-        levelText.text = "Level: " + experienceManager.CurrentLevel;
+        if (levelText != null)
+        {
+            levelText.text =
+                $"Level: {level}";
+        }
     }
 }

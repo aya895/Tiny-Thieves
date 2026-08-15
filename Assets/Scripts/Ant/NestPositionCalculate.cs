@@ -3,25 +3,44 @@ using UnityEngine;
 
 public class NestPositionCalculate
 {
-    private float xMin, xMax, yMin, yMax;
-    private float minDistanceBetweenNests;
-    private float minDistanceFromDessert;
-    private Transform dessertTransform;
+    private float xMin;
+    private float xMax;
+    private float yMin;
+    private float yMax;
 
-    public NestPositionCalculate(float xMin, float xMax, float yMin, float yMax,
-        float minDistanceBetweenNests, float minDistanceFromDessert,
+    private readonly float minDistanceBetweenNests;
+    private readonly float minDistanceFromDessert;
+    private readonly Transform dessertTransform;
+
+    public NestPositionCalculate(
+        float xMin,
+        float xMax,
+        float yMin,
+        float yMax,
+        float minDistanceBetweenNests,
+        float minDistanceFromDessert,
         Transform dessertTransform)
     {
         this.xMin = xMin;
         this.xMax = xMax;
         this.yMin = yMin;
         this.yMax = yMax;
-        this.minDistanceBetweenNests = minDistanceBetweenNests;
-        this.minDistanceFromDessert = minDistanceFromDessert;
-        this.dessertTransform = dessertTransform;
+
+        this.minDistanceBetweenNests =
+            minDistanceBetweenNests;
+
+        this.minDistanceFromDessert =
+            minDistanceFromDessert;
+
+        this.dessertTransform =
+            dessertTransform;
     }
 
-    public void UpdateArea(float xMin, float xMax, float yMin, float yMax)
+    public void UpdateArea(
+        float xMin,
+        float xMax,
+        float yMin,
+        float yMax)
     {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -29,31 +48,104 @@ public class NestPositionCalculate
         this.yMax = yMax;
     }
 
-    public Vector2 GetNestPosition(List<Vector2> existingPositions)
+    public bool TryGetNestPosition(
+        List<Vector2> existingPositions,
+        out Vector2 position)
     {
-        const int maxAttempts = 50;
+        List<Vector2> validPositions =
+            GenerateValidPositions(existingPositions);
 
-        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        if (validPositions.Count == 0)
         {
-            Vector2 candidate = new Vector2(Random.Range(xMin, xMax), Random.Range(yMin, yMax));
-
-            if (dessertTransform != null && Vector2.Distance(candidate, dessertTransform.position) < minDistanceFromDessert)
-                continue;
-
-            bool tooClose = false;
-            foreach (Vector2 pos in existingPositions)
-            {
-                if (Vector2.Distance(candidate, pos) < minDistanceBetweenNests)
-                {
-                    tooClose = true;
-                    break;
-                }
-            }
-
-            if (tooClose) continue;
-
-            return candidate;
+            position = default;
+            return false;
         }
-        return new Vector2(Random.Range(xMin, xMax), Random.Range(yMin, yMax));
+
+        int randomIndex =
+            Random.Range(0, validPositions.Count);
+
+        position = validPositions[randomIndex];
+
+        return true;
+    }
+
+    private List<Vector2> GenerateValidPositions(
+        List<Vector2> existingPositions)
+    {
+        List<Vector2> validPositions =
+            new List<Vector2>();
+
+        float spacing =
+            minDistanceBetweenNests;
+
+        for (float x = xMin;
+             x <= xMax;
+             x += spacing)
+        {
+            for (float y = yMin;
+                 y <= yMax;
+                 y += spacing)
+            {
+                Vector2 candidate =
+                    new Vector2(x, y);
+
+                if (!IsValidPosition(
+                        candidate,
+                        existingPositions))
+                {
+                    continue;
+                }
+
+                validPositions.Add(candidate);
+            }
+        }
+
+        return validPositions;
+    }
+
+    private bool IsValidPosition(
+        Vector2 candidate,
+        List<Vector2> existingPositions)
+    {
+        if (dessertTransform != null)
+        {
+            float sqrDessertDistance =
+                (
+                    candidate -
+                    (Vector2)dessertTransform.position
+                ).sqrMagnitude;
+
+            float minDessertDistanceSquared =
+                minDistanceFromDessert *
+                minDistanceFromDessert;
+
+            if (sqrDessertDistance <
+                minDessertDistanceSquared)
+            {
+                return false;
+            }
+        }
+
+        float minNestDistanceSquared =
+            minDistanceBetweenNests *
+            minDistanceBetweenNests;
+
+        foreach (Vector2 existingPosition
+                 in existingPositions)
+        {
+            float sqrDistance =
+                (
+                    candidate -
+                    existingPosition
+                ).sqrMagnitude;
+
+            if (sqrDistance <
+                minNestDistanceSquared)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

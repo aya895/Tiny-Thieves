@@ -171,7 +171,6 @@ public class UIManager : MonoBehaviour
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.StopEating();
-            AudioManager.Instance.StopMusic();
         }
 
         SceneManager.LoadScene(0);

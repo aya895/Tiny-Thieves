@@ -17,7 +17,7 @@ public class GameOverUI : MonoBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    public void NextWave()
+    public void RetryWave()
     {
         gameOverPanel.SetActive(false);
         waveManager.ContinueAfterGameOver();

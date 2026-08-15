@@ -120,13 +120,33 @@ public class SpawnManager : MonoBehaviour
     {
         for (int i = 0; i < numberOfNests; i++)
         {
-            Vector2 nestPosition = positionCalculator.GetNestPosition(placedNestPositions);
+            if (!positionCalculator.TryGetNestPosition(
+                    placedNestPositions,
+                    out Vector2 nestPosition))
+            {
+                Debug.LogWarning(
+                    "[SpawnManager] No valid nest position available."
+                );
 
-            placedNestPositions.Add(nestPosition);
-            GameObject nest = Instantiate(antNest,nestPosition,Quaternion.identity);
+                break;
+            }
+
+            placedNestPositions.Add(
+                nestPosition
+            );
+
+            GameObject nest =
+                Instantiate(
+                    antNest,
+                    nestPosition,
+                    Quaternion.identity
+                );
 
             spawnedNests.Add(nest);
-            SpawnLinePerNest(nest.transform);
+
+            SpawnLinePerNest(
+                nest.transform
+            );
         }
     }
 

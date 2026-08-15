@@ -15,13 +15,13 @@ public class WaveTimerUI : MonoBehaviour
     private void OnEnable()
     {
         WaveManager.OnStateChanged += HandleStateChanged;
-        WaveManager.OnCountdownTick += HandleCountdownTick;
+       // WaveManager.OnCountdownTick += HandleCountdownTick;
     }
 
     private void OnDisable()
     {
         WaveManager.OnStateChanged -= HandleStateChanged;
-        WaveManager.OnCountdownTick -= HandleCountdownTick;
+       // WaveManager.OnCountdownTick -= HandleCountdownTick;
     }
 
     private void HandleStateChanged(IWaveState state)

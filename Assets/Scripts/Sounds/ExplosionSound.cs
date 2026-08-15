@@ -2,28 +2,52 @@ using UnityEngine;
 
 public class ExplosionSound : MonoBehaviour
 {
-    [SerializeField] private AudioManager audioManager;
-    [SerializeField] private AudioClip explosionClip;
+    [SerializeField]
+    private TNTPlacementController tntController;
+
+    [SerializeField]
+    private AudioClip explosionClip;
+
+    private void Awake()
+    {
+        if (tntController == null)
+        {
+            tntController =
+                FindFirstObjectByType<TNTPlacementController>();
+        }
+    }
 
     private void OnEnable()
     {
-        ExplosionSignal.OnExplosion += HandleExplosion;
+        if (tntController != null)
+        {
+            tntController.OnAnyExplosion +=
+                HandleExplosion;
+        }
     }
 
     private void OnDisable()
     {
-        ExplosionSignal.OnExplosion -= HandleExplosion;
+        if (tntController != null)
+        {
+            tntController.OnAnyExplosion -=
+                HandleExplosion;
+        }
     }
 
-    private void HandleExplosion(Vector2 position, float radius, float damage)
+    private void HandleExplosion(
+        Vector2 position,
+        float radius,
+        float damage)
     {
-        //if (audioManager == null || explosionClip == null)
-        //    return;
-
-        //audioManager.PlaySfx(explosionClip);
-        if (AudioManager.Instance == null || explosionClip == null)
+        if (AudioManager.Instance == null ||
+            explosionClip == null)
+        {
             return;
+        }
 
-        AudioManager.Instance.PlaySfx(explosionClip);
+        AudioManager.Instance.PlaySfx(
+            explosionClip
+        );
     }
 }

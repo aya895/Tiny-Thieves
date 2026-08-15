@@ -58,17 +58,19 @@ public class MenuUIHandler : MonoBehaviour
             }
             isInitializing = false;
         }
+        if (AudioManager.Instance != null &&
+        menuMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(
+                menuMusicClip
+            );
+        }
     }
 
 
     // functions needed for the buttons
-    public void PlayClicked() 
+    public void PlayClicked()
     {
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.StopMusic();
-        }
-
         SceneManager.LoadScene(1);
         OnPlayClicked?.Invoke();
     }

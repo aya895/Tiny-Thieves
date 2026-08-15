@@ -122,4 +122,82 @@ public class Ant : MonoBehaviour, IDamageable, IKnockbackable
         Destroy(gameObject);
     }
 
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (!isKnockedBack || stackedWith != null) return;
+    //    Ant other = collision.gameObject.GetComponent<Ant>();
+
+    //    if (other == null || other == this || other.stackedWith != null) return;
+    //    if (other.isKnockedBack == true)
+    //    {
+    //        if (this.GetInstanceID() < other.GetInstanceID())
+    //        {
+    //            return;
+    //        }
+    //    }
+    //    stackedWith = other;
+    //    other.stackedWith = this;
+
+    //    // Disable physics and pathing on THIS flying ant so it becomes a passenger
+    //    Collider2D antCollider = GetComponent<Collider2D>();
+
+    //    if (antCollider != null)
+    //    {
+    //        antCollider.enabled = false;
+    //    }
+    //    rb.simulated = false;
+    //    if (antMovement != null)
+    //    {
+    //        antMovement.SetPathingEnabled(false);
+    //    }
+
+    //    //Parent it to the base ant so it follows its movement exactly & make its sorting order higher
+    //    transform.SetParent(other.transform);
+    //    //
+    //    transform.localPosition = new Vector3(0f, 0.3f, 0f);
+    //    if (spriteRenderer != null && other.spriteRenderer != null)
+    //    {
+    //        spriteRenderer.sortingOrder = other.spriteRenderer.sortingOrder + 1;
+    //    }
+    //}
+
+    //public void LeaveStack()
+    //{
+
+    //    if (stackedWith != null)
+    //    {
+    //        // Determine which ant is the passenger (the one that has a parent)
+    //        Ant passenger;
+    //        if (this.transform.parent != null)
+    //        {
+    //            passenger = this;
+    //        }
+    //        else
+    //        {
+    //            passenger = stackedWith;
+    //        }
+
+    //        // Unparent the passenger & restore its physics & sorting order
+    //        passenger.transform.SetParent(null);
+    //        Collider2D passengerCollider = passenger.GetComponent<Collider2D>();
+    //        if (passengerCollider != null)
+    //        {
+    //            passengerCollider.enabled = true;
+    //        }
+    //        passenger.rb.simulated = true;
+    //        if (passenger.antMovement != null)
+    //        {
+    //            passenger.antMovement.SetPathingEnabled(true);
+    //        }
+    //        if (passenger.spriteRenderer != null)
+    //        {
+    //            passenger.spriteRenderer.sortingOrder = 0;
+    //        }
+
+
+    //        // Clear references for both
+    //        stackedWith.stackedWith = null;
+    //        stackedWith = null;
+    //    }
+    //}
 }
