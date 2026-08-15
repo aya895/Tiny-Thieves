@@ -3,9 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// SINGLE RESPONSIBILITY: display one upgrade's info and report a click.
-// Doesn't know what "applying" an upgrade means or how many are pending -
-// that's UpgradeSelectionUI's job.
 public class UpgradeChoiceButtonUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text titleText;
@@ -14,49 +11,66 @@ public class UpgradeChoiceButtonUI : MonoBehaviour
     [SerializeField] private Button button;
 
     private UpgradeDefinition upgrade;
+
     private Action<UpgradeDefinition> onChosen;
 
-    public void Setup(UpgradeDefinition upgradeDefinition, Action<UpgradeDefinition> onChosenCallback)
+    public void Setup(
+        UpgradeDefinition upgradeDefinition,
+        Action<UpgradeDefinition> callback)
     {
-        
+        if (upgradeDefinition == null)
+        {
+            Debug.LogError(
+                "[UpgradeChoiceButtonUI] Upgrade is missing.",
+                this
+            );
 
-            if (upgradeDefinition == null)
-            {
-                Debug.LogError("[UpgradeChoiceButtonUI] UpgradeDefinition is NULL.", this);
-                return;
-            }
+            return;
+        }
 
-            if (titleText == null)
-            {
-                Debug.LogError("[UpgradeChoiceButtonUI] Title Text is missing.", this);
-                return;
-            }
+        upgrade = upgradeDefinition;
+        onChosen = callback;
 
-            if (descriptionText == null)
-            {
-                Debug.LogError("[UpgradeChoiceButtonUI] Description Text is missing.", this);
-                return;
-            }
+        if (titleText != null)
+        {
+            titleText.text = upgrade.Title;
+        }
 
-            if (button == null)
-            {
-                Debug.LogError("[UpgradeChoiceButtonUI] Button reference is missing.", this);
-                return;
-            }
+        if (descriptionText != null)
+        {
+            descriptionText.text =
+                upgrade.Description;
+        }
 
-            upgrade = upgradeDefinition;
-        onChosen = onChosenCallback;
+        if (iconImage != null)
+        {
+            iconImage.sprite = upgrade.Icon;
+        }
 
-        titleText.text = upgrade.Title;
-        descriptionText.text = upgrade.Description;
-        if (iconImage != null) iconImage.sprite = upgrade.Icon;
+        if (button != null)
+        {
+            button.onClick.RemoveListener(
+                HandleClick
+            );
 
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(HandleClick);
+            button.onClick.AddListener(
+                HandleClick
+            );
+        }
     }
 
     private void HandleClick()
     {
         onChosen?.Invoke(upgrade);
+    }
+
+    private void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(
+                HandleClick
+            );
+        }
     }
 }

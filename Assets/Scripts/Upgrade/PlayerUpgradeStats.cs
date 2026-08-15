@@ -1,77 +1,62 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-// What each StatUpgradeDefinition is allowed to affect. Keeping this as an
-// enum (rather than raw strings/reflection) means a mistyped stat name
-// fails at compile time in the Inspector dropdown, not silently at runtime.
-public enum UpgradeStatType
-{
-    ExplosionRadius,
-    MaxTNTCount,
-    KnockbackForce,
-    FuseBurnSpeed,
-    MaxFuseDistance,
-    MaxDessertHealth
-}
-
-// SINGLE RESPONSIBILITY: holds the current total of every upgradeable
-// stat and nothing else. It doesn't know what XP is, what a wave is, or
-// how upgrades get chosen - it's just the shared answer to "how much
-// bonus does the player currently have on X."
-//
-// TNTLogic and TNTPlacementController read from this; UpgradeDefinitions
-// write to it. Neither side needs to know about the other.
 public class PlayerUpgradeStats : MonoBehaviour
 {
-    public static PlayerUpgradeStats Instance { get; private set; }
+    private readonly Dictionary<UpgradeStatType, float> bonuses =
+        new Dictionary<UpgradeStatType, float>();
 
-    public float BonusExplosionRadius { get; private set; }
-    public int BonusMaxTNTCount { get; private set; }
-    public float BonusKnockbackForce { get; private set; }
-    public float BonusFuseBurnSpeed { get; private set; }
-    public float BonusMaxFuseDistance { get; private set; }
-    public float BonusMaxDessertHealth { get; private set; }
+    public event Action<UpgradeStatType, float> BonusApplied;
 
-    [SerializeField] private Dessert dessert;
+    public float BonusExplosionRadius =>
+        GetBonus(UpgradeStatType.ExplosionRadius);
 
-    private void Awake()
+    public int BonusMaxTNTCount =>
+        Mathf.RoundToInt(
+            GetBonus(UpgradeStatType.MaxTNTCount)
+        );
+
+    public float BonusKnockbackForce =>
+        GetBonus(UpgradeStatType.KnockbackForce);
+
+    public float BonusFuseBurnSpeed =>
+        GetBonus(UpgradeStatType.FuseBurnSpeed);
+
+    public float BonusMaxFuseDistance =>
+        GetBonus(UpgradeStatType.MaxFuseDistance);
+
+    public float BonusMaxDessertHealth =>
+        GetBonus(UpgradeStatType.MaxDessertHealth);
+
+    public void AddBonus(
+        UpgradeStatType statType,
+        float amount)
     {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning(
-                "A second PlayerUpgradeStats was found in the scene - destroying the duplicate. " +
-                "Make sure only ONE GameObject has this component.");
-            Destroy(gameObject);
+        if (Mathf.Approximately(amount, 0f))
             return;
-        }
 
-        Instance = this;
+        bonuses[statType] =
+            GetBonus(statType) + amount;
+
+        BonusApplied?.Invoke(
+            statType,
+            amount
+        );
     }
 
-    public void AddBonus(UpgradeStatType type, float amount)
+    public float GetBonus(UpgradeStatType statType)
     {
-        switch (type)
-        {
-            case UpgradeStatType.ExplosionRadius:
-                BonusExplosionRadius += amount;
-                break;
-            case UpgradeStatType.MaxTNTCount:
-                BonusMaxTNTCount += Mathf.RoundToInt(amount);
-                break;
-            case UpgradeStatType.KnockbackForce:
-                BonusKnockbackForce += amount;
-                break;
-            case UpgradeStatType.FuseBurnSpeed:
-                BonusFuseBurnSpeed += amount;
-                break;
-            case UpgradeStatType.MaxFuseDistance:
-                BonusMaxFuseDistance += amount;
-                break;
-            case UpgradeStatType.MaxDessertHealth:
-                BonusMaxDessertHealth += amount;
-                break;
-        }
+        return bonuses.TryGetValue(
+            statType,
+            out float value
+        )
+            ? value
+            : 0f;
+    }
 
-        
-        UpgradeAppliedSignal.Raise(type, amount);
+    public void ResetBonuses()
+    {
+        bonuses.Clear();
     }
 }

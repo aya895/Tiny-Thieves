@@ -1,9 +1,8 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-// SINGLE RESPONSIBILITY: input + placement + linking TNTs into a fuse chain.
-// This class doesn't know how a TNT explodes or animates - it just places
-// TNTLogic instances and tells them who's next in line via SetNext().
 public class TNTPlacementController : MonoBehaviour
 {
 
@@ -15,119 +14,248 @@ public class TNTPlacementController : MonoBehaviour
     [SerializeField] private ExplosionRadiusIndicator previewIndicatorPrefab;
     [SerializeField] private FuseConnection fuseLinePrefab;
 
+    [Header("Dependencies")]
+    [SerializeField] private PlayerUpgradeStats playerUpgradeStats;
+    [SerializeField] private WaveManager waveManager;
+
     [Header("Rules")]
-    [Tooltip("Matches the reference game's 'max distance between TNTs' fuse limit.")]
     [SerializeField] private float maxFuseLength = 6f;
-    [Tooltip("Total TNT the player can place per level/attempt, like the reference game's limited dynamite.")]
     [SerializeField] private int maxTNTCount = 5;
 
     private ExplosionRadiusIndicator activePreview;
+
+    private TNTLogic firstPlaced;
     private TNTLogic lastPlaced;
-    private TNTLogic firstPlaced; // remembered so Detonator knows where the chain starts
-    private Camera mainCam; // cache & assign in awake so it wont be called every frame in update
-    private int placedCount = 0;
 
-    public int RemainingTNT => EffectiveMaxTNTCount - placedCount;
+    private Camera mainCam;
+    private int placedCount;
 
-     private int EffectiveMaxTNTCount =>
-        maxTNTCount + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxTNTCount : 0);
+    private readonly List<TNTLogic> placedTNTs =
+        new List<TNTLogic>();
 
-     private float EffectiveMaxFuseLength =>
-        maxFuseLength + (PlayerUpgradeStats.Instance != null ? PlayerUpgradeStats.Instance.BonusMaxFuseDistance : 0f);
+    private readonly List<FuseConnection> placedFuses =
+        new List<FuseConnection>();
 
-    [SerializeField] private WaveManager waveManager;
-   
+    public int RemainingTNT =>
+        Mathf.Max(
+            0,
+            EffectiveMaxTNTCount - placedCount
+        );
+
+    private int EffectiveMaxTNTCount =>
+        maxTNTCount +
+        (playerUpgradeStats != null
+            ? playerUpgradeStats.BonusMaxTNTCount
+            : 0);
+
+    private float EffectiveMaxFuseLength =>
+        maxFuseLength +
+        (playerUpgradeStats != null
+            ? playerUpgradeStats.BonusMaxFuseDistance
+            : 0f);
+
+    private float EffectiveExplosionRadius =>
+        tntPrefab.BaseExplosionRadius +
+        (playerUpgradeStats != null
+            ? playerUpgradeStats.BonusExplosionRadius
+            : 0f);
 
     private void Awake()
     {
-        if (waveManager == null)
-        {
-            waveManager = FindFirstObjectByType<WaveManager>();
-        }
-
-        
         mainCam = Camera.main;
     }
+
     private void OnEnable()
     {
-        //WaveReadySignal.OnWaveReady += ResetForNewWave;
         WaveManager.OnWaveReady += ResetForNewWave;
+        WaveManager.OnWaveEnded += ClearPlacedObjects;
     }
- 
+
     private void OnDisable()
     {
-        //WaveReadySignal.OnWaveReady -= ResetForNewWave;
         WaveManager.OnWaveReady -= ResetForNewWave;
+        WaveManager.OnWaveEnded -= ClearPlacedObjects;
+    }
+
+    private void Update()
+    {
+        if (waveManager == null)
+            return;
+
+        if (!waveManager.IsPlanning() &&
+            !waveManager.IsPlaying())
+        {
+            HidePreview();
+            return;
+        }
+
+        if (mainCam == null)
+            return;
+
+        Vector3 mouseWorld =
+            mainCam.ScreenToWorldPoint(
+                Input.mousePosition
+            );
+
+        mouseWorld.z = 0f;
+
+        bool placementValid =
+            IsPlacementValid(mouseWorld);
+
+        UpdatePreview(
+            mouseWorld,
+            placementValid
+        );
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (EventSystem.current != null &&
+                EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
+            if (placementValid)
+            {
+                PlaceTNT(mouseWorld);
+            }
+        }
+    }
+
+    // =========================================================
+    // WAVE CLEANUP
+    // =========================================================
+
+    private void ClearPlacedObjects()
+    {
+        foreach (TNTLogic tnt in placedTNTs)
+        {
+            if (tnt != null)
+            {
+                Destroy(tnt.gameObject);
+            }
+        }
+
+        placedTNTs.Clear();
+
+        foreach (FuseConnection fuse in placedFuses)
+        {
+            if (fuse != null)
+            {
+                Destroy(fuse.gameObject);
+            }
+        }
+
+        placedFuses.Clear();
+
+        placedCount = 0;
+        firstPlaced = null;
+        lastPlaced = null;
+
+        DestroyPreview();
     }
 
     private void ResetForNewWave()
     {
-        placedCount = 0;
-        lastPlaced = null;
-        firstPlaced = null;
- 
-        if (activePreview != null)
-        {
-            Destroy(activePreview.gameObject);
-            activePreview = null;
-        }
-    }
-    private void Update()
-    {
-        if (waveManager == null)
-        {
-            waveManager = FindFirstObjectByType<WaveManager>();
-
-            if (waveManager == null)
-                return;
-        }
-        if (!waveManager.IsPlanning() && !waveManager.IsPlaying())
-        {
-            return;
-        }
-        Vector3 mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorld.z = 0f;
-
-        bool placementValid = IsPlacementValid(mouseWorld); // computed once 
-
-        UpdatePreview(mouseWorld, placementValid);
-        if (Input.GetMouseButtonDown(0) && placementValid)
-        {
-            PlaceTNT(mouseWorld);
-        }
+        // Safety cleanup in case something survived
+        // the previous wave.
+        ClearPlacedObjects();
     }
 
-    private void UpdatePreview(Vector3 worldPos, bool placementValid)
+    // =========================================================
+    // PREVIEW
+    // =========================================================
+
+    private void UpdatePreview(
+        Vector3 worldPosition,
+        bool placementValid)
     {
         if (placedCount >= EffectiveMaxTNTCount)
         {
-            if (activePreview != null) activePreview.SetVisible(false);
+            HidePreview();
             return;
         }
 
         if (activePreview == null)
         {
-            activePreview = Instantiate(previewIndicatorPrefab);
+            activePreview =
+                Instantiate(
+                    previewIndicatorPrefab
+                );
         }
 
-        activePreview.transform.position = worldPos;
-        activePreview.SetRadius(tntPrefab.ExplosionRadius);
-        activePreview.SetVisible(placementValid);
+        activePreview.transform.position =
+            worldPosition;
+
+        activePreview.SetRadius(
+            EffectiveExplosionRadius
+        );
+
+        activePreview.SetVisible(
+            placementValid
+        );
     }
 
-    private bool IsPlacementValid(Vector3 worldPos)
+    private void HidePreview()
     {
-        if (placedCount >= EffectiveMaxTNTCount) return false;
-        if (lastPlaced == null) return true; // first TNT can go anywhere
-
-        //return Vector3.Distance(lastPlaced.transform.position, worldPos) <= EffectiveMaxFuseLength;
-        float maxFuseLength = EffectiveMaxFuseLength;
-        return (worldPos - lastPlaced.transform.position).sqrMagnitude <= maxFuseLength * maxFuseLength;
+        if (activePreview != null)
+        {
+            activePreview.SetVisible(false);
+        }
     }
 
-    private void PlaceTNT(Vector3 worldPos)
+    private void DestroyPreview()
     {
-        TNTLogic newTNT = Instantiate(tntPrefab, worldPos, Quaternion.identity);
+        if (activePreview == null)
+            return;
+
+        Destroy(activePreview.gameObject);
+        activePreview = null;
+    }
+
+    // =========================================================
+    // PLACEMENT
+    // =========================================================
+
+    private bool IsPlacementValid(
+        Vector3 worldPosition)
+    {
+        if (placedCount >= EffectiveMaxTNTCount)
+            return false;
+
+        // First TNT can be placed anywhere.
+        if (lastPlaced == null)
+            return true;
+
+        float allowedDistance =
+            EffectiveMaxFuseLength;
+
+        Vector3 difference =
+            worldPosition -
+            lastPlaced.transform.position;
+
+        return difference.sqrMagnitude <=
+               allowedDistance * allowedDistance;
+    }
+
+    private void PlaceTNT(
+        Vector3 worldPosition)
+    {
+        TNTLogic newTNT =
+            Instantiate(
+                tntPrefab,
+                worldPosition,
+                Quaternion.identity
+            );
+
+        newTNT.Initialize(
+            playerUpgradeStats
+        );
+
+        // Important:
+        // keep track of every TNT this controller creates.
+        placedTNTs.Add(newTNT);
+
         placedCount++;
 
         newTNT.OnExplode += (pos, r, dmg) => OnAnyExplosion?.Invoke(pos, r, dmg);
@@ -135,9 +263,24 @@ public class TNTPlacementController : MonoBehaviour
 
         if (lastPlaced != null)
         {
-            FuseConnection fuse = Instantiate(fuseLinePrefab);
-            float distance = fuse.Setup(lastPlaced, worldPos);
-            lastPlaced.SetNext(newTNT, distance);
+            FuseConnection fuse =
+                Instantiate(
+                    fuseLinePrefab
+                );
+
+            // Keep track of every fuse too.
+            placedFuses.Add(fuse);
+
+            float distance =
+                fuse.Setup(
+                    lastPlaced,
+                    worldPosition
+                );
+
+            lastPlaced.SetNext(
+                newTNT,
+                distance
+            );
         }
         else
         {
@@ -147,34 +290,12 @@ public class TNTPlacementController : MonoBehaviour
         lastPlaced = newTNT;
     }
 
-    // Detonator reads this - it doesn't need to know HOW the chain was built.
-    public TNTLogic GetChainStart() => firstPlaced;
+    // =========================================================
+    // DETONATOR
+    // =========================================================
+
+    public TNTLogic GetChainStart()
+    {
+        return firstPlaced;
+    }
 }
-
-
-
-// 4o8l 3ale kal3ada ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡿⠇⠀⠀⠀⠀⢻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡇⠀⠀⠀⠀⡸⣞⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠃⠀⠀⠀⢀⣧⢿⣽⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⢴⣿⠆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⣼⣞⡿⣞⡅⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠓⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠀⠀⠀⣰⣟⢾⣽⢫⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣠⢤⣶⡻⣞⣿⣺⢯⣽⣳⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⢠⣄⡀⠀⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀⣀⣠⣤⣿⣽⣻⢾⣽⣷⣾⣽⣻⣞⣷⣳⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣶⣄⡀⠀⠀⠀⣉⣲⣴⢶⣞⡿⣽⣞⡷⣯⢿⡽⣞⣿⠟⠋⠁⠉⠈⠳⣟⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⢶⣾⣿⡽⣯⣟⡾⣽⡷⣯⣟⡽⡾⣽⡯⠁⠀⠀⠀⠀⠀⠀⢮⣭⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⢞⣿⣿⢯⡿⣿⣯⣟⣷⣯⢿⣳⣟⡷⣽⣼⣻⣽⠀⠀⠀⠀⠀⠀⠀⢀⣼⡯⡗⠋⠤⠀⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢾⣿⣿⣯⣽⣾⣿⣾⣗⡿⣯⡷⣯⣟⡷⣞⣼⣿⣀⠀⠀⠀⠀⢀⣠⡿⣏⡗⠈⠐⠈⠅⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⠛⠏⠉⠉⠽⢟⢿⣿⣿⣿⣿⣷⣻⢾⡽⣞⡷⠄⡹⣶⢿⣻⢿⣻⡽⢯⣼⢦⠶⠁⠈⠀⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣯⠇⠀⠀⠀⠀⠀⠁⣽⣿⣿⣿⣷⣯⣿⣽⣛⡦⠀⠀⢩⣿⣹⢯⣷⢻⣟⠺⢣⡖⣘⠤⠓⠀⠀⠀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⣿⡃⠁⠀⠀⠀⢀⣤⣾⣟⢿⣻⣿⣿⣟⡾⣽⡳⠄⠎⢳⣯⢯⣟⡾⢯⣞⣯⣓⠉⢀⠀⠀⡄⢢⡀⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣷⣷⣶⣳⣶⣺⣿⣿⣳⢯⣟⣿⣿⣳⢯⠛⠅⠃⠀⠀⣴⣿⡿⣬⢶⠾⠙⣊⣥⠾⡒⠊⢁⢠⠣⣌⠀⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡽⣾⡽⣯⣟⣿⡿⣯⣿⣿⣾⢿⣿⠳⢏⣈⢠⠀⠀⣰⢿⡿⣽⣉⡶⠌⠋⠉⣀⡀⠁⠀⠀⠀⣘⡐⣂⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣽⣳⣟⣳⣟⣾⣽⣿⣿⣿⣿⣿⣦⣜⡻⡽⠆⠧⣴⡟⣯⢟⡳⣭⠲⠄⠐⠀⠀⠀⠈⠁⠉⠑⢊⡕⢃⠄⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣾⣿⣯⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣾⢧⠀⠹⠾⡵⡞⡽⢢⣃⠐⠀⠀⠄⡐⠀⠀⠀⡘⢦⠘⣌⠀⠀
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠹⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢯⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠒⡈⠀⡀⠄⡑⠢⣉⠴⣈⣆
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢯⣏⡴⣶⣵⣢⢤⢠⡀⡄⢠⠐⡰⢌⡱⠀⡁⡀⠆⡥⠆⡥⣛⡽⣾
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠔⠉⠀⠀⢽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣼⣻⢷⣯⡽⣞⣷⣻⡼⣡⢋⡔⠣⠜⡐⢐⠠⡓⣤⣙⣲⣽⣻⢷
-//⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡿⣽⣞⣷⣻⡴⣣⢜⡱⣊⡕⣊⠠⡙⡰⣭⢷⣯⣿⢿

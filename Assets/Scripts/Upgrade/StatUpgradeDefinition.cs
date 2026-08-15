@@ -1,17 +1,39 @@
 using UnityEngine;
 
-// Covers "increase explosion radius," "give one more max TNT," "increase
-// knockback," "burn the fuse faster" - all as the SAME class, just
-// different asset data. Create one asset per upgrade in the Project
-// window; no new code required for any of these (OCP in practice).
-[CreateAssetMenu(fileName = "New Stat Upgrade", menuName = "Upgrades/Stat Upgrade")]
-public class StatUpgradeDefinition : UpgradeDefinition
+[CreateAssetMenu(
+    fileName = "New Stat Upgrade",
+    menuName = "Upgrades/Stat Upgrade"
+)]
+public sealed class StatUpgradeDefinition : UpgradeDefinition
 {
+    [Header("Effect")]
     [SerializeField] private UpgradeStatType statType;
+
     [SerializeField] private float amount;
 
-    public override void Apply()
+    public override void Apply(UpgradeContext context)
     {
-        PlayerUpgradeStats.Instance.AddBonus(statType, amount);
+        if (context == null)
+        {
+            Debug.LogError(
+                $"Cannot apply '{Title}': UpgradeContext is missing."
+            );
+
+            return;
+        }
+
+        if (context.PlayerStats == null)
+        {
+            Debug.LogError(
+                $"Cannot apply '{Title}': PlayerUpgradeStats is missing."
+            );
+
+            return;
+        }
+
+        context.PlayerStats.AddBonus(
+            statType,
+            amount
+        );
     }
 }
