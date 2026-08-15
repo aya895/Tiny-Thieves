@@ -32,11 +32,59 @@ public class AudioManager : MonoBehaviour
         );
     }
 
-    private void OnDestroy()
+    public void PlayMusic(AudioClip clip)
     {
-        if (Instance == this)
+        if (musicSource == null || clip == null)
+            return;
+
+        if (musicSource.clip == clip &&
+            musicSource.isPlaying)
         {
-            Instance = null;
+            return;
+        }
+
+        musicSource.clip = clip;
+        musicSource.loop = true;
+        musicSource.Play();
+    }
+
+    public void StopMusic()
+    {
+        if (musicSource != null)
+        {
+            musicSource.Stop();
+        }
+    }
+
+    public void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource == null || clip == null)
+            return;
+
+        sfxSource.PlayOneShot(clip);
+    }
+
+    public void PlayEating(AudioClip clip)
+    {
+        if (eatingSource == null || clip == null)
+            return;
+
+        if (eatingSource.clip == clip &&
+            eatingSource.isPlaying)
+        {
+            return;
+        }
+
+        eatingSource.clip = clip;
+        eatingSource.loop = true;
+        eatingSource.Play();
+    }
+
+    public void StopEating()
+    {
+        if (eatingSource != null)
+        {
+            eatingSource.Stop();
         }
     }
 
@@ -73,65 +121,5 @@ public class AudioManager : MonoBehaviour
             SFX_KEY,
             volume
         );
-    }
-
-    public void PlayMusic(AudioClip clip)
-    {
-        if (musicSource == null || clip == null)
-            return;
-
-        if (musicSource.clip == clip &&
-            musicSource.isPlaying)
-        {
-            return;
-        }
-
-        musicSource.clip = clip;
-        musicSource.loop = true;
-        musicSource.Play();
-    }
-
-    public void StopMusic()
-    {
-        if (musicSource != null)
-        {
-            musicSource.Stop();
-        }
-    }
-
-    public void PlaySfx(AudioClip clip)
-    {
-        if (sfxSource == null || clip == null)
-            return;
-
-        sfxSource.PlayOneShot(clip);
-    }
-
-    public void PlayEating(AudioClip clip)
-    {
-        if (eatingSource == null ||
-            clip == null)
-        {
-            return;
-        }
-
-        if (eatingSource.clip == clip &&
-            eatingSource.isPlaying)
-        {
-            return;
-        }
-
-        eatingSource.clip = clip;
-        eatingSource.loop = true;
-        eatingSource.Play();
-    }
-
-    public void StopEating()
-    {
-        if (eatingSource != null &&
-            eatingSource.isPlaying)
-        {
-            eatingSource.Stop();
-        }
     }
 }

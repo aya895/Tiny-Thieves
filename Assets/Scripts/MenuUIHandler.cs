@@ -58,6 +58,13 @@ public class MenuUIHandler : MonoBehaviour
             }
             isInitializing = false;
         }
+        if (AudioManager.Instance != null &&
+        menuMusicClip != null)
+        {
+            AudioManager.Instance.PlayMusic(
+                menuMusicClip
+            );
+        }
     }
 
 

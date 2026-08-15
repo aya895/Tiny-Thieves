@@ -8098,9 +8098,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 584036359}
         m_TargetAssemblyTypeName: GameOverUI, Assembly-CSharp
-        m_MethodName: NextWave
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8733,7 +8733,7 @@ MonoBehaviour:
   waveManager: {fileID: 584036360}
   enemyUpgradeInterval: 3
   mapExpansionInterval: 3
-  gameplayMusicClip: {fileID: 0}
+  gameplayMusicClip: {fileID: 8300000, guid: 6701ead35015bfa408dfb12f5bbc3384, type: 3}
 --- !u!114 &2019891961
 MonoBehaviour:
   m_ObjectHideFlags: 0
