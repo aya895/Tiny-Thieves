@@ -16,4 +16,4 @@ MonoBehaviour:
   description: Make the chain explode faster
   icon: {fileID: 21300000, guid: b4430fd29b9ff7d4791289fc5fda08d2, type: 3}
   statType: 3
-  amount: 1
+  amount: 2
