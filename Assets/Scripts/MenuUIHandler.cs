@@ -69,13 +69,8 @@ public class MenuUIHandler : MonoBehaviour
 
 
     // functions needed for the buttons
-    public void PlayClicked() 
+    public void PlayClicked()
     {
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.StopMusic();
-        }
-
         SceneManager.LoadScene(1);
         OnPlayClicked?.Invoke();
     }
