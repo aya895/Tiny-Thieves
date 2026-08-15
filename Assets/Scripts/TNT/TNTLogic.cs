@@ -4,34 +4,26 @@ using UnityEngine;
 
 public class TNTLogic : MonoBehaviour
 {
-    // needed events
-    public event Action<Vector2, float, float> OnExplode;
-    public event Action<Vector2, float, float> OnShockwave;
-
-
     [Header("Explosion")]
     [SerializeField] private float explosionRadius = 2f;
     [SerializeField] private float damage = 100f;
 
     [Header("Shockwave")]
-    [SerializeField]
-    private float shockwaveRadiusMultiplier = 1.4f;
-
-    [SerializeField]
-    private float knockbackForce = 8f;
+    [SerializeField] private float shockwaveRadiusMultiplier = 1.4f;
+    [SerializeField] private float knockbackForce = 8f;
 
     [Header("Fuse")]
-    [SerializeField]
-    private float fuseBurnSpeed = 5f;
+    [SerializeField] private float fuseBurnSpeed = 5f;
 
     private PlayerUpgradeStats playerStats;
+    private TNTPlacementController placementController;
 
     private TNTLogic nextInChain;
-
     private float distanceToNext;
 
     private bool hasIgnited;
 
+    // TNTVisual and FuseConnection listen to this.
     public event Action OnExplode;
 
     public float BaseExplosionRadius =>
@@ -60,9 +52,11 @@ public class TNTLogic : MonoBehaviour
             : 0f);
 
     public void Initialize(
-        PlayerUpgradeStats stats)
+        PlayerUpgradeStats stats,
+        TNTPlacementController controller)
     {
         playerStats = stats;
+        placementController = controller;
     }
 
     public void SetNext(
@@ -89,30 +83,36 @@ public class TNTLogic : MonoBehaviour
     {
         yield return new WaitForSeconds(0.15f);
 
+        // Visual / fuse event.
         OnExplode?.Invoke();
 
-        ExplosionSignal.Raise(
-            transform.position,
-            ExplosionRadius,
-            damage
-        );
+        // Gameplay explosion.
+        if (placementController != null)
+        {
+            placementController.RaiseExplosion(
+                transform.position,
+                ExplosionRadius,
+                damage
+            );
 
-        ShockwaveSignal.Raise(
-            transform.position,
-            ShockwaveRadius,
-            EffectiveKnockbackForce
-        );
+            placementController.RaiseShockwave(
+                transform.position,
+                ShockwaveRadius,
+                EffectiveKnockbackForce
+            );
+        }
 
         if (nextInChain != null)
         {
-            float speed =
+            float safeFuseSpeed =
                 Mathf.Max(
                     EffectiveFuseBurnSpeed,
                     0.01f
                 );
 
             float chainDelay =
-                distanceToNext / speed;
+                distanceToNext /
+                safeFuseSpeed;
 
             yield return new WaitForSeconds(
                 chainDelay

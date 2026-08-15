@@ -5,10 +5,6 @@ using UnityEngine.EventSystems;
 
 public class TNTPlacementController : MonoBehaviour
 {
-
-    public event Action<Vector2, float, float> OnAnyExplosion;
-    public event Action<Vector2, float, float> OnAnyShockwave;
-
     [Header("Prefabs")]
     [SerializeField] private TNTLogic tntPrefab;
     [SerializeField] private ExplosionRadiusIndicator previewIndicatorPrefab;
@@ -21,6 +17,17 @@ public class TNTPlacementController : MonoBehaviour
     [Header("Rules")]
     [SerializeField] private float maxFuseLength = 6f;
     [SerializeField] private int maxTNTCount = 5;
+
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
+    public event Action<Vector2, float, float> OnAnyExplosion;
+    public event Action<Vector2, float, float> OnAnyShockwave;
+
+    // =========================================================
+    // STATE
+    // =========================================================
 
     private ExplosionRadiusIndicator activePreview;
 
@@ -35,6 +42,10 @@ public class TNTPlacementController : MonoBehaviour
 
     private readonly List<FuseConnection> placedFuses =
         new List<FuseConnection>();
+
+    // =========================================================
+    // EFFECTIVE VALUES
+    // =========================================================
 
     public int RemainingTNT =>
         Mathf.Max(
@@ -59,6 +70,10 @@ public class TNTPlacementController : MonoBehaviour
         (playerUpgradeStats != null
             ? playerUpgradeStats.BonusExplosionRadius
             : 0f);
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
@@ -107,19 +122,48 @@ public class TNTPlacementController : MonoBehaviour
             placementValid
         );
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (EventSystem.current != null &&
-                EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
+        if (!Input.GetMouseButtonDown(0))
+            return;
 
-            if (placementValid)
-            {
-                PlaceTNT(mouseWorld);
-            }
+        // Do not place TNT when clicking UI.
+        if (EventSystem.current != null &&
+            EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
         }
+
+        if (placementValid)
+        {
+            PlaceTNT(mouseWorld);
+        }
+    }
+
+    // =========================================================
+    // EXPLOSION BROADCASTING
+    // =========================================================
+
+    public void RaiseExplosion(
+        Vector2 position,
+        float radius,
+        float damage)
+    {
+        OnAnyExplosion?.Invoke(
+            position,
+            radius,
+            damage
+        );
+    }
+
+    public void RaiseShockwave(
+        Vector2 position,
+        float radius,
+        float force)
+    {
+        OnAnyShockwave?.Invoke(
+            position,
+            radius,
+            force
+        );
     }
 
     // =========================================================
@@ -157,8 +201,6 @@ public class TNTPlacementController : MonoBehaviour
 
     private void ResetForNewWave()
     {
-        // Safety cleanup in case something survived
-        // the previous wave.
         ClearPlacedObjects();
     }
 
@@ -210,6 +252,7 @@ public class TNTPlacementController : MonoBehaviour
             return;
 
         Destroy(activePreview.gameObject);
+
         activePreview = null;
     }
 
@@ -223,7 +266,6 @@ public class TNTPlacementController : MonoBehaviour
         if (placedCount >= EffectiveMaxTNTCount)
             return false;
 
-        // First TNT can be placed anywhere.
         if (lastPlaced == null)
             return true;
 
@@ -249,17 +291,13 @@ public class TNTPlacementController : MonoBehaviour
             );
 
         newTNT.Initialize(
-            playerUpgradeStats
+            playerUpgradeStats,
+            this
         );
 
-        // Important:
-        // keep track of every TNT this controller creates.
         placedTNTs.Add(newTNT);
 
         placedCount++;
-
-        newTNT.OnExplode += (pos, r, dmg) => OnAnyExplosion?.Invoke(pos, r, dmg);
-        newTNT.OnShockwave += (pos, r, force) => OnAnyShockwave?.Invoke(pos, r, force);
 
         if (lastPlaced != null)
         {
@@ -268,7 +306,6 @@ public class TNTPlacementController : MonoBehaviour
                     fuseLinePrefab
                 );
 
-            // Keep track of every fuse too.
             placedFuses.Add(fuse);
 
             float distance =
@@ -289,10 +326,6 @@ public class TNTPlacementController : MonoBehaviour
 
         lastPlaced = newTNT;
     }
-
-    // =========================================================
-    // DETONATOR
-    // =========================================================
 
     public TNTLogic GetChainStart()
     {
