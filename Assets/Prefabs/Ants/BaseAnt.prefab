@@ -90,7 +90,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 5a2eabdeda12cff4aa77450282cb61bc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -181,7 +181,6 @@ MonoBehaviour:
   maxHealth: 10
   moveSpeed: 2
   damageToDessert: 1
-  coinReward: 1
   tntResistance: 1
 --- !u!114 &3071861395202135738
 MonoBehaviour:
@@ -321,9 +320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ant
   health: 10
   expValue: 5
-  stackedVisualPrefab: {fileID: 0}
   knockBackPathPause: 0.3
-  xpValue: 1
+  isKnockedBack: 0
 --- !u!114 &2334167632764990676
 MonoBehaviour:
   m_ObjectHideFlags: 0
