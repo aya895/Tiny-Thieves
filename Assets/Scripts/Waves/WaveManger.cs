@@ -252,11 +252,8 @@ public class WaveManager : MonoBehaviour
             return;
 
         retryCurrentWave = false;
-
         ClearedWaves++;
-
         OnVictory?.Invoke();
-
         FinishWave();
     }
 

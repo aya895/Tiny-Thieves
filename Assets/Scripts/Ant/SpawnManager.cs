@@ -159,7 +159,7 @@ public class SpawnManager : MonoBehaviour
 
     public void ResetProgress()
     {
-        numberOfNests = 1;
+        numberOfNests = 2;
         linesPerNest = 1;
         maxUnlockedAnt = 0;
 
@@ -193,6 +193,14 @@ public class SpawnManager : MonoBehaviour
     {
         StopAllCoroutines();
 
+        AntMovement[] activeAnts = FindObjectsByType<AntMovement>(FindObjectsSortMode.None);
+        foreach (AntMovement antMovement in activeAnts)
+        {
+            if (antMovement != null && antMovement.gameObject.activeSelf)
+            {
+                ReleaseAnt(antMovement.gameObject);
+            }
+        }
 
         foreach (GameObject nest in spawnedNests)
         {
@@ -215,14 +223,6 @@ public class SpawnManager : MonoBehaviour
 
         spawnedLines.Clear();
 
-        AntMovement[] activeAnts = FindObjectsByType<AntMovement>(FindObjectsSortMode.None);
-        foreach (AntMovement antMovement in activeAnts)
-        {
-            if (antMovement != null && antMovement.gameObject.activeSelf)
-            {
-                ReleaseAnt(antMovement.gameObject);
-            }
-        }
 
         placedNestPositions.Clear();
 

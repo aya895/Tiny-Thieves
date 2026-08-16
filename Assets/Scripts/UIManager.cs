@@ -140,21 +140,21 @@ public class UIManager : MonoBehaviour
         victoryPanel.SetActive(true);
         Time.timeScale = 0;
         pauseButton.gameObject.SetActive(false);
-        waveClearedAt.gameObject.SetActive(true);
 
-
-        waveClearedAt.text = $"All ants cleared at wave: {waveManager.CurrentWave}";
+        if (waveClearedAt != null)
+        {
+            waveClearedAt.gameObject.SetActive(true);
+            waveClearedAt.text = $"Total Waves Cleared: {waveManager.ClearedWaves}";
+        }
     }
 
     private void HandleNextWaveClicked()
     {
         victoryPanel.SetActive(false);
-        waveClearedAt.gameObject.SetActive(false);
 
-        if (waveManager != null && waveManager.IsGameComplete())
+        if (waveClearedAt != null)
         {
-            ShowGameComplete();
-            return;
+            waveClearedAt.gameObject.SetActive(false);
         }
 
         if (AudioManager.Instance != null)
@@ -163,35 +163,34 @@ public class UIManager : MonoBehaviour
         }
 
         pauseButton.gameObject.SetActive(true);
-
         Time.timeScale = 1f;
     }
 
-    private void ShowGameComplete()
-    {
-        if (gameCompletePanel != null)
-        {
-            gameCompletePanel.SetActive(true);
-        }
+    //private void ShowGameComplete()
+    //{
+    //    if (gameCompletePanel != null)
+    //    {
+    //        gameCompletePanel.SetActive(true);
+    //    }
 
-        if (TotalClearedText != null && waveManager != null)
-        {
-            TotalClearedText.text = $"Total Waves cleared: {waveManager.WavesCleared}";
-        }
+    //    if (TotalClearedText != null && waveManager != null)
+    //    {
+    //        TotalClearedText.text = $"Total Waves cleared: {waveManager.WavesCleared}";
+    //    }
 
-        if (pauseButton != null)
-        {
-            pauseButton.gameObject.SetActive(false);
-        }
+    //    if (pauseButton != null)
+    //    {
+    //        pauseButton.gameObject.SetActive(false);
+    //    }
 
-        // Call AudioManager to switch music
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.PlayGameCompleteMusic();
-        }
+    //    // Call AudioManager to switch music
+    //    if (AudioManager.Instance != null)
+    //    {
+    //        AudioManager.Instance.PlayGameCompleteMusic();
+    //    }
 
-        Time.timeScale = 0f;
-    }
+    //    Time.timeScale = 0f;
+    //}
 
     public void ShowPause()
     {
