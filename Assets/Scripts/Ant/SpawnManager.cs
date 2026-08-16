@@ -197,8 +197,20 @@ public class SpawnManager : MonoBehaviour
             GameObject lineOrigin = new GameObject(nestTransform.name + "_LineOrigin" + i);
             spawnedLines.Add(lineOrigin);
 
-            Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
-            lineOrigin.transform.position = (Vector2)nestTransform.position + lineOffset;
+            Vector2 lineOffset = Vector2.zero;
+
+            if (i > 0 && dessertTransform != null)
+            {
+                Vector2 directionToDessert =
+                    ((Vector2)dessertTransform.position -
+                     (Vector2)nestTransform.position).normalized;
+
+                lineOffset =
+                    directionToDessert * 0.5f * i;
+            }
+
+            lineOrigin.transform.position =
+                (Vector2)nestTransform.position + lineOffset;
 
             lineController.nest = lineOrigin.transform;
 
