@@ -3365,7 +3365,6 @@ MonoBehaviour:
   dessert: {fileID: 1701313834}
   gameOverUI: {fileID: 1891420181}
   experienceManager: {fileID: 770089304}
-  victoryTracker: {fileID: 0}
 --- !u!4 &584036361
 Transform:
   m_ObjectHideFlags: 0
@@ -6113,9 +6112,6 @@ MonoBehaviour:
   pauseButton: {fileID: 1677652289}
   nextWaveButton: {fileID: 1299672579}
   waveClearedAt: {fileID: 448224799}
-  TotalClearedText: {fileID: 526865629}
-  musicSlider: {fileID: 1635071347}
-  sfxSlider: {fileID: 1878207790}
 --- !u!4 &1451174104
 Transform:
   m_ObjectHideFlags: 0
@@ -8832,9 +8828,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
   waveManager: {fileID: 584036360}
   gameOverPanel: {fileID: 348860934}
-  pauseButton: {fileID: 1677652289}
-  clearedWavesText: {fileID: 1060793012}
-  reachedWaveText: {fileID: 961508635}
 --- !u!4 &1891420182
 Transform:
   m_ObjectHideFlags: 0
