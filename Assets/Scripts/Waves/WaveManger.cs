@@ -51,7 +51,7 @@ public class WaveManager : MonoBehaviour
     private bool retryCurrentWave;
 
     public int CurrentWave { get; private set; }
-
+    public int ClearedWaves { get; private set; }
     public float ReadyTime => readyTime;
     public float WaveDuration => waveDuration;
     public float RemainingTime => timer;
@@ -117,6 +117,7 @@ public class WaveManager : MonoBehaviour
     private void Start()
     {
         CurrentWave = 0;
+        ClearedWaves = 0;
         retryCurrentWave = false;
 
         StartCoroutine(ShowStartMessage());
@@ -252,6 +253,8 @@ public class WaveManager : MonoBehaviour
 
         retryCurrentWave = false;
 
+        ClearedWaves++;
+
         OnVictory?.Invoke();
 
         FinishWave();
@@ -320,6 +323,7 @@ public class WaveManager : MonoBehaviour
     public void ContinueAfterGameOver()
     {
         CurrentWave = 0;
+        ClearedWaves = 0;
         retryCurrentWave = false;
 
         if (spawnManager != null)
@@ -337,9 +341,7 @@ public class WaveManager : MonoBehaviour
             experienceManager.ResetProgress();
         }
 
-        StartCoroutine(
-            ShowStartMessage()
-        );
+        StartCoroutine(ShowStartMessage());
     }
 
 
