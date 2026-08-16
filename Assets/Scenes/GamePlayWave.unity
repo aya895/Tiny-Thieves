@@ -3077,7 +3077,12 @@ MonoBehaviour:
   dessert: {fileID: 1701313834}
   gameOverUI: {fileID: 1891420181}
   experienceManager: {fileID: 770089304}
+<<<<<<< Updated upstream
   upgradeSelectionUI: {fileID: 0}
+=======
+  victoryTracker: {fileID: 623173253}
+  gameManager: {fileID: 2019891960}
+>>>>>>> Stashed changes
 --- !u!4 &584036361
 Transform:
   m_ObjectHideFlags: 0
@@ -5288,6 +5293,11 @@ MonoBehaviour:
   pausePanel: {fileID: 1619749284}
   pauseButton: {fileID: 1677652289}
   waveClearedAt: {fileID: 448224799}
+<<<<<<< Updated upstream
+=======
+  musicSlider: {fileID: 1635071347}
+  sfxSlider: {fileID: 1878207790}
+>>>>>>> Stashed changes
 --- !u!4 &1451174104
 Transform:
   m_ObjectHideFlags: 0
@@ -7923,6 +7933,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
   waveManager: {fileID: 584036360}
   gameOverPanel: {fileID: 348860934}
+<<<<<<< Updated upstream
+=======
+  pauseButton: {fileID: 1677652289}
+>>>>>>> Stashed changes
 --- !u!4 &1891420182
 Transform:
   m_ObjectHideFlags: 0
