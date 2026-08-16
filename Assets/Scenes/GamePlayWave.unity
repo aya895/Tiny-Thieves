@@ -8363,10 +8363,11 @@ MonoBehaviour:
   xMax: -6
   yMin: -4
   yMax: 1
-  distancePerNest: 5
+  gameCamera: {fileID: 0}
+  cameraPadding: 0.5
   dessertTransform: {fileID: 1701313838}
-  minDistanceFromDessert: 4
-  minDistanceBetweenNests: 4
+  minDistanceFromDessert: 10
+  minDistanceBetweenNests: 6
   numberOfNests: 2
   linesPerNest: 1
   antPrefabs:
