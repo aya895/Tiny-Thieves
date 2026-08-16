@@ -6,45 +6,127 @@ public class SpawnManager : MonoBehaviour
 {
     private NestPositionCalculate positionCalculator;
 
+
+    // =========================================================
+    // NEST
+    // =========================================================
+
     [Header("Nest")]
     [SerializeField] private GameObject antNest;
 
+
+    // =========================================================
+    // SPAWN SETTINGS
+    // =========================================================
+
     [Header("Spawn Settings")]
     [SerializeField] private float spawnDelay = 0.75f;
+
     [SerializeField] private float xMin = -8f;
     [SerializeField] private float xMax = -6f;
     [SerializeField] private float yMin = -4f;
     [SerializeField] private float yMax = 1f;
-    [SerializeField] private float distancePerNest = 5f;
+
+
+    // =========================================================
+    // CAMERA BOUNDS
+    // =========================================================
+
+    [Header("Camera Bounds")]
+    [SerializeField] private Camera gameCamera;
+
+    [SerializeField] private float cameraPadding = 0.5f;
+
+
+    // =========================================================
+    // DESSERT DISTANCE
+    // =========================================================
 
     [Header("Dessert Distance")]
     [SerializeField] private Transform dessertTransform;
+
     [SerializeField] private float minDistanceFromDessert = 4f;
+
+
+    // =========================================================
+    // NEST DISTANCE
+    // =========================================================
 
     [Header("Nest Distance")]
     [SerializeField] private float minDistanceBetweenNests = 3f;
 
+
+    // =========================================================
+    // WAVE SETTINGS
+    // =========================================================
+
     [Header("Wave Settings")]
     public int numberOfNests = 2;
+
     public int linesPerNest = 1;
 
+
+    // =========================================================
+    // ANTS
+    // =========================================================
+
     [Header("Ants")]
-    public List<GameObject> antPrefabs = new List<GameObject>();
+    public List<GameObject> antPrefabs =
+        new List<GameObject>();
+
     private int maxUnlockedAnt = 0;
 
-    private List<Vector2> placedNestPositions = new List<Vector2>();
-    private List<GameObject> spawnedNests = new List<GameObject>();
-    private List<GameObject> spawnedLines = new List<GameObject>();
+
+    // =========================================================
+    // RUNTIME DATA
+    // =========================================================
+
+    private readonly List<Vector2> placedNestPositions =
+        new List<Vector2>();
+
+    private readonly List<GameObject> spawnedNests =
+        new List<GameObject>();
+
+    private readonly List<GameObject> spawnedLines =
+        new List<GameObject>();
+
     private int pendingSpawnLines = 0;
 
+
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
     public static event System.Action OnAntSpawned;
+
     public static event System.Action OnSpawnComplete;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
-        positionCalculator = new NestPositionCalculate(xMin, xMax, yMin, yMax,
-            minDistanceBetweenNests, minDistanceFromDessert, dessertTransform);
+        if (gameCamera == null)
+        {
+            gameCamera = Camera.main;
+        }
+
+        UpdateSpawnAreaFromCamera();
+
+        positionCalculator =
+            new NestPositionCalculate(
+                xMin,
+                xMax,
+                yMin,
+                yMax,
+                minDistanceBetweenNests,
+                minDistanceFromDessert,
+                dessertTransform
+            );
     }
+
 
     private void OnEnable()
     {
@@ -53,6 +135,7 @@ public class SpawnManager : MonoBehaviour
         GameManager.OnNewAntType += UnlockNewAnt;
     }
 
+
     private void OnDisable()
     {
         GameManager.OnAddAntNest -= AddNest;
@@ -60,28 +143,46 @@ public class SpawnManager : MonoBehaviour
         GameManager.OnNewAntType -= UnlockNewAnt;
     }
 
+
     private void Start()
     {
         numberOfNests = 2;
         linesPerNest = 1;
     }
 
+
+    // =========================================================
+    // WAVE
+    // =========================================================
+
     public void StartWave()
     {
         ClearPreviousWave();
+
+        UpdateSpawnAreaFromCamera();
+
+        positionCalculator.UpdateArea(
+            xMin,
+            xMax,
+            yMin,
+            yMax
+        );
+
         pendingSpawnLines = 0;
 
         SpawnNests();
-        // No lines means spawning is already complete.
+
         if (pendingSpawnLines == 0)
         {
             OnSpawnComplete?.Invoke();
         }
     }
 
+
     public void ClearPreviousWave()
     {
         StopAllCoroutines();
+
 
         foreach (GameObject nest in spawnedNests)
         {
@@ -93,6 +194,7 @@ public class SpawnManager : MonoBehaviour
 
         spawnedNests.Clear();
 
+
         foreach (GameObject line in spawnedLines)
         {
             if (line != null)
@@ -103,7 +205,9 @@ public class SpawnManager : MonoBehaviour
 
         spawnedLines.Clear();
 
-        GameObject[] ants = GameObject.FindGameObjectsWithTag("Ant");
+
+        GameObject[] ants =
+            GameObject.FindGameObjectsWithTag("Ant");
 
         foreach (GameObject ant in ants)
         {
@@ -112,9 +216,17 @@ public class SpawnManager : MonoBehaviour
                 Destroy(ant);
             }
         }
+
+
         placedNestPositions.Clear();
+
         pendingSpawnLines = 0;
     }
+
+
+    // =========================================================
+    // NEST SPAWNING
+    // =========================================================
 
     private void SpawnNests()
     {
@@ -124,12 +236,33 @@ public class SpawnManager : MonoBehaviour
                     placedNestPositions,
                     out Vector2 nestPosition))
             {
+                Debug.LogWarning(
+                    "Could not find a valid position for another nest."
+                );
+
                 break;
             }
+
+
+            nestPosition.x =
+                Mathf.Clamp(
+                    nestPosition.x,
+                    xMin,
+                    xMax
+                );
+
+            nestPosition.y =
+                Mathf.Clamp(
+                    nestPosition.y,
+                    yMin,
+                    yMax
+                );
+
 
             placedNestPositions.Add(
                 nestPosition
             );
+
 
             GameObject nest =
                 Instantiate(
@@ -138,7 +271,11 @@ public class SpawnManager : MonoBehaviour
                     Quaternion.identity
                 );
 
-            spawnedNests.Add(nest);
+
+            spawnedNests.Add(
+                nest
+            );
+
 
             SpawnLinePerNest(
                 nest.transform
@@ -146,121 +283,328 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+
     // =========================================================
     // LINES
     // =========================================================
 
-    private void SpawnLinePerNest(Transform nestTransform)
+    private void SpawnLinePerNest(
+        Transform nestTransform)
     {
         for (int i = 0; i < linesPerNest; i++)
         {
-            GameObject line = new GameObject(nestTransform.name + "_Line_" + i);
-            AntLineController lineController = line.AddComponent<AntLineController>();
-            spawnedLines.Add(line);
+            GameObject line =
+                new GameObject(
+                    nestTransform.name +
+                    "_Line_" +
+                    i
+                );
 
-            GameObject lineOrigin = new GameObject(nestTransform.name + "_LineOrigin_" + i);
-            spawnedLines.Add(lineOrigin);
 
-            Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
-            lineOrigin.transform.position = (Vector2)nestTransform.position + lineOffset;
+            AntLineController lineController =
+                line.AddComponent<AntLineController>();
 
-            lineController.nest = lineOrigin.transform;
+
+            spawnedLines.Add(
+                line
+            );
+
+
+            GameObject lineOrigin =
+                new GameObject(
+                    nestTransform.name +
+                    "_LineOrigin_" +
+                    i
+                );
+
+
+            spawnedLines.Add(
+                lineOrigin
+            );
+
+
+            Vector2 lineOffset =
+                Random.insideUnitCircle.normalized *
+                0.9f *
+                i;
+
+
+            Vector2 linePosition =
+                (Vector2)nestTransform.position +
+                lineOffset;
+
+
+            // Prevent the line origin from leaving
+            // the visible camera spawn area.
+
+            linePosition.x =
+                Mathf.Clamp(
+                    linePosition.x,
+                    xMin,
+                    xMax
+                );
+
+            linePosition.y =
+                Mathf.Clamp(
+                    linePosition.y,
+                    yMin,
+                    yMax
+                );
+
+
+            lineOrigin.transform.position =
+                linePosition;
+
+
+            lineController.nest =
+                lineOrigin.transform;
+
+
             pendingSpawnLines++;
 
-            StartCoroutine(SpawnLine(lineController));
+
+            StartCoroutine(
+                SpawnLine(lineController)
+            );
         }
     }
 
-    private IEnumerator SpawnLine(AntLineController lineController)
+
+    private IEnumerator SpawnLine(
+        AntLineController lineController)
     {
-        for (int i = 0; i < lineController.maxAnts; i++)
+        for (int i = 0;
+             i < lineController.maxAnts;
+             i++)
         {
-            SpawnAnt(lineController);
-            yield return new WaitForSeconds(spawnDelay);
+            SpawnAnt(
+                lineController
+            );
+
+
+            yield return new WaitForSeconds(
+                spawnDelay
+            );
         }
 
+
         pendingSpawnLines--;
+
+
         if (pendingSpawnLines <= 0)
         {
             pendingSpawnLines = 0;
+
             OnSpawnComplete?.Invoke();
         }
     }
 
+
     // =========================================================
-    // ANT
+    // ANT SPAWNING
     // =========================================================
 
-    private void SpawnAnt(AntLineController lineController)
+    private void SpawnAnt(
+        AntLineController lineController)
     {
-        if (antPrefabs == null || antPrefabs.Count == 0)
+        if (antPrefabs == null ||
+            antPrefabs.Count == 0)
         {
             return;
         }
 
-        int maxIndex = Mathf.Min(maxUnlockedAnt, antPrefabs.Count - 1);
-        int index = Random.Range(0, maxIndex + 1);
 
-        GameObject selectedAntPrefab = antPrefabs[index];
+        int maxIndex =
+            Mathf.Min(
+                maxUnlockedAnt,
+                antPrefabs.Count - 1
+            );
+
+
+        int index =
+            Random.Range(
+                0,
+                maxIndex + 1
+            );
+
+
+        GameObject selectedAntPrefab =
+            antPrefabs[index];
+
+
         if (selectedAntPrefab == null)
         {
             return;
         }
 
-        Vector2 spawnPosition = lineController.nest.position;
 
-        GameObject ant = Instantiate(selectedAntPrefab, spawnPosition, Quaternion.identity);
+        Vector2 spawnPosition =
+            lineController.nest.position;
+
+
+        // Final safety check:
+        // ants can never spawn outside the camera area.
+
+        spawnPosition.x =
+            Mathf.Clamp(
+                spawnPosition.x,
+                xMin,
+                xMax
+            );
+
+        spawnPosition.y =
+            Mathf.Clamp(
+                spawnPosition.y,
+                yMin,
+                yMax
+            );
+
+
+        GameObject ant =
+            Instantiate(
+                selectedAntPrefab,
+                spawnPosition,
+                Quaternion.identity
+            );
+
+
         if (ant == null)
             return;
 
-        AntMovement antMovement = ant.GetComponent<AntMovement>();
+
+        AntMovement antMovement =
+            ant.GetComponent<AntMovement>();
+
+
         if (antMovement != null)
         {
-            antMovement.antLineController = lineController;
-            lineController.antLine.Add(ant);
+            antMovement.antLineController =
+                lineController;
+
+            lineController.antLine.Add(
+                ant
+            );
+
             lineController.UpdatePosition();
         }
+
 
         OnAntSpawned?.Invoke();
     }
 
+
     // =========================================================
-    // DIFFICULTY & AREA EXPANSION
+    // DIFFICULTY
     // =========================================================
 
     private void UnlockNewAnt()
     {
-        if (antPrefabs != null && maxUnlockedAnt < antPrefabs.Count - 1)
+        if (antPrefabs != null &&
+            maxUnlockedAnt <
+            antPrefabs.Count - 1)
         {
             maxUnlockedAnt++;
         }
     }
+
 
     private void AddNest()
     {
         numberOfNests++;
     }
 
+
     private void AddAntInLine()
     {
         linesPerNest++;
     }
 
-    public void ExpandSpawnArea(float amount)
+
+    // =========================================================
+    // CAMERA / SPAWN AREA
+    // =========================================================
+
+    private void UpdateSpawnAreaFromCamera()
+    {
+        if (gameCamera == null)
+            return;
+
+
+        Vector3 bottomLeft =
+            gameCamera.ViewportToWorldPoint(
+                new Vector3(
+                    0f,
+                    0f,
+                    0f
+                )
+            );
+
+
+        Vector3 topRight =
+            gameCamera.ViewportToWorldPoint(
+                new Vector3(
+                    1f,
+                    1f,
+                    0f
+                )
+            );
+
+
+        xMin =
+            bottomLeft.x +
+            cameraPadding;
+
+        xMax =
+            topRight.x -
+            cameraPadding;
+
+        yMin =
+            bottomLeft.y +
+            cameraPadding;
+
+        yMax =
+            topRight.y -
+            cameraPadding;
+    }
+
+
+    public void ExpandSpawnArea(
+        float amount)
     {
         xMin -= amount;
         xMax += amount;
+
         yMin -= amount;
         yMax += amount;
-        positionCalculator.UpdateArea(xMin, xMax, yMin, yMax);
+
+
+        positionCalculator.UpdateArea(
+            xMin,
+            xMax,
+            yMin,
+            yMax
+        );
     }
 
-    public void SetSpawnArea(float newXMin, float newXMax, float newYMin, float newYMax)
+
+    public void SetSpawnArea(
+        float newXMin,
+        float newXMax,
+        float newYMin,
+        float newYMax)
     {
         xMin = newXMin;
         xMax = newXMax;
+
         yMin = newYMin;
         yMax = newYMax;
-        positionCalculator.UpdateArea(xMin, xMax, yMin, yMax);
+
+
+        positionCalculator.UpdateArea(
+            xMin,
+            xMax,
+            yMin,
+            yMax
+        );
     }
 }
