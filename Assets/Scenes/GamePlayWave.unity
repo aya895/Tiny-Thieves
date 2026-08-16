@@ -3365,6 +3365,7 @@ MonoBehaviour:
   experienceManager: {fileID: 770089304}
   victoryTracker: {fileID: 623173253}
   gameManager: {fileID: 2019891960}
+  playerUpgradeStats: {fileID: 1620677612}
 --- !u!4 &584036361
 Transform:
   m_ObjectHideFlags: 0
@@ -5245,11 +5246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5958556874469410641, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.04
+      value: 7.19
       objectReference: {fileID: 0}
     - target: {fileID: 5958556874469410641, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.79
+      value: -1.81
       objectReference: {fileID: 0}
     - target: {fileID: 5958556874469410641, guid: 6cc9ad56cf7abe147b2b6465ef9a83cf, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9282,6 +9283,8 @@ MonoBehaviour:
   cameraPadding: 0.5
   dessertTransform: {fileID: 1701313838}
   minDistanceFromDessert: 4
+  dessertRadius: 2
+  nestRadius: 1.5
   minDistanceBetweenNests: 6
   numberOfNests: 2
   linesPerNest: 1
