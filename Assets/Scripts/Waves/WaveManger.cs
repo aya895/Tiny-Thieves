@@ -12,6 +12,7 @@ public class WaveManager : MonoBehaviour
     public static event Action OnVictory;
     public static event Action OnWaveReady;
     public static event Action OnWaveEnded;
+    public static event Action<int> OnAllWavesCleared;
     public static event Action<IWaveState> OnStateChanged;
 
 
@@ -27,6 +28,10 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countdownText;
     [SerializeField] private string startMessage = "GO!";
     [SerializeField] private float startMessageDuration = 0.75f;
+
+    [Header("Wave Limit")]
+    public int WavesCleared { get; private set; }
+    [SerializeField] private int maxWaves = 20;
 
 
     // =========================================================
@@ -55,6 +60,7 @@ public class WaveManager : MonoBehaviour
     public float ReadyTime => readyTime;
     public float WaveDuration => waveDuration;
     public float RemainingTime => timer;
+    public int MaxWaves => maxWaves;
 
     public void SetWaveDuration(float duration)
     {
@@ -117,6 +123,7 @@ public class WaveManager : MonoBehaviour
     private void Start()
     {
         CurrentWave = 0;
+        WavesCleared = 0;
         retryCurrentWave = false;
 
         StartCoroutine(ShowStartMessage());
@@ -160,6 +167,10 @@ public class WaveManager : MonoBehaviour
     public bool IsGameOver()
     {
         return stateMachine != null && stateMachine.IsInState<GameOverState>();
+    }
+    public bool IsGameComplete()
+    {
+        return stateMachine != null && stateMachine.IsInState<GameCompleteState>();
     }
 
 
@@ -235,9 +246,8 @@ public class WaveManager : MonoBehaviour
         if (!IsPlaying())
             return;
 
-        stateMachine.ChangeState(
-            new UpgradeState(this)
-        );
+        WavesCleared++;
+        stateMachine.ChangeState(new UpgradeState(this));
     }
 
 
@@ -255,6 +265,18 @@ public class WaveManager : MonoBehaviour
         OnVictory?.Invoke();
 
         FinishWave();
+    }
+
+    public void HandleGameComplete()
+    {
+        if (spawnManager != null)
+        {
+            spawnManager.ClearPreviousWave();
+        }
+
+        OnWaveEnded?.Invoke();
+
+        OnAllWavesCleared?.Invoke(WavesCleared);
     }
 
 

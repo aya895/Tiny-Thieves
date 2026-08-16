@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -74,6 +75,7 @@ public class SpawnManager : MonoBehaviour
     public List<GameObject> antPrefabs =
         new List<GameObject>();
 
+    private ObjectPool<GameObject> antPool;
     private int maxUnlockedAnt = 0;
 
 
@@ -105,18 +107,6 @@ public class SpawnManager : MonoBehaviour
     // =========================================================
     // UNITY
     // =========================================================
-    private void Start()
-    {
-        ResetProgress();
-    }
-    public void ResetProgress()
-    {
-        numberOfNests = 1;
-        linesPerNest = 1;
-        maxUnlockedAnt = 0;
-
-        ClearPreviousWave();
-    }
     private void Awake()
     {
         if (gameCamera == null)
@@ -139,11 +129,18 @@ public class SpawnManager : MonoBehaviour
     }
 
 
+    private void Start()
+    {
+        ResetProgress();
+        antPool = new ObjectPool<GameObject>(CreateAnt, OnGetAnt, OnReleaseAnt, OnDestroyAnt, true, 50, 500);
+    }
+
     private void OnEnable()
     {
         GameManager.OnAddAntNest += AddNest;
         GameManager.OnMoreAntInLine += AddAntInLine;
         GameManager.OnNewAntType += UnlockNewAnt;
+        Ant.OnAntDeath += HandleAntDeath;
     }
 
 
@@ -152,24 +149,26 @@ public class SpawnManager : MonoBehaviour
         GameManager.OnAddAntNest -= AddNest;
         GameManager.OnMoreAntInLine -= AddAntInLine;
         GameManager.OnNewAntType -= UnlockNewAnt;
+        Ant.OnAntDeath -= HandleAntDeath;
     }
-
-
-    //private void Start()
-    //{
-    //    numberOfNests = 2;
-    //    linesPerNest = 1;
-    //}
 
 
     // =========================================================
     // WAVE
     // =========================================================
 
+    public void ResetProgress()
+    {
+        numberOfNests = 1;
+        linesPerNest = 1;
+        maxUnlockedAnt = 0;
+
+        ClearPreviousWave();
+    }
+
     public void StartWave()
     {
         ClearPreviousWave();
-
         UpdateSpawnAreaFromCamera();
 
         positionCalculator.UpdateArea(
@@ -216,18 +215,14 @@ public class SpawnManager : MonoBehaviour
 
         spawnedLines.Clear();
 
-
-        GameObject[] ants =
-            GameObject.FindGameObjectsWithTag("Ant");
-
-        foreach (GameObject ant in ants)
+        AntMovement[] activeAnts = FindObjectsByType<AntMovement>(FindObjectsSortMode.None);
+        foreach (AntMovement antMovement in activeAnts)
         {
-            if (ant != null)
+            if (antMovement != null && antMovement.gameObject.activeSelf)
             {
-                Destroy(ant);
+                ReleaseAnt(antMovement.gameObject);
             }
         }
-
 
         placedNestPositions.Clear();
 
@@ -243,54 +238,20 @@ public class SpawnManager : MonoBehaviour
     {
         for (int i = 0; i < numberOfNests; i++)
         {
-            if (!positionCalculator.TryGetNestPosition(
-                    placedNestPositions,
-                    out Vector2 nestPosition))
+            if (!positionCalculator.TryGetNestPosition(placedNestPositions, out Vector2 nestPosition))
             {
-                Debug.LogWarning(
-                    "Could not find a valid position for another nest."
-                );
-
                 break;
             }
 
+            nestPosition.x = Mathf.Clamp(nestPosition.x, xMin, xMax);
+            nestPosition.y = Mathf.Clamp(nestPosition.y, yMin, yMax);
 
-            nestPosition.x =
-                Mathf.Clamp(
-                    nestPosition.x,
-                    xMin,
-                    xMax
-                );
+            placedNestPositions.Add(nestPosition);
 
-            nestPosition.y =
-                Mathf.Clamp(
-                    nestPosition.y,
-                    yMin,
-                    yMax
-                );
+            GameObject nest = Instantiate(antNest, nestPosition, Quaternion.identity);
+            spawnedNests.Add(nest);
 
-
-            placedNestPositions.Add(
-                nestPosition
-            );
-
-
-            GameObject nest =
-                Instantiate(
-                    antNest,
-                    nestPosition,
-                    Quaternion.identity
-                );
-
-
-            spawnedNests.Add(
-                nest
-            );
-
-
-            SpawnLinePerNest(
-                nest.transform
-            );
+            SpawnLinePerNest(nest.transform);
         }
     }
 
@@ -304,108 +265,42 @@ public class SpawnManager : MonoBehaviour
     {
         for (int i = 0; i < linesPerNest; i++)
         {
-            GameObject line =
-                new GameObject(
-                    nestTransform.name +
-                    "_Line_" +
-                    i
-                );
+            GameObject line = new GameObject($"{nestTransform.name}_Line_{i}");
+            AntLineController lineController = line.AddComponent<AntLineController>();
+            spawnedLines.Add(line);
 
+            GameObject lineOrigin = new GameObject($"{nestTransform.name}_LineOrigin_{i}");
+            spawnedLines.Add(lineOrigin);
 
-            AntLineController lineController =
-                line.AddComponent<AntLineController>();
+            Vector2 lineOffset = Random.insideUnitCircle.normalized * 0.9f * i;
+            Vector2 linePosition = (Vector2)nestTransform.position + lineOffset;
 
+            // Clamp line origin to camera boundaries
+            linePosition.x = Mathf.Clamp(linePosition.x, xMin, xMax);
+            linePosition.y = Mathf.Clamp(linePosition.y, yMin, yMax);
 
-            spawnedLines.Add(
-                line
-            );
-
-
-            GameObject lineOrigin =
-                new GameObject(
-                    nestTransform.name +
-                    "_LineOrigin_" +
-                    i
-                );
-
-
-            spawnedLines.Add(
-                lineOrigin
-            );
-
-
-            Vector2 lineOffset =
-                Random.insideUnitCircle.normalized *
-                0.9f *
-                i;
-
-
-            Vector2 linePosition =
-                (Vector2)nestTransform.position +
-                lineOffset;
-
-
-            // Prevent the line origin from leaving
-            // the visible camera spawn area.
-
-            linePosition.x =
-                Mathf.Clamp(
-                    linePosition.x,
-                    xMin,
-                    xMax
-                );
-
-            linePosition.y =
-                Mathf.Clamp(
-                    linePosition.y,
-                    yMin,
-                    yMax
-                );
-
-
-            lineOrigin.transform.position =
-                linePosition;
-
-
-            lineController.nest =
-                lineOrigin.transform;
-
+            lineOrigin.transform.position = linePosition;
+            lineController.nest = lineOrigin.transform;
 
             pendingSpawnLines++;
-
-
-            StartCoroutine(
-                SpawnLine(lineController)
-            );
+            StartCoroutine(SpawnLine(lineController));
         }
     }
 
 
-    private IEnumerator SpawnLine(
-        AntLineController lineController)
+    private IEnumerator SpawnLine(AntLineController lineController)
     {
-        for (int i = 0;
-             i < lineController.maxAnts;
-             i++)
+        for (int i = 0; i < lineController.maxAnts; i++)
         {
-            SpawnAnt(
-                lineController
-            );
-
-
-            yield return new WaitForSeconds(
-                spawnDelay
-            );
+            SpawnAnt(lineController);
+            yield return new WaitForSeconds(spawnDelay);
         }
 
-
         pendingSpawnLines--;
-
 
         if (pendingSpawnLines <= 0)
         {
             pendingSpawnLines = 0;
-
             OnSpawnComplete?.Invoke();
         }
     }
@@ -415,94 +310,116 @@ public class SpawnManager : MonoBehaviour
     // ANT SPAWNING
     // =========================================================
 
-    private void SpawnAnt(
-        AntLineController lineController)
+    private void SpawnAnt(AntLineController lineController)
     {
-        if (antPrefabs == null ||
-            antPrefabs.Count == 0)
-        {
-            return;
-        }
-
-
-        int maxIndex =
-            Mathf.Min(
-                maxUnlockedAnt,
-                antPrefabs.Count - 1
-            );
-
-
-        int index =
-            Random.Range(
-                0,
-                maxIndex + 1
-            );
-
-
-        GameObject selectedAntPrefab =
-            antPrefabs[index];
-
-
-        if (selectedAntPrefab == null)
-        {
-            return;
-        }
-
-
-        Vector2 spawnPosition =
-            lineController.nest.position;
-
-
-        // Final safety check:
-        // ants can never spawn outside the camera area.
-
-        spawnPosition.x =
-            Mathf.Clamp(
-                spawnPosition.x,
-                xMin,
-                xMax
-            );
-
-        spawnPosition.y =
-            Mathf.Clamp(
-                spawnPosition.y,
-                yMin,
-                yMax
-            );
-
-
-        GameObject ant =
-            Instantiate(
-                selectedAntPrefab,
-                spawnPosition,
-                Quaternion.identity
-            );
-
-
-        if (ant == null)
+        if (antPrefabs == null || antPrefabs.Count == 0)
             return;
 
+        Vector2 spawnPosition = lineController.nest.position;
+        spawnPosition.x = Mathf.Clamp(spawnPosition.x, xMin, xMax);
+        spawnPosition.y = Mathf.Clamp(spawnPosition.y, yMin, yMax);
 
-        AntMovement antMovement =
-            ant.GetComponent<AntMovement>();
+        GameObject ant = antPool.Get();
+        if (ant == null) return;
 
+        ant.transform.position = spawnPosition;
+        ant.transform.rotation = Quaternion.identity;
 
+        AntMovement antMovement = ant.GetComponent<AntMovement>();
         if (antMovement != null)
         {
-            antMovement.antLineController =
-                lineController;
-
-            lineController.antLine.Add(
-                ant
-            );
-
+            antMovement.antLineController = lineController;
+            lineController.antLine.Add(ant);
             lineController.UpdatePosition();
         }
-
 
         OnAntSpawned?.Invoke();
     }
 
+    private void HandleAntDeath(GameObject antObject, float expValue)
+    {
+        ReleaseAnt(antObject);
+    }
+
+   // needed for object pooling
+    private void ReleaseAnt(GameObject antObject)
+    {
+        if (antObject == null || !antObject.activeSelf)
+            return;
+
+        antPool.Release(antObject);
+    }
+
+    private GameObject CreateAnt()
+    {
+        int maxIndex = Mathf.Min(maxUnlockedAnt, antPrefabs.Count - 1);
+        int index = Random.Range(0, maxIndex + 1);
+        GameObject selectedPrefab = antPrefabs[index];
+
+        return Instantiate(selectedPrefab);
+    }
+
+    private void OnGetAnt(GameObject instance) // lots of reset but its necessary :(
+    {
+        instance.transform.SetParent(null);
+        AntStackController stacker = instance.GetComponent<AntStackController>();
+        if (stacker != null)
+        {
+            stacker.DetachFromStack();
+        }
+
+        Ant ant = instance.GetComponent<Ant>();
+        if (ant != null)
+        {
+            ant.ResetForPool();
+        }
+
+        AntMovement antMovement = instance.GetComponent<AntMovement>();
+        if (antMovement != null)
+        {
+            antMovement.ResetMovement();
+        }
+
+        AntStats antStats = instance.GetComponent<AntStats>();
+        if (antStats != null)
+        {
+            antStats.ResetStats();
+        }
+
+        Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.simulated = true;
+        }
+
+        Collider2D col = instance.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        SpriteRenderer sr = instance.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = 0;
+            sr.color = Color.white;
+        }
+
+        instance.SetActive(true);
+    }
+
+    private void OnReleaseAnt(GameObject instance)
+    {
+        instance.transform.SetParent(null);
+        instance.SetActive(false);
+    }
+
+    private void OnDestroyAnt(GameObject instance)
+    {
+        Destroy(instance);
+    }
 
     // =========================================================
     // DIFFICULTY
@@ -518,18 +435,15 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-
     private void AddNest()
     {
         numberOfNests++;
     }
 
-
     private void AddAntInLine()
     {
         linesPerNest++;
     }
-
 
     // =========================================================
     // CAMERA / SPAWN AREA
@@ -540,63 +454,24 @@ public class SpawnManager : MonoBehaviour
         if (gameCamera == null)
             return;
 
+        Vector3 bottomLeft = gameCamera.ViewportToWorldPoint(new Vector3(0f, 0f, 0f));
+        Vector3 topRight = gameCamera.ViewportToWorldPoint(new Vector3(1f, 1f, 0f));
 
-        Vector3 bottomLeft =
-            gameCamera.ViewportToWorldPoint(
-                new Vector3(
-                    0f,
-                    0f,
-                    0f
-                )
-            );
-
-
-        Vector3 topRight =
-            gameCamera.ViewportToWorldPoint(
-                new Vector3(
-                    1f,
-                    1f,
-                    0f
-                )
-            );
-
-
-        xMin =
-            bottomLeft.x +
-            cameraPadding;
-
-        xMax =
-            topRight.x -
-            cameraPadding;
-
-        yMin =
-            bottomLeft.y +
-            cameraPadding;
-
-        yMax =
-            topRight.y -
-            cameraPadding;
+        xMin = bottomLeft.x + cameraPadding;
+        xMax = topRight.x - cameraPadding;
+        yMin = bottomLeft.y + cameraPadding;
+        yMax = topRight.y - cameraPadding;
     }
 
-
-    public void ExpandSpawnArea(
-        float amount)
+    public void ExpandSpawnArea(float amount)
     {
         xMin -= amount;
         xMax += amount;
-
         yMin -= amount;
         yMax += amount;
 
-
-        positionCalculator.UpdateArea(
-            xMin,
-            xMax,
-            yMin,
-            yMax
-        );
+        positionCalculator.UpdateArea(xMin, xMax, yMin, yMax);
     }
-
 
     public void SetSpawnArea(
         float newXMin,

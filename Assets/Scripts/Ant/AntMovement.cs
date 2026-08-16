@@ -12,6 +12,7 @@ public class AntMovement : MonoBehaviour
     private Ant ant;
     public AntLineController antLineController;
     private AntStackController stacker;
+    private AntStats antStats;
 
     void Awake()
     {
@@ -20,16 +21,7 @@ public class AntMovement : MonoBehaviour
         destinationSetter = GetComponent<AIDestinationSetter>();
         ant = GetComponent<Ant>();
         stacker = GetComponent<AntStackController>();
-    }
-    void Start()
-    {
-        // set ai path speed to ant's move speed
-        if (aiPath != null)
-        {
-            aiPath.maxSpeed = GetComponent<AntStats>().MoveSpeed;
-            SetPathingEnabled(true);
-            aiPath.enabled = true;
-        }
+        antStats = GetComponent<AntStats>();
     }
 
     private void OnEnable()
@@ -42,6 +34,14 @@ public class AntMovement : MonoBehaviour
         {
             stacker.OnStackStateChanged += HandleStackStateChanged;
         }
+
+        // set ai path speed to ant's move speed
+        if (aiPath != null && antStats != null)
+        {
+            aiPath.maxSpeed = antStats.MoveSpeed;
+            aiPath.enabled = true;
+            SetPathingEnabled(true);
+        }
     }
 
     private void OnDisable()
@@ -53,6 +53,11 @@ public class AntMovement : MonoBehaviour
         if (stacker != null)
         {
             stacker.OnStackStateChanged -= HandleStackStateChanged;
+        }
+
+        if (destinationSetter != null)
+        {
+            destinationSetter.target = null;
         }
     }
 
@@ -89,6 +94,15 @@ public class AntMovement : MonoBehaviour
         if (aiPath != null)
         {
             aiPath.canMove = enabled;
+        }
+    }
+
+    public void ResetMovement()
+    {
+        SetPathingEnabled(true);
+        if (destinationSetter != null)
+        {
+            destinationSetter.target = null;
         }
     }
 }

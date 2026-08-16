@@ -17,6 +17,12 @@ public class AntStats : MonoBehaviour
     public float MoveSpeed => moveSpeed;
     public int DamageToDessert => damageToDessert;
     public float TntResistance => tntResistance;
+    private float baseMoveSpeed;
+
+    private void Awake()
+    {
+        baseMoveSpeed = moveSpeed;
+    }
 
     private void OnEnable()
     {
@@ -31,5 +37,10 @@ public class AntStats : MonoBehaviour
     void IncreseAntSpeed()
     {
         moveSpeed++;
+    }
+
+    public void ResetStats()
+    {
+        moveSpeed = baseMoveSpeed;
     }
 }

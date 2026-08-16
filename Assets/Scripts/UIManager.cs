@@ -9,9 +9,11 @@ public class UIManager : MonoBehaviour
     WaveManager waveManager;
     public GameObject victoryPanel;
     public GameObject pausePanel;
+    public GameObject gameCompletePanel;
     public Button pauseButton;
     public Button nextWaveButton;
     public TextMeshProUGUI waveClearedAt;
+    public TextMeshProUGUI TotalClearedText;
     private bool isPaused = false;
 
     [Header("Audio Settings")]
@@ -148,9 +150,47 @@ public class UIManager : MonoBehaviour
     {
         victoryPanel.SetActive(false);
         waveClearedAt.gameObject.SetActive(false);
+
+        if (waveManager != null && waveManager.IsGameComplete())
+        {
+            ShowGameComplete();
+            return;
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopEating();
+        }
+
         pauseButton.gameObject.SetActive(true);
 
         Time.timeScale = 1f;
+    }
+
+    private void ShowGameComplete()
+    {
+        if (gameCompletePanel != null)
+        {
+            gameCompletePanel.SetActive(true);
+        }
+
+        if (TotalClearedText != null && waveManager != null)
+        {
+            TotalClearedText.text = $"Total Waves cleared: {waveManager.WavesCleared}";
+        }
+
+        if (pauseButton != null)
+        {
+            pauseButton.gameObject.SetActive(false);
+        }
+
+        // Call AudioManager to switch music
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayGameCompleteMusic();
+        }
+
+        Time.timeScale = 0f;
     }
 
     public void ShowPause()
