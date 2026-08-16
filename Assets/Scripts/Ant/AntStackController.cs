@@ -56,6 +56,7 @@ public class AntStackController : MonoBehaviour
         return StackedWith != null ? 2f : 1f;
     }
 
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!isKnockedBack || StackedWith != null) return;
@@ -68,6 +69,21 @@ public class AntStackController : MonoBehaviour
         if (other.isKnockedBack && ant.GetInstanceID() < other.GetInstanceID()) return;
 
         SetStack(other, otherStacker);
+    }
+
+    // clear refrences for both ants
+    public void DetachFromStack()
+    {
+        if (StackedWith == null)
+            return;
+
+        AntStackController otherStacker = StackedWith.GetComponent<AntStackController>();
+        if (otherStacker != null)
+        {
+            otherStacker.StackedWith = null;
+        }
+
+        StackedWith = null;
     }
 
     private void SetStack(Ant otherAnt, AntStackController otherStacker)

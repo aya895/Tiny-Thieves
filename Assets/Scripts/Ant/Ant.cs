@@ -16,12 +16,17 @@ public class Ant : MonoBehaviour, IDamageable, IKnockbackable
     private AntStackController antStacker;
     private TNTPlacementController tntController;
 
+    private float baseHealth;
+    private float baseExpValue;
     public bool isKnockedBack;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         antStacker = GetComponent<AntStackController>();
+
+        baseHealth = health;
+        baseExpValue = expValue;
     }
 
     private void OnEnable()
@@ -94,8 +99,15 @@ public class Ant : MonoBehaviour, IDamageable, IKnockbackable
         if (antStacker != null && antStacker.StackedWith != null) // stacked ant give more bonus
         {
             expValue *= 2;
+            antStacker.DetachFromStack();
         }
         OnAntDeath?.Invoke(this.gameObject, expValue);
-        Destroy(gameObject);
+    }
+    
+    public void ResetForPool()
+    {
+        health = baseHealth;
+        expValue = baseExpValue;
+        isKnockedBack = false;
     }
 }

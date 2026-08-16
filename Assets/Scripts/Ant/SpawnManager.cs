@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class SpawnManager : MonoBehaviour
 
     [Header("Ants")]
     public List<GameObject> antPrefabs = new List<GameObject>();
+    private ObjectPool<GameObject> antPool;
     private int maxUnlockedAnt = 0;
 
     private List<Vector2> placedNestPositions = new List<Vector2>();
@@ -51,6 +53,7 @@ public class SpawnManager : MonoBehaviour
         GameManager.OnAddAntNest += AddNest;
         GameManager.OnMoreAntInLine += AddAntInLine;
         GameManager.OnNewAntType += UnlockNewAnt;
+        Ant.OnAntDeath += HandleAntDeath;
     }
 
     private void OnDisable()
@@ -58,12 +61,15 @@ public class SpawnManager : MonoBehaviour
         GameManager.OnAddAntNest -= AddNest;
         GameManager.OnMoreAntInLine -= AddAntInLine;
         GameManager.OnNewAntType -= UnlockNewAnt;
+        Ant.OnAntDeath -= HandleAntDeath;
     }
 
     private void Start()
     {
         numberOfNests = 2;
         linesPerNest = 1;
+
+        antPool = new ObjectPool<GameObject>(CreateAnt, OnGetAnt, OnReleaseAnt, OnDestroyAnt, true, 50, 500);
     }
 
     public void StartWave()
@@ -104,12 +110,11 @@ public class SpawnManager : MonoBehaviour
         spawnedLines.Clear();
 
         GameObject[] ants = GameObject.FindGameObjectsWithTag("Ant");
-
         foreach (GameObject ant in ants)
         {
-            if (ant != null)
+            if (ant != null && ant.activeSelf)
             {
-                Destroy(ant);
+                ReleaseAnt(ant);
             }
         }
         placedNestPositions.Clear();
@@ -120,29 +125,15 @@ public class SpawnManager : MonoBehaviour
     {
         for (int i = 0; i < numberOfNests; i++)
         {
-            if (!positionCalculator.TryGetNestPosition(
-                    placedNestPositions,
-                    out Vector2 nestPosition))
+            if (!positionCalculator.TryGetNestPosition(placedNestPositions,out Vector2 nestPosition))
             {
                 break;
             }
 
-            placedNestPositions.Add(
-                nestPosition
-            );
-
-            GameObject nest =
-                Instantiate(
-                    antNest,
-                    nestPosition,
-                    Quaternion.identity
-                );
-
+            placedNestPositions.Add(nestPosition);
+            GameObject nest =Instantiate(antNest,nestPosition,Quaternion.identity);
             spawnedNests.Add(nest);
-
-            SpawnLinePerNest(
-                nest.transform
-            );
+            SpawnLinePerNest(nest.transform);
         }
     }
 
@@ -198,20 +189,11 @@ public class SpawnManager : MonoBehaviour
             return;
         }
 
-        int maxIndex = Mathf.Min(maxUnlockedAnt, antPrefabs.Count - 1);
-        int index = Random.Range(0, maxIndex + 1);
+        GameObject ant = antPool.Get();
+        if (ant == null) return;
 
-        GameObject selectedAntPrefab = antPrefabs[index];
-        if (selectedAntPrefab == null)
-        {
-            return;
-        }
-
-        Vector2 spawnPosition = lineController.nest.position;
-
-        GameObject ant = Instantiate(selectedAntPrefab, spawnPosition, Quaternion.identity);
-        if (ant == null)
-            return;
+        ant.transform.position = lineController.nest.position;
+        ant.transform.rotation = Quaternion.identity;
 
         AntMovement antMovement = ant.GetComponent<AntMovement>();
         if (antMovement != null)
@@ -222,6 +204,92 @@ public class SpawnManager : MonoBehaviour
         }
 
         OnAntSpawned?.Invoke();
+    }
+
+    private void HandleAntDeath(GameObject antObject, float expValue)
+    {
+        ReleaseAnt(antObject);
+    }
+
+   // needed for object pooling
+
+    private void ReleaseAnt(GameObject antObject)
+    {
+        if (antObject == null || !antObject.activeSelf)
+            return;
+
+        antPool.Release(antObject);
+    }
+
+    private GameObject CreateAnt()
+    {
+        int maxIndex = Mathf.Min(maxUnlockedAnt, antPrefabs.Count - 1);
+        int index = Random.Range(0, maxIndex + 1);
+        GameObject selectedPrefab = antPrefabs[index];
+
+        return Instantiate(selectedPrefab);
+    }
+
+    private void OnGetAnt(GameObject instance) // lots of reset but its necessary :(
+    {
+        instance.transform.SetParent(null);
+        AntStackController stacker = instance.GetComponent<AntStackController>();
+        if (stacker != null)
+        {
+            stacker.DetachFromStack();
+        }
+
+        Ant ant = instance.GetComponent<Ant>();
+        if (ant != null)
+        {
+            ant.ResetForPool();
+        }
+
+        AntMovement antMovement = instance.GetComponent<AntMovement>();
+        if (antMovement != null)
+        {
+            antMovement.ResetMovement();
+        }
+
+        AntStats antStats = instance.GetComponent<AntStats>();
+        if (antStats != null)
+        {
+            antStats.ResetStats();
+        }
+
+        Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.simulated = true;
+        }
+
+        Collider2D col = instance.GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        SpriteRenderer sr = instance.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = 0;
+            sr.color = Color.white;
+        }
+
+        instance.SetActive(true);
+    }
+
+    private void OnReleaseAnt(GameObject instance)
+    {
+        instance.transform.SetParent(null);
+        instance.SetActive(false);
+    }
+
+    private void OnDestroyAnt(GameObject instance)
+    {
+        Destroy(instance);
     }
 
     // =========================================================

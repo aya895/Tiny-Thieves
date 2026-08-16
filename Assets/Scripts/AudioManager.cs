@@ -9,6 +9,9 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource eatingSource;
 
+    [Header("Audio Clips")]
+    [SerializeField] private AudioClip gameCompleteMusic;
+
     private const string MUSIC_KEY = "MusicVolume";
     private const string SFX_KEY = "SFXVolume";
 
@@ -26,6 +29,12 @@ public class AudioManager : MonoBehaviour
         SetMusicVolume(PlayerPrefs.GetFloat(MUSIC_KEY, 1f));
 
         SetSFXVolume(PlayerPrefs.GetFloat(SFX_KEY, 1f));
+    }
+
+    public void PlayGameCompleteMusic()
+    {
+        StopEating();
+        PlayMusic(gameCompleteMusic);
     }
 
     public void PlayMusic(AudioClip clip)
@@ -48,6 +57,7 @@ public class AudioManager : MonoBehaviour
         if (musicSource != null)
         {
             musicSource.Stop();
+            musicSource.clip = null;
         }
     }
 
