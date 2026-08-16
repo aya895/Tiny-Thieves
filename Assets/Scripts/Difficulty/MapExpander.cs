@@ -16,7 +16,7 @@ public class MapExpander : MonoBehaviour
     [SerializeField] private float backgroundPadding = 2f;
 
     [Header("Spawn Area")]
-    [SerializeField] private float spawnMargin = 1f;
+    [SerializeField] private float spawnMargin = 1.5f;
 
     [Header("Camera Limit")]
     [SerializeField] private float maxCameraSize = 7f;
@@ -36,6 +36,14 @@ public class MapExpander : MonoBehaviour
         WaveManager.OnWaveReady -= HandlePlanningStarted;
     }
 
+    private void Start()
+    {
+        // IMPORTANT:
+        // Set correct spawn bounds from the first wave.
+        UpdateBackground();
+        UpdateSpawnArea();
+    }
+
 
     // =========================================================
     // WAVE / EXPANSION
@@ -48,24 +56,30 @@ public class MapExpander : MonoBehaviour
 
         int nextWave = waveManager.CurrentWave + 1;
 
-        // Expand every X waves.
-        if (nextWave <= 0 ||
-            nextWave % mapExpansionInterval != 0)
-        {
+        if (nextWave <= 0)
             return;
-        }
+
+        if (nextWave % mapExpansionInterval != 0)
+            return;
 
         ExpandMap();
     }
 
-
     private void ExpandMap()
     {
+        if (!CanExpand())
+            return;
+
         ExpandCamera();
-
         UpdateBackground();
-
         UpdateSpawnArea();
+    }
+
+    private bool CanExpand()
+    {
+        return mainCamera != null &&
+               mainCamera.orthographic &&
+               mainCamera.orthographicSize < maxCameraSize;
     }
 
 
@@ -75,17 +89,11 @@ public class MapExpander : MonoBehaviour
 
     private void ExpandCamera()
     {
-        if (mainCamera == null)
-            return;
-
-        if (!mainCamera.orthographic)
-            return;
-
-        float targetSize =
-            mainCamera.orthographicSize + expansionAmount;
-
         mainCamera.orthographicSize =
-            Mathf.Min(targetSize, maxCameraSize);
+            Mathf.Min(
+                mainCamera.orthographicSize + expansionAmount,
+                maxCameraSize
+            );
     }
 
 
@@ -95,37 +103,31 @@ public class MapExpander : MonoBehaviour
 
     private void UpdateBackground()
     {
-        if (mainCamera == null || background == null)
+        if (mainCamera == null ||
+            background == null ||
+            !mainCamera.orthographic)
+        {
             return;
+        }
 
-        if (!mainCamera.orthographic)
-            return;
+        Vector2 cameraSize =
+            GetCameraWorldSize();
 
-        float height =
-            mainCamera.orthographicSize * 2f;
+        background.size =
+            cameraSize +
+            Vector2.one * backgroundPadding;
 
-        float width =
-            height * mainCamera.aspect;
-
-        // Resize background to cover the camera.
-        background.size = new Vector2(
-            width + backgroundPadding,
-            height + backgroundPadding
-        );
-
-        // Keep background centered with camera.
-        Vector3 backgroundPosition =
+        Vector3 position =
             background.transform.position;
 
-        backgroundPosition.x =
+        position.x =
             mainCamera.transform.position.x;
 
-        backgroundPosition.y =
+        position.y =
             mainCamera.transform.position.y;
 
-        // Keep original Z.
         background.transform.position =
-            backgroundPosition;
+            position;
     }
 
 
@@ -136,48 +138,68 @@ public class MapExpander : MonoBehaviour
     private void UpdateSpawnArea()
     {
         if (spawnManager == null ||
-            mainCamera == null)
+            mainCamera == null ||
+            !mainCamera.orthographic)
         {
             return;
         }
 
-        if (!mainCamera.orthographic)
-            return;
+        Vector2 cameraSize =
+            GetCameraWorldSize();
 
-        float height =
-            mainCamera.orthographicSize * 2f;
+        Vector3 cameraPosition =
+            mainCamera.transform.position;
 
-        float width =
-            height * mainCamera.aspect;
+        float halfWidth =
+            cameraSize.x * 0.5f;
 
+        float halfHeight =
+            cameraSize.y * 0.5f;
 
         float xMin =
-            mainCamera.transform.position.x
-            - width / 2f
-            + spawnMargin;
+            cameraPosition.x -
+            halfWidth +
+            spawnMargin;
 
         float xMax =
-            mainCamera.transform.position.x
-            + width / 2f
-            - spawnMargin;
-
+            cameraPosition.x +
+            halfWidth -
+            spawnMargin;
 
         float yMin =
-            mainCamera.transform.position.y
-            - height / 2f
-            + spawnMargin;
+            cameraPosition.y -
+            halfHeight +
+            spawnMargin;
 
         float yMax =
-            mainCamera.transform.position.y
-            + height / 2f
-            - spawnMargin;
-
+            cameraPosition.y +
+            halfHeight -
+            spawnMargin;
 
         spawnManager.SetSpawnArea(
             xMin,
             xMax,
             yMin,
             yMax
+        );
+    }
+
+
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    private Vector2 GetCameraWorldSize()
+    {
+        float height =
+            mainCamera.orthographicSize * 2f;
+
+        float width =
+            height * mainCamera.aspect;
+
+        return new Vector2(
+            width,
+            height
         );
     }
 }

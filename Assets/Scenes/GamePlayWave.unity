@@ -2599,6 +2599,10 @@ MonoBehaviour:
   musicSource: {fileID: 557138944}
   sfxSource: {fileID: 557138947}
   eatingSource: {fileID: 557138946}
+  countdownClip: {fileID: 0}
+  goClip: {fileID: 0}
+  victoryClip: {fileID: 0}
+  noXPClip: {fileID: 0}
 --- !u!82 &557138944
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2610,7 +2614,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 6701ead35015bfa408dfb12f5bbc3384, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -3074,13 +3078,14 @@ MonoBehaviour:
   readyTime: 5
   waveDuration: 20
   countdownText: {fileID: 124315678}
-  startMessage: GO!
-  startMessageDuration: 0.75
+  countdownStartNumber: 3
+  countdownStepDuration: 1
+  goDuration: 0.75
   spawnManager: {fileID: 1957066049}
   dessert: {fileID: 1701313834}
   gameOverUI: {fileID: 1891420181}
   experienceManager: {fileID: 770089304}
-  victoryTracker: {fileID: 0}
+  victoryTracker: {fileID: 623173253}
 --- !u!4 &584036361
 Transform:
   m_ObjectHideFlags: 0
@@ -5279,8 +5284,8 @@ MonoBehaviour:
   pauseButton: {fileID: 1677652289}
   nextWaveButton: {fileID: 1299672579}
   waveClearedAt: {fileID: 448224799}
-  musicSlider: {fileID: 0}
-  sfxSlider: {fileID: 0}
+  musicSlider: {fileID: 1635071347}
+  sfxSlider: {fileID: 1878207790}
 --- !u!4 &1451174104
 Transform:
   m_ObjectHideFlags: 0
@@ -7917,7 +7922,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
   waveManager: {fileID: 584036360}
   gameOverPanel: {fileID: 348860934}
-  pauseButton: {fileID: 0}
+  pauseButton: {fileID: 1677652289}
 --- !u!4 &1891420182
 Transform:
   m_ObjectHideFlags: 0

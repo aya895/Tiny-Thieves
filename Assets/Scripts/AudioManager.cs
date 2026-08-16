@@ -8,9 +8,11 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource musicSource;
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource eatingSource;
+    [SerializeField] private AudioSource countdownSource;
 
     private const string MUSIC_KEY = "MusicVolume";
     private const string SFX_KEY = "SFXVolume";
+
 
     private void Awake()
     {
@@ -21,48 +23,119 @@ public class AudioManager : MonoBehaviour
         }
 
         Instance = this;
+
         DontDestroyOnLoad(gameObject);
 
-        SetMusicVolume(PlayerPrefs.GetFloat(MUSIC_KEY, 1f));
+        SetMusicVolume(
+            PlayerPrefs.GetFloat(
+                MUSIC_KEY,
+                1f
+            )
+        );
 
-        SetSFXVolume(PlayerPrefs.GetFloat(SFX_KEY, 1f));
+        SetSFXVolume(
+            PlayerPrefs.GetFloat(
+                SFX_KEY,
+                1f
+            )
+        );
     }
+
+
+    // =========================================================
+    // MUSIC
+    // =========================================================
 
     public void PlayMusic(AudioClip clip)
     {
-        if (musicSource == null || clip == null)
-            return;
-
-        if (musicSource.clip == clip && musicSource.isPlaying)
+        if (musicSource == null ||
+            clip == null)
         {
             return;
         }
+
+        if (musicSource.clip == clip &&
+            musicSource.isPlaying)
+        {
+            return;
+        }
+
+        musicSource.Stop();
 
         musicSource.clip = clip;
         musicSource.loop = true;
+
         musicSource.Play();
     }
 
+
     public void StopMusic()
     {
-        if (musicSource != null)
-        {
-            musicSource.Stop();
-        }
+        if (musicSource == null)
+            return;
+
+        musicSource.Stop();
+        musicSource.clip = null;
     }
+
+
+    // =========================================================
+    // SFX
+    // =========================================================
 
     public void PlaySfx(AudioClip clip)
     {
-        if (sfxSource == null || clip == null)
+        if (sfxSource == null ||
+            clip == null)
+        {
             return;
+        }
 
         sfxSource.PlayOneShot(clip);
     }
 
+
+    // =========================================================
+    // COUNTDOWN
+    // =========================================================
+
+    public void PlayCountdown(AudioClip clip)
+    {
+        if (countdownSource == null ||
+            clip == null)
+        {
+            return;
+        }
+
+        countdownSource.Stop();
+
+        countdownSource.clip = clip;
+        countdownSource.loop = false;
+
+        countdownSource.Play();
+    }
+
+
+    public void StopCountdown()
+    {
+        if (countdownSource == null)
+            return;
+
+        countdownSource.Stop();
+    }
+
+
+    // =========================================================
+    // EATING
+    // =========================================================
+
     public void PlayEating(AudioClip clip)
     {
-        if (eatingSource == null || clip == null)
+        if (eatingSource == null ||
+            clip == null)
+        {
             return;
+        }
 
         if (eatingSource.clip == clip &&
             eatingSource.isPlaying)
@@ -70,18 +143,27 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
+        eatingSource.Stop();
+
         eatingSource.clip = clip;
         eatingSource.loop = true;
+
         eatingSource.Play();
     }
 
+
     public void StopEating()
     {
-        if (eatingSource != null)
-        {
-            eatingSource.Stop();
-        }
+        if (eatingSource == null)
+            return;
+
+        eatingSource.Stop();
     }
+
+
+    // =========================================================
+    // VOLUME
+    // =========================================================
 
     public void SetMusicVolume(float volume)
     {
@@ -92,8 +174,12 @@ public class AudioManager : MonoBehaviour
             musicSource.volume = volume;
         }
 
-        PlayerPrefs.SetFloat(MUSIC_KEY,volume);
+        PlayerPrefs.SetFloat(
+            MUSIC_KEY,
+            volume
+        );
     }
+
 
     public void SetSFXVolume(float volume)
     {
@@ -109,42 +195,36 @@ public class AudioManager : MonoBehaviour
             eatingSource.volume = volume;
         }
 
-        PlayerPrefs.SetFloat(SFX_KEY,volume);
+        if (countdownSource != null)
+        {
+            countdownSource.volume = volume;
+        }
+
+        PlayerPrefs.SetFloat(
+            SFX_KEY,
+            volume
+        );
     }
+
+
+    // =========================================================
+    // PAUSE
+    // =========================================================
 
     public void PauseAll()
     {
-        if (musicSource != null && musicSource.isPlaying)
-        {
-            musicSource.Pause();
-        }
-
-        if (sfxSource != null && sfxSource.isPlaying)
-        {
-            sfxSource.Pause();
-        }
-
-        if (eatingSource != null && eatingSource.isPlaying)
-        {
-            eatingSource.Pause();
-        }
+        musicSource?.Pause();
+        sfxSource?.Pause();
+        eatingSource?.Pause();
+        countdownSource?.Pause();
     }
+
 
     public void ResumeAll()
     {
-        if (musicSource != null)
-        {
-            musicSource.UnPause();
-        }
-
-        if (sfxSource != null)
-        {
-            sfxSource.UnPause();
-        }
-
-        if (eatingSource != null)
-        {
-            eatingSource.UnPause();
-        }
+        musicSource?.UnPause();
+        sfxSource?.UnPause();
+        eatingSource?.UnPause();
+        countdownSource?.UnPause();
     }
 }

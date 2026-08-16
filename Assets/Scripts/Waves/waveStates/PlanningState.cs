@@ -1,21 +1,44 @@
+using UnityEngine;
+
 public class PlanningState : IWaveState
 {
-    private readonly WaveManager waveManager;
+    private readonly WaveManager context;
 
-    public PlanningState(WaveManager waveManager)
+    private float remainingTime;
+
+    public float RemainingTime => remainingTime;
+
+
+    public PlanningState(WaveManager context)
     {
-        this.waveManager = waveManager;
+        this.context = context;
     }
+
 
     public void Enter()
     {
-        waveManager.StartPlanningPhase();
+        remainingTime = context.ReadyTime;
+
+        context.PrepareWave();
+
+        context.NotifyWaveReady();
     }
+
 
     public void Update()
     {
-        waveManager.UpdatePlanningTimer();
+        remainingTime -= Time.deltaTime;
+
+        if (remainingTime <= 0f)
+        {
+            remainingTime = 0f;
+
+            context.ChangeState(
+                new PlayingState(context)
+            );
+        }
     }
+
 
     public void Exit()
     {

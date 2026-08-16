@@ -1,20 +1,24 @@
 public class GameOverState : IWaveState
 {
-    private readonly WaveManager waveManager;
+    private readonly WaveManager context;
 
-    public GameOverState(WaveManager waveManager)
+
+    public GameOverState(WaveManager context)
     {
-        this.waveManager = waveManager;
+        this.context = context;
     }
+
 
     public void Enter()
     {
-        waveManager.HandleGameOver();
+        context.BeginGameOver();
     }
+
 
     public void Update()
     {
     }
+
 
     public void Exit()
     {

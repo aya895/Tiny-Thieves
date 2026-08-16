@@ -1,21 +1,43 @@
+using UnityEngine;
+
 public class PlayingState : IWaveState
 {
-    private readonly WaveManager waveManager;
+    private readonly WaveManager context;
 
-    public PlayingState(WaveManager waveManager)
+    private float remainingTime;
+
+    public float RemainingTime => remainingTime;
+
+
+    public PlayingState(WaveManager context)
     {
-        this.waveManager = waveManager;
+        this.context = context;
     }
+
 
     public void Enter()
     {
-        waveManager.StartPlayingPhase();
+        remainingTime = context.WaveDuration;
+
+        context.BeginWave();
     }
+
 
     public void Update()
     {
-        waveManager.UpdatePlayingTimer();
+        if (context.IsWaveEndLocked)
+            return;
+
+        remainingTime -= Time.deltaTime;
+
+        if (remainingTime <= 0f)
+        {
+            remainingTime = 0f;
+
+            context.CompleteWave();
+        }
     }
+
 
     public void Exit()
     {

@@ -12,6 +12,7 @@ public class NestPositionCalculate
     private readonly float minDistanceFromDessert;
     private readonly Transform dessertTransform;
 
+
     public NestPositionCalculate(
         float xMin,
         float xMax,
@@ -26,14 +27,26 @@ public class NestPositionCalculate
         this.yMin = yMin;
         this.yMax = yMax;
 
-        this.minDistanceBetweenNests = minDistanceBetweenNests;
+        this.minDistanceBetweenNests =
+            minDistanceBetweenNests;
 
-        this.minDistanceFromDessert = minDistanceFromDessert;
+        this.minDistanceFromDessert =
+            minDistanceFromDessert;
 
-        this.dessertTransform = dessertTransform;
+        this.dessertTransform =
+            dessertTransform;
     }
 
-    public void UpdateArea(float xMin, float xMax, float yMin, float yMax)
+
+    // =========================================================
+    // AREA
+    // =========================================================
+
+    public void UpdateArea(
+        float xMin,
+        float xMax,
+        float yMin,
+        float yMax)
     {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -41,22 +54,43 @@ public class NestPositionCalculate
         this.yMax = yMax;
     }
 
-    public bool TryGetNestPosition(List<Vector2> existingPositions, out Vector2 position)
+
+    // =========================================================
+    // POSITION
+    // =========================================================
+
+    public bool TryGetNestPosition(
+        List<Vector2> existingPositions,
+        out Vector2 position)
     {
-        List<Vector2> validPositions = GenerateValidPositions(existingPositions);
+        List<Vector2> validPositions =
+            GenerateValidPositions(
+                existingPositions
+            );
 
         if (validPositions.Count == 0)
         {
             position = default;
+
             return false;
         }
 
-        int randomIndex = Random.Range(0, validPositions.Count);
+        int randomIndex =
+            Random.Range(
+                0,
+                validPositions.Count
+            );
 
-        position = validPositions[randomIndex];
+        position =
+            validPositions[randomIndex];
 
         return true;
     }
+
+
+    // =========================================================
+    // GENERATION
+    // =========================================================
 
     private List<Vector2> GenerateValidPositions(
         List<Vector2> existingPositions)
@@ -76,7 +110,10 @@ public class NestPositionCalculate
                  y += spacing)
             {
                 Vector2 candidate =
-                    new Vector2(x, y);
+                    new Vector2(
+                        x,
+                        y
+                    );
 
                 if (!IsValidPosition(
                         candidate,
@@ -85,17 +122,25 @@ public class NestPositionCalculate
                     continue;
                 }
 
-                validPositions.Add(candidate);
+                validPositions.Add(
+                    candidate
+                );
             }
         }
 
         return validPositions;
     }
 
+
+    // =========================================================
+    // VALIDATION
+    // =========================================================
+
     private bool IsValidPosition(
         Vector2 candidate,
         List<Vector2> existingPositions)
     {
+        // Keep away from dessert.
         if (dessertTransform != null)
         {
             float sqrDessertDistance =
@@ -115,12 +160,15 @@ public class NestPositionCalculate
             }
         }
 
+
+        // Keep away from other nests.
         float minNestDistanceSquared =
             minDistanceBetweenNests *
             minDistanceBetweenNests;
 
-        foreach (Vector2 existingPosition
-                 in existingPositions)
+        foreach (
+            Vector2 existingPosition
+            in existingPositions)
         {
             float sqrDistance =
                 (

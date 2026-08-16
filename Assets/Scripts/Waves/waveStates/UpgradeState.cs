@@ -1,20 +1,24 @@
 public class UpgradeState : IWaveState
 {
-    private readonly WaveManager waveManager;
+    private readonly WaveManager context;
 
-    public UpgradeState(WaveManager waveManager)
+
+    public UpgradeState(WaveManager context)
     {
-        this.waveManager = waveManager;
+        this.context = context;
     }
+
 
     public void Enter()
     {
-        waveManager.StartUpgradePhase();
+        context.BeginUpgradePhase();
     }
+
 
     public void Update()
     {
     }
+
 
     public void Exit()
     {

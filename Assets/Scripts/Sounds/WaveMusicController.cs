@@ -8,21 +8,31 @@ public class WaveMusicController : MonoBehaviour
     [SerializeField] private AudioClip gameOverMusic;
     [SerializeField] private AudioClip victoryMusic;
 
+    [Header("Countdown SFX")]
+    [SerializeField] private AudioClip countdownSound;
+
     private bool isVictoryMusicPlaying;
+
 
     private void OnEnable()
     {
         WaveManager.OnStateChanged += HandleStateChanged;
         WaveManager.OnVictory += HandleVictory;
-        WaveManager.OnWaveReady += HandleNewWaveReady;
+        WaveManager.OnWaveEnded += HandleWaveEnded;
+
+        WaveCountdownController.OnCountdownSound += HandleCountdownSound;
     }
+
 
     private void OnDisable()
     {
         WaveManager.OnStateChanged -= HandleStateChanged;
         WaveManager.OnVictory -= HandleVictory;
-        WaveManager.OnWaveReady -= HandleNewWaveReady;
+        WaveManager.OnWaveEnded -= HandleWaveEnded;
+
+        WaveCountdownController.OnCountdownSound -= HandleCountdownSound;
     }
+
 
     private void HandleStateChanged(IWaveState state)
     {
@@ -37,24 +47,31 @@ public class WaveMusicController : MonoBehaviour
             return;
         }
 
-        // Victory panel is currently active.
-        // Do not let UpgradeState replace the victory music.
-        if (isVictoryMusicPlaying)
-            return;
-
         if (state is PlanningState)
         {
+            isVictoryMusicPlaying = false;
+
             AudioManager.Instance.PlayMusic(planningMusic);
+            return;
         }
-        else if (state is PlayingState)
+
+        if (state is PlayingState)
         {
+            isVictoryMusicPlaying = false;
+
             AudioManager.Instance.PlayMusic(gameplayMusic);
+            return;
         }
-        else if (state is UpgradeState)
+
+        if (state is UpgradeState)
         {
+            if (isVictoryMusicPlaying)
+                return;
+
             AudioManager.Instance.PlayMusic(gameplayMusic);
         }
     }
+
 
     private void HandleVictory()
     {
@@ -66,13 +83,23 @@ public class WaveMusicController : MonoBehaviour
         AudioManager.Instance.PlayMusic(victoryMusic);
     }
 
-    private void HandleNewWaveReady()
-    {
-        isVictoryMusicPlaying = false;
 
-        if (AudioManager.Instance != null)
-        {
-            AudioManager.Instance.PlayMusic(planningMusic);
-        }
+    private void HandleCountdownSound()
+    {
+        if (AudioManager.Instance == null)
+            return;
+
+        AudioManager.Instance.PlayCountdown(
+            countdownSound
+        );
+    }
+
+
+    private void HandleWaveEnded()
+    {
+        if (AudioManager.Instance == null)
+            return;
+
+        AudioManager.Instance.StopEating();
     }
 }

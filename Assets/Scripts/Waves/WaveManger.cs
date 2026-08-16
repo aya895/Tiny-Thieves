@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class WaveManager : MonoBehaviour
@@ -12,6 +10,7 @@ public class WaveManager : MonoBehaviour
     public static event Action OnVictory;
     public static event Action OnWaveReady;
     public static event Action OnWaveEnded;
+
     public static event Action<IWaveState> OnStateChanged;
 
 
@@ -23,42 +22,54 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float readyTime = 10f;
     [SerializeField] private float waveDuration = 20f;
 
-    [Header("Start Message")]
-    [SerializeField] private TextMeshProUGUI countdownText;
-    [SerializeField] private string startMessage = "GO!";
-    [SerializeField] private float startMessageDuration = 0.75f;
-
 
     // =========================================================
     // REFERENCES
     // =========================================================
 
+    
     [Header("References")]
     [SerializeField] private SpawnManager spawnManager;
     [SerializeField] private Dessert dessert;
-    [SerializeField] private GameOverUI gameOverUI;
     [SerializeField] private ExperienceManager experienceManager;
     [SerializeField] private VictoryTracker victoryTracker;
-
+    [SerializeField] private WaveCountdownController countdownController;
 
     // =========================================================
     // STATE
     // =========================================================
 
     private WaveStateMachine stateMachine;
-    private float timer;
 
     private bool retryCurrentWave;
+    private bool waveEndLocked;
+
+
+    // =========================================================
+    // PROPERTIES
+    // =========================================================
 
     public int CurrentWave { get; private set; }
 
     public float ReadyTime => readyTime;
-    public float WaveDuration => waveDuration;
-    public float RemainingTime => timer;
 
-    public void SetWaveDuration(float duration)
+    public float WaveDuration => waveDuration;
+
+    public bool IsWaveEndLocked => waveEndLocked;
+
+
+    public float RemainingTime
     {
-        waveDuration = duration;
+        get
+        {
+            if (stateMachine.CurrentState is PlanningState planning)
+                return planning.RemainingTime;
+
+            if (stateMachine.CurrentState is PlayingState playing)
+                return playing.RemainingTime;
+
+            return 0f;
+        }
     }
 
 
@@ -68,69 +79,109 @@ public class WaveManager : MonoBehaviour
 
     private void Awake()
     {
-        Time.timeScale = 1f;
-
         stateMachine = new WaveStateMachine();
 
-        stateMachine.OnStateChanged += HandleStateChanged;
+        stateMachine.OnStateChanged +=
+            HandleStateChanged;
 
         if (victoryTracker == null)
         {
-            victoryTracker = GetComponent<VictoryTracker>();
-        }
-
-        if (countdownText != null)
-        {
-            countdownText.gameObject.SetActive(false);
-        }
-    }
-
-    private void OnEnable()
-    {
-        DessertDestroyedSignal.OnDessertDestroyed += HandleDessertDestroyed;
-
-        VictoryTracker.OnVictoryAchieved += HandleVictory;
-
-        if (experienceManager != null)
-        {
-            experienceManager.UpgradesResolved += HandleUpgradesResolved;
-        }
-    }
-
-    private void OnDisable()
-    {
-        DessertDestroyedSignal.OnDessertDestroyed -= HandleDessertDestroyed;
-
-        VictoryTracker.OnVictoryAchieved -= HandleVictory;
-
-        if (experienceManager != null)
-        {
-            experienceManager.UpgradesResolved -= HandleUpgradesResolved;
-        }
-
-        if (stateMachine != null)
-        {
-            stateMachine.OnStateChanged -= HandleStateChanged;
+            victoryTracker =
+                GetComponent<VictoryTracker>();
         }
     }
 
     private void Start()
     {
         CurrentWave = 0;
+
         retryCurrentWave = false;
 
-        StartCoroutine(ShowStartMessage());
+        waveEndLocked = false;
+
+        ChangeState(
+            new PlanningState(this)
+        );
     }
+    private void OnEnable()
+    {
+        DessertDestroyedSignal.OnDessertDestroyed +=
+            HandleDessertDestroyed;
+
+        VictoryTracker.OnVictoryAchieved +=
+            HandleVictory;
+
+        WaveCountdownController.OnCountdownFinished +=
+            HandleCountdownFinished;
+
+        if (experienceManager != null)
+        {
+            experienceManager.UpgradesResolved +=
+                HandleUpgradesResolved;
+        }
+    }
+
+
+    private void OnDisable()
+    {
+        DessertDestroyedSignal.OnDessertDestroyed -=
+            HandleDessertDestroyed;
+
+        VictoryTracker.OnVictoryAchieved -=
+            HandleVictory;
+
+        WaveCountdownController.OnCountdownFinished -=
+            HandleCountdownFinished;
+
+        if (experienceManager != null)
+        {
+            experienceManager.UpgradesResolved -=
+                HandleUpgradesResolved;
+        }
+
+        if (stateMachine != null)
+        {
+            stateMachine.OnStateChanged -=
+                HandleStateChanged;
+        }
+    }
+
+    
+    private void StartCountdown()
+    {
+        if (countdownController != null)
+        {
+            countdownController.StartCountdown();
+            return;
+        }
+
+        HandleCountdownFinished();
+    }
+
+
+    private void HandleCountdownFinished()
+    {
+        ChangeState(
+            new PlanningState(this)
+        );
+    }
+
 
     private void Update()
     {
-        stateMachine?.Update();
+        stateMachine.Update();
     }
 
 
     // =========================================================
-    // STATE EVENTS
+    // STATE MACHINE
     // =========================================================
+
+    public void ChangeState(IWaveState state)
+    {
+        stateMachine.ChangeState(state);
+    }
+
 
     private void HandleStateChanged(IWaveState state)
     {
@@ -138,66 +189,57 @@ public class WaveManager : MonoBehaviour
     }
 
 
-    // =========================================================
-    // STATE QUERIES
-    // =========================================================
-
     public bool IsPlanning()
     {
-        return stateMachine != null && stateMachine.IsInState<PlanningState>();
+        return stateMachine.IsInState<PlanningState>();
     }
+
 
     public bool IsPlaying()
     {
-        return stateMachine != null && stateMachine.IsInState<PlayingState>();
+        return stateMachine.IsInState<PlayingState>();
     }
+
 
     public bool IsUpgrading()
     {
-        return stateMachine != null && stateMachine.IsInState<UpgradeState>();
+        return stateMachine.IsInState<UpgradeState>();
     }
+
 
     public bool IsGameOver()
     {
-        return stateMachine != null && stateMachine.IsInState<GameOverState>();
+        return stateMachine.IsInState<GameOverState>();
     }
 
 
     // =========================================================
-    // PLANNING STATE
+    // PLANNING
     // =========================================================
 
-    public void StartPlanningPhase()
+    public void PrepareWave()
     {
-        timer = readyTime;
-
         if (dessert != null)
         {
             dessert.ResetHealth();
         }
+    }
 
+
+    public void NotifyWaveReady()
+    {
         OnWaveReady?.Invoke();
     }
 
-    public void UpdatePlanningTimer()
-    {
-        timer -= Time.deltaTime;
-
-        if (timer <= 0f)
-        {
-            stateMachine.ChangeState(
-                new PlayingState(this)
-            );
-        }
-    }
-
 
     // =========================================================
-    // PLAYING STATE
+    // PLAYING
     // =========================================================
 
-    public void StartPlayingPhase()
+    public void BeginWave()
     {
+        waveEndLocked = false;
+
         if (retryCurrentWave)
         {
             retryCurrentWave = false;
@@ -207,12 +249,12 @@ public class WaveManager : MonoBehaviour
             CurrentWave++;
         }
 
-        timer = waveDuration;
 
         if (victoryTracker != null)
         {
             victoryTracker.Reset();
         }
+
 
         if (spawnManager != null)
         {
@@ -220,22 +262,13 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    public void UpdatePlayingTimer()
-    {
-        timer -= Time.deltaTime;
 
-        if (timer <= 0f)
-        {
-            FinishWave();
-        }
-    }
-
-    private void FinishWave()
+    public void CompleteWave()
     {
-        if (!IsPlaying())
+        if (!TryLockWaveEnd())
             return;
 
-        stateMachine.ChangeState(
+        ChangeState(
             new UpgradeState(this)
         );
     }
@@ -247,42 +280,72 @@ public class WaveManager : MonoBehaviour
 
     private void HandleVictory()
     {
-        if (!IsPlaying())
+        if (!TryLockWaveEnd())
             return;
 
         retryCurrentWave = false;
 
         OnVictory?.Invoke();
 
-        FinishWave();
+        ChangeState(
+            new UpgradeState(this)
+        );
     }
 
 
     // =========================================================
-    // UPGRADE STATE
+    // DESSERT DESTROYED
     // =========================================================
 
-    public void StartUpgradePhase()
+    private void HandleDessertDestroyed()
     {
-        if (spawnManager != null)
+        if (!TryLockWaveEnd())
+            return;
+
+
+        if (experienceManager != null &&
+            experienceManager.PendingLevelUps > 0)
         {
-            spawnManager.ClearPreviousWave();
+            retryCurrentWave = false;
+
+            ChangeState(
+                new UpgradeState(this)
+            );
+
+            return;
         }
 
-        OnWaveEnded?.Invoke();
+
+        retryCurrentWave = true;
+
+        ChangeState(
+            new GameOverState(this)
+        );
+    }
+
+
+    // =========================================================
+    // UPGRADE
+    // =========================================================
+
+    public void BeginUpgradePhase()
+    {
+        ClearWave();
 
         if (experienceManager != null)
         {
             experienceManager.ResolveWaveEnd();
+
             return;
         }
 
-        HandleUpgradesResolved();
+        StartNextWave();
     }
+
 
     private void HandleUpgradesResolved()
     {
-        StartCoroutine(ShowStartMessage());
+        StartNextWave();
     }
 
 
@@ -290,27 +353,30 @@ public class WaveManager : MonoBehaviour
     // GAME OVER
     // =========================================================
 
-    private void HandleDessertDestroyed()
+    public void BeginGameOver()
     {
-        if (!IsPlaying())
-            return;
+        ClearWave();
+    }
 
-        if (experienceManager != null &&
-            experienceManager.PendingLevelUps > 0)
+
+    public void ContinueAfterGameOver()
+    {
+        if (experienceManager != null)
         {
-            retryCurrentWave = false;
-
-            stateMachine.ChangeState(new UpgradeState(this));
+            experienceManager.ResolveWaveEnd();
 
             return;
         }
 
-        retryCurrentWave = true;
-
-        stateMachine.ChangeState(new GameOverState(this));
+        StartNextWave();
     }
 
-    public void HandleGameOver()
+
+    // =========================================================
+    // WAVE CLEANUP
+    // =========================================================
+
+    private void ClearWave()
     {
         if (spawnManager != null)
         {
@@ -318,48 +384,44 @@ public class WaveManager : MonoBehaviour
         }
 
         OnWaveEnded?.Invoke();
-
-        if (gameOverUI != null)
-        {
-            gameOverUI.Show();
-        }
-    }
-
-    public void ContinueAfterGameOver()
-    {
-        if (experienceManager != null)
-        {
-            experienceManager.ResolveWaveEnd();
-            return;
-        }
-
-        StartCoroutine(ShowStartMessage());
     }
 
 
     // =========================================================
-    // START MESSAGE
+    // WAVE END PROTECTION
     // =========================================================
 
-    private IEnumerator ShowStartMessage()
+    private bool TryLockWaveEnd()
     {
-        if (countdownText != null)
-        {
-            countdownText.text = startMessage;
-            countdownText.gameObject.SetActive(true);
-        }
+        if (!IsPlaying())
+            return false;
 
-        yield return new WaitForSeconds(
-            startMessageDuration
-        );
+        if (waveEndLocked)
+            return false;
 
-        if (countdownText != null)
-        {
-            countdownText.gameObject.SetActive(false);
-        }
+        waveEndLocked = true;
 
-        stateMachine.ChangeState(
-            new PlanningState(this)
-        );
+        return true;
+    }
+
+
+    // =========================================================
+    // NEXT WAVE
+    // =========================================================
+
+    
+
+
+    // =========================================================
+    // SETTINGS
+    // =========================================================
+
+    public void SetWaveDuration(float duration)
+    {
+        waveDuration = duration;
+    }
+    private void StartNextWave()
+    {
+        StartCountdown();
     }
 }

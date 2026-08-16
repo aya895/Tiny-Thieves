@@ -1,35 +1,74 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameOverUI : MonoBehaviour
 {
     public static event Action OnGameOverShown;
     public static event Action OnGameOverHidden;
 
+
     [Header("References")]
     [SerializeField] private WaveManager waveManager;
     [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private Button pauseButton;
+
 
     private void Awake()
     {
-        gameOverPanel.SetActive(false);
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
     }
 
-    public void Show()
+
+    private void OnEnable()
     {
+        WaveManager.OnStateChanged += HandleStateChanged;
+    }
+
+
+    private void OnDisable()
+    {
+        WaveManager.OnStateChanged -= HandleStateChanged;
+    }
+
+
+    private void HandleStateChanged(IWaveState state)
+    {
+        if (state is GameOverState)
+        {
+            Show();
+        }
+    }
+
+
+    private void Show()
+    {
+        if (gameOverPanel == null)
+            return;
+
         gameOverPanel.SetActive(true);
+
         OnGameOverShown?.Invoke();
     }
 
+
     public void RetryWave()
     {
-        gameOverPanel.SetActive(false);
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+
         OnGameOverHidden?.Invoke();
-        waveManager.ContinueAfterGameOver();
+
+        if (waveManager != null)
+        {
+            waveManager.ContinueAfterGameOver();
+        }
     }
+
 
     public void ReturnToMainMenu()
     {
