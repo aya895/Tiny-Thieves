@@ -10,7 +10,12 @@ public class NestPositionCalculate
 
     private readonly float minDistanceBetweenNests;
     private readonly float minDistanceFromDessert;
+
+    private readonly float dessertRadius;
+    private readonly float nestRadius;
+
     private readonly Transform dessertTransform;
+
 
     public NestPositionCalculate(
         float xMin,
@@ -19,6 +24,8 @@ public class NestPositionCalculate
         float yMax,
         float minDistanceBetweenNests,
         float minDistanceFromDessert,
+        float dessertRadius,
+        float nestRadius,
         Transform dessertTransform)
     {
         this.xMin = xMin;
@@ -27,13 +34,20 @@ public class NestPositionCalculate
         this.yMax = yMax;
 
         this.minDistanceBetweenNests = minDistanceBetweenNests;
-
         this.minDistanceFromDessert = minDistanceFromDessert;
+
+        this.dessertRadius = dessertRadius;
+        this.nestRadius = nestRadius;
 
         this.dessertTransform = dessertTransform;
     }
 
-    public void UpdateArea(float xMin, float xMax, float yMin, float yMax)
+
+    public void UpdateArea(
+        float xMin,
+        float xMax,
+        float yMin,
+        float yMax)
     {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -41,9 +55,13 @@ public class NestPositionCalculate
         this.yMax = yMax;
     }
 
-    public bool TryGetNestPosition(List<Vector2> existingPositions, out Vector2 position)
+
+    public bool TryGetNestPosition(
+        List<Vector2> existingPositions,
+        out Vector2 position)
     {
-        List<Vector2> validPositions = GenerateValidPositions(existingPositions);
+        List<Vector2> validPositions =
+            GenerateValidPositions(existingPositions);
 
         if (validPositions.Count == 0)
         {
@@ -51,12 +69,14 @@ public class NestPositionCalculate
             return false;
         }
 
-        int randomIndex = Random.Range(0, validPositions.Count);
+        int randomIndex =
+            Random.Range(0, validPositions.Count);
 
         position = validPositions[randomIndex];
 
         return true;
     }
+
 
     private List<Vector2> GenerateValidPositions(
         List<Vector2> existingPositions)
@@ -92,28 +112,38 @@ public class NestPositionCalculate
         return validPositions;
     }
 
+
     private bool IsValidPosition(
         Vector2 candidate,
         List<Vector2> existingPositions)
     {
+        // =========================================================
+        // DESSERT DISTANCE
+        // =========================================================
+
         if (dessertTransform != null)
         {
-            float sqrDessertDistance =
-                (
-                    candidate -
+            float distanceFromDessert =
+                Vector2.Distance(
+                    candidate,
                     (Vector2)dessertTransform.position
-                ).sqrMagnitude;
+                );
 
-            float minDessertDistanceSquared =
-                minDistanceFromDessert *
+            float requiredDistance =
+                dessertRadius +
+                nestRadius +
                 minDistanceFromDessert;
 
-            if (sqrDessertDistance <
-                minDessertDistanceSquared)
+            if (distanceFromDessert < requiredDistance)
             {
                 return false;
             }
         }
+
+
+        // =========================================================
+        // NEST DISTANCE
+        // =========================================================
 
         float minNestDistanceSquared =
             minDistanceBetweenNests *
@@ -123,10 +153,7 @@ public class NestPositionCalculate
                  in existingPositions)
         {
             float sqrDistance =
-                (
-                    candidate -
-                    existingPosition
-                ).sqrMagnitude;
+                (candidate - existingPosition).sqrMagnitude;
 
             if (sqrDistance <
                 minNestDistanceSquared)
@@ -134,6 +161,7 @@ public class NestPositionCalculate
                 return false;
             }
         }
+
 
         return true;
     }

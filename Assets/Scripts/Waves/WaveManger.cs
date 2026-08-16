@@ -40,7 +40,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private ExperienceManager experienceManager;
     [SerializeField] private VictoryTracker victoryTracker;
     [SerializeField] private GameManager gameManager;
-
+    [SerializeField] private PlayerUpgradeStats playerUpgradeStats;
     // =========================================================
     // STATE
     // =========================================================
@@ -336,6 +336,11 @@ public class WaveManager : MonoBehaviour
         if (experienceManager != null)
         {
             experienceManager.ResetProgress();
+        }
+
+        if (playerUpgradeStats != null)
+        {
+            playerUpgradeStats.ResetBonuses();
         }
 
         StartCoroutine(ShowStartMessage());
