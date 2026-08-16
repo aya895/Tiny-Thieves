@@ -105,7 +105,18 @@ public class SpawnManager : MonoBehaviour
     // =========================================================
     // UNITY
     // =========================================================
+    private void Start()
+    {
+        ResetProgress();
+    }
+    public void ResetProgress()
+    {
+        numberOfNests = 1;
+        linesPerNest = 1;
+        maxUnlockedAnt = 0;
 
+        ClearPreviousWave();
+    }
     private void Awake()
     {
         if (gameCamera == null)
@@ -144,11 +155,11 @@ public class SpawnManager : MonoBehaviour
     }
 
 
-    private void Start()
-    {
-        numberOfNests = 2;
-        linesPerNest = 1;
-    }
+    //private void Start()
+    //{
+    //    numberOfNests = 2;
+    //    linesPerNest = 1;
+    //}
 
 
     // =========================================================

@@ -39,7 +39,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private GameOverUI gameOverUI;
     [SerializeField] private ExperienceManager experienceManager;
     [SerializeField] private VictoryTracker victoryTracker;
-
+    [SerializeField] private GameManager gameManager;
 
     // =========================================================
     // STATE
@@ -295,19 +295,11 @@ public class WaveManager : MonoBehaviour
         if (!IsPlaying())
             return;
 
-        if (experienceManager != null &&
-            experienceManager.PendingLevelUps > 0)
-        {
-            retryCurrentWave = false;
+        retryCurrentWave = false;
 
-            stateMachine.ChangeState(new UpgradeState(this));
-
-            return;
-        }
-
-        retryCurrentWave = true;
-
-        stateMachine.ChangeState(new GameOverState(this));
+        stateMachine.ChangeState(
+            new GameOverState(this)
+        );
     }
 
     public void HandleGameOver()
@@ -327,13 +319,27 @@ public class WaveManager : MonoBehaviour
 
     public void ContinueAfterGameOver()
     {
-        if (experienceManager != null)
+        CurrentWave = 0;
+        retryCurrentWave = false;
+
+        if (spawnManager != null)
         {
-            experienceManager.ResolveWaveEnd();
-            return;
+            spawnManager.ResetProgress();
         }
 
-        StartCoroutine(ShowStartMessage());
+        if (gameManager != null)
+        {
+            gameManager.ResetProgress();
+        }
+
+        if (experienceManager != null)
+        {
+            experienceManager.ResetProgress();
+        }
+
+        StartCoroutine(
+            ShowStartMessage()
+        );
     }
 
 

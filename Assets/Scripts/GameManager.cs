@@ -43,7 +43,17 @@ public class GameManager : MonoBehaviour
             waveManager.SetWaveDuration(startingWaveDuration);
         }
     }
+    public void ResetProgress()
+    {
+        processedWave = 0;
 
+        if (waveManager != null)
+        {
+            waveManager.SetWaveDuration(
+                startingWaveDuration
+            );
+        }
+    }
     private void Update()
     {
         if (waveManager == null)
