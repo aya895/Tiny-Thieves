@@ -1,4 +1,4 @@
-'''mermaid
+```mermaid
 classDiagram
     %% ==========================================
     %% CORE SYSTEMS & FLOW
